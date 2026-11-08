@@ -118,7 +118,7 @@ main.wide{background:linear-gradient(#0d1526,#0a101c)}
 .mc.sp{background:linear-gradient(#1f9d8a,#13695d);color:#fff}
 .mc.rare{border-color:#fff;box-shadow:0 0 0 2px #7fe3ff88,0 0 10px #7fe3ff}
 .mc.sel{outline:3px solid #3fd0f0;outline-offset:1px}
-.mc.mx{opacity:.45}
+.mc.mx{opacity:1}.mc.mx::after{content:"";position:absolute;inset:0;background:#0b1220b0;border-radius:inherit;pointer-events:none}
 .mc i{font-style:normal;font-weight:700}
 .at{display:inline-block;padding:0 4px;margin:0 2px;border-radius:7px;font-size:9px;font-weight:700;color:#fff;line-height:14px;vertical-align:middle;text-shadow:0 1px 1px #0008}
 .at-LIGHT{background:#c9a21a}.at-DARK{background:#6a3a9a}.at-EARTH{background:#8a5a2a}.at-WATER{background:#2a78c8}.at-FIRE{background:#d4401a}.at-WIND{background:#2f9a4a}
@@ -514,8 +514,8 @@ button:active:not(:disabled){transform:translateY(2px);box-shadow:inset 0 1px 0 
 .info{background:#00000026;border-radius:6px;padding:6px 8px;border-left:3px solid #c9a45c}
 .ov>div{background:linear-gradient(180deg,#14403c,#0a1f1e);box-shadow:0 0 40px #c9a45c55;border-radius:14px}
 .dc,.xv,.dgbx,.fxn{border-radius:14px}
-.mc{border-radius:7px;box-shadow:0 2px 5px #0007;transition:transform .12s}
-.mc:hover{transform:translateY(-2px)}
+.mc{border-radius:7px}
+
 .tabs button{border-radius:999px;padding:5px 12px}
 .pkart.cv{filter:drop-shadow(0 4px 8px #000a)}
 input,textarea{border-radius:8px}
