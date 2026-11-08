@@ -38,6 +38,13 @@ button:focus-visible,.card:focus-visible{outline:3px solid #fff}
 .slot.zpick{border:2px solid var(--red);cursor:pointer;animation:blink .8s infinite alternate}
 @keyframes blink{to{outline-color:transparent}}
 .hand{display:flex;gap:6px;overflow-x:auto;padding:6px 0}
+.hand .card{touch-action:pan-x}.dragsrc{opacity:.35}.dragghost{box-shadow:0 8px 22px #000a;border-radius:8px}
+.dropok{outline:2px dashed #7fe0b0;outline-offset:-2px}.drophov{outline:3px solid #ffd24a;background:rgba(255,210,74,.18)}
+body.dragging{cursor:grabbing}
+.dgask{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:10001;display:flex;align-items:center;justify-content:center;padding:12px}
+.dgbx{background:#1c1c2a;color:#fff;border:2px solid #d9b36a;border-radius:12px;padding:12px;width:100%;max-width:320px;font:14px sans-serif}
+.dgt1{font-weight:700;margin-bottom:8px;text-align:center}.dgbx button{display:block;width:100%;margin:6px 0;padding:11px;background:#2e2e48;color:#fff;border:1px solid #6a6a90;border-radius:8px;font:inherit}.dgbx button:disabled{opacity:.4}.dgbx .dgx{background:#3a2a2a}
+#dgt{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:#1c1c2aee;color:#fff;border:1px solid #d9b36a;border-radius:10px;padding:8px 14px;font-size:13px;z-index:10000;opacity:0;pointer-events:none;transition:opacity .2s}#dgt.on{opacity:1}
 .hand .card{flex:0 0 96px;min-height:96px}
 .panel{background:var(--edge);border-radius:8px;padding:8px 10px;margin:6px 0}
 .info{min-height:36px;margin-bottom:6px}
@@ -336,6 +343,10 @@ main.gm .hand .card{flex:0 0 80px;min-height:80px}
 .dkgrid{grid-template-columns:1fr 1fr;align-items:start}
 .dkinfo{grid-column:1/-1;top:0}
 .dkmain,.dkpool{min-width:0;overflow-y:auto;max-height:calc(100dvh - 250px);min-height:280px}
+.dkpn{display:flex;gap:6px;align-items:center;flex-wrap:wrap;background:#0b1220;border:1px solid #24406b;border-radius:10px;padding:6px;margin-bottom:6px}
+.dkpn input{flex:1;min-width:120px;background:#121c30;color:#e8f2ff;border:1px solid #24406b;border-radius:8px;padding:6px 8px;font-size:13px}
+.dkpn.col{flex-direction:column;align-items:stretch;max-height:220px;overflow:auto}
+.dkr{display:flex;gap:6px;align-items:center}.dkn{flex:1;display:flex;flex-direction:column;min-width:0}.dkn b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.dkn small{color:#8fa8c8;font-size:11px}
 .dkh{font:700 13px Georgia,serif;color:#9fd8ff;margin-bottom:6px;position:sticky;top:-8px;background:#121c30;padding:2px 0;z-index:1}
 .dkmain .pool.dkd,.dkpool .pool{grid-template-columns:repeat(3,1fr);gap:4px}
 .dkmain .stat span{font-size:11px;padding:1px 7px}
@@ -517,6 +528,10 @@ const FUS={'Blaze Blademaster':['Pyre Weaver','Sword Saint Masaru'],'Ember Squir
 const EQT={eqS:'Spellcaster',eqA:'Aqua',eqW:'Warrior',eqB:'Beast',eqZ:'Zombie'};
 const eqOk=(m,k)=>!!m&&!m.fd&&(EQA[k]?ATTR[m.n]==EQA[k]:[].concat(EQT[k]).includes(TYPES[m.n])); // เป้าหมายอุปกรณ์: ต้องเป็นเผ่าที่ตรงและไม่ได้คว่ำอยู่
 const CTK=new Set(['uo','rd','cdk']),isCt=n=>!!(CARDS[n]&&CARDS[n].t=='t'&&CTK.has(CARDS[n].k)),isCtc=c=>!!(c&&c.t=='t'&&CTK.has(c.k)),isCn=n=>!!(CARDS[n]&&CARDS[n].t=='t'&&CNTK[CARDS[n].k]),isCnc=c=>!!(c&&c.t=='t'&&CNTK[c.k]); // กับดักต่อเนื่อง (แยกจากกับดักปกติ)
+const EQSIDE={mbl:'any',nme:'any'}; // อุปกรณ์ที่สวมให้มอนสเตอร์ฝั่งใดก็ได้ (ไม่ระบุ = สวมได้เฉพาะมอนสเตอร์ของเราเอง)
+const eqSide=k=>EQSIDE[k]||'own';
+const eqT=(p,k)=>{const r=[];G.f[p].forEach((m,j)=>eqOk(m,k)&&r.push({z:p,j}));if(eqSide(k)=='any')G.f[1-p].forEach((m,j)=>eqOk(m,k)&&r.push({z:1-p,j}));return r}; // เป้าหมายที่สวมได้
+function unequip(e){[0,1].forEach(z=>{const mm=G.f[z].find(m=>m&&m.id==e.on);if(!mm)return;const bv=(typeof EQV!='undefined'&&EQV[e.k])||[300,300];mm.a=Math.max(0,mm.a-bv[0]*(e.sg||1)+(e.dec||0));mm.d=Math.max(0,mm.d-bv[1]*(e.sg||1));const ix=(mm.eq||[]).indexOf(e.n);if(ix>=0)mm.eq.splice(ix,1);if(e.k=='nme')mm.np=(G.b[0].concat(G.b[1])).some(x=>x&&x!==e&&x.k=='nme'&&x.on==mm.id)?1:0})}
 const isEq=n=>CARDS[n]&&CARDS[n].t=='s'&&!!EQT[CARDS[n].k]; // เวทอุปกรณ์ (แยกจากเวทมนตร์ปกติ)
 const ART={
  "Solo-Eye Giant":"<rect width=\"100\" height=\"80\" fill=\"#17352f\"/><path d=\"M40 14 L36 4 M60 14 L64 4\" stroke=\"#3f9a62\" stroke-width=\"3\"/><path d=\"M24 80 Q26 44 50 42 Q74 44 76 80Z\" fill=\"#2f7d4f\"/><circle cx=\"50\" cy=\"27\" r=\"15\" fill=\"#3f9a62\"/><circle cx=\"50\" cy=\"26\" r=\"9\" fill=\"#fff\"/><circle cx=\"50\" cy=\"26\" r=\"4.5\" fill=\"#111\"/><rect x=\"72\" y=\"26\" width=\"8\" height=\"48\" rx=\"4\" fill=\"#8a5a2b\" transform=\"rotate(14 76 50)\"/>",
@@ -1257,19 +1272,25 @@ function trapOk(e,ev){ // e = กับดักของฝั่งที่�
     case'rvt':return !!EQT[c.k];
     case'nd':return c.k=='dh';
     case'nr':return c.k=='rev';
+    case'gw':return c.k=='hfd';
     case'ar':return c.k=='dh'||c.k=='fis'||!!XT[c.k];
     default:return true; // jd, cod
   }
 }
+function destroyST(z,keep){ // ทำลายการ์ดเวทมนตร์/กับดัก/เวทสนามทั้งหมดของฝั่ง z (ยกเว้นการ์ดที่กำลังทำงาน)
+  let k=0;G.b[z].forEach((e,j)=>{if(e&&!e.rs&&e!==keep){if(e.on)unequip(e);G.b[z][j]=null;k++}});
+  if(G.fz[z]){const fz=G.fz[z];G.gy[z].push(fz.n);G.fz[z]=null;G.fld=null;k++}return k}
 function mkFx(e,q,ev){ // ผลของกับดักตอนประมวลผล (q = เจ้าของกับดัก)
   const p=ev.p,kill=m=>{const j=G.f[p].indexOf(m);if(j>=0){G.f[p][j]=null;log(`${e.n}: ${m.n} ถูกทำลาย`)}};
   switch(e.k){
     case'pit':case'cod':return()=>kill(ev.m);
     case'jar':return()=>{G.f[p].forEach(m=>{if(m&&TYPES[m.n]=='Dragon'){m.pos='d';m.fd=false;m.lock=true}});log(`${e.n}: มอนสเตอร์ Dragon ถูกบังคับเป็นท่าป้องกัน`)};
     case'tp':return()=>{for(let k=0;k<2;k++){let w=-1;G.f[q].forEach((mm,j)=>{if(mm&&(w<0||mm.a<G.f[q][w].a))w=j});if(w>=0){log(`${G.f[q][w].n} ถูกทำลาย`);G.f[q][w]=null}}kill(ev.m)};
+    case'mf':return()=>{let k=0;G.f[p]=G.f[p].map(m=>{if(m&&m.pos=='a'){k++;return null}return m});log(`${e.n}: มอนสเตอร์ท่าโจมตีของ${who(p)} ${k} ตัวถูกทำลาย`)};
     case'jd':return()=>{const k=G.f[p].filter(Boolean).length;G.lp[p]-=500*k;log(`${e.n}: ${who(p)}รับความเสียหาย ${500*k} LP`)};
     case'rf':case'cw':return()=>{const t=ev.tg,a=e.k=='rf';if(!G.f[q].includes(t))return;t[a?'a':'d']+=500;ev.tmp=a?'a':'d';ev.tgm=t;log(`${e.n}: ${t.n} ${a?'ATK':'DEF'} +500`)};
     case'rvt':return()=>{ev.sg=-1;log(`${e.n}: ค่าที่เพิ่มกลับเป็นลดแทน`)};
+    case'gw':return()=>{ev.neg=true;const k=destroyST(p);log(`${e.n}: ${ev.c.n} ถูกลบล้าง การ์ดเวทมนตร์/กับดักของ${who(p)} ${k} ใบถูกทำลายแทน`)};
     case'nd':case'nr':return()=>{ev.neg=true;log(`${e.n}: ${ev.c.n} ถูกลบล้างและทำลาย`)};
     case'ar':return()=>{let k=0;G.f[p]=G.f[p].map(m=>{if(m)k++;return null});log(`${e.n}: มอนสเตอร์ของ${who(p)} ${k} ตัวถูกทำลาย`)};
   }
@@ -1278,8 +1299,9 @@ function mkFx(e,q,ev){ // ผลของกับดักตอนประม
 function chOpts(w,ev,L){ // การ์ด/สกิลที่ฝั่ง w ใช้ตอบโต้ได้ตอนนี้
   const o=[];const last=L&&L.length?L[L.length-1]:null,ctOnly=!!(last&&last.ct),actorCan=!!(last&&last.trap&&last.p!=w); // Counter Trap (Vol.6): ผู้เล่นฝั่งที่ใช้ก็ตอบสนองกับดักของอีกฝั่งด้วย Counter Trap ได้
   if(w==ev.p&&!actorCan)return o;
-  G.b[w].forEach((e,i)=>{if(CNTK[e.k]){if(ctOk(e,w,ev,L))o.push({k:'t',i,n:e.n,x:e.x})}else if(!ctOnly&&w!=ev.p&&trapOk(e,ev))o.push({k:'t',i,n:e.n,x:e.x})});
+  G.b[w].forEach((e,i)=>{if(!e)return;if(CNTK[e.k]){if(ctOk(e,w,ev,L))o.push({k:'t',i,n:e.n,x:e.x})}else if(!ctOnly&&w!=ev.p&&trapOk(e,ev))o.push({k:'t',i,n:e.n,x:e.x})});
   if(!ctOnly&&w!=ev.p&&(ev.t=='bat'||ev.t=='atk')&&!ev.sk&&ev.tg&&SANGA.has(ev.tg.n)&&!ev.tg.fd)o.push({k:'m',n:ev.tg.n,x:EFXT[ev.tg.n]});
+  if(!ctOnly&&w!=ev.p&&!ev.hu&&G.hand[w].some(c=>c.n=='Puffball Familiar')){const bot=MODE!='pvp'&&w==1,dm=ev.t=='bat'&&ev.tg&&ev.tg.pos=='a'?(!bot||ev.m.a>ev.tg.a):ev.t=='atk'&&!ev.tg?(!bot||ev.m.a>0):false;if(dm)o.push({k:'h',n:'Puffball Familiar',x:EFXT['Puffball Familiar']})} // Kuriboh: ทิ้งจากมือ ลดดาเมจการต่อสู้เป็น 0
   return o;
 }
 const CHT=ev=>({sum:`คู่ต่อสู้ลง ${ev.m&&ev.m.n}`,atk:`คู่ต่อสู้ประกาศโจมตีด้วย ${ev.m&&ev.m.n}`,bat:`${ev.m&&ev.m.n} โจมตี ${ev.tg&&ev.tg.n} — กำลังเข้าสู่การคำนวณความเสียหาย`,spl:`คู่ต่อสู้ใช้เวทมนตร์ ${ev.c&&ev.c.n}`,flp:`คู่ต่อสู้พลิกเปิด ${ev.m&&ev.m.n}`}[ev.t]);
@@ -1299,6 +1321,7 @@ async function chainWin(ev,L){ // L = ลิงก์ที่มีอยู่
       if(pk>=0&&o[pk]){
         const op=o[pk];let link;
         if(op.k=='t'){const e=G.b[cur][op.i];if(CNTK[e.k]){if(!(await ctPay(cur,e))){pass++;cur=1-cur;continue}emit({t:'act',p:cur,n:e.n,x:e.x,k:'trap'});link=ctLink(cur,e,ev,L)}else{if(e.k=='uo')e.ac=1;emit({t:'act',p:cur,n:e.n,x:e.x,k:'trap'});link={p:cur,n:e.n,x:e.x,fx:mkFx(e,cur,ev),ref:e,t:e.k!='uo',trap:true}}}
+        else if(op.k=='h'){const hi=G.hand[cur].findIndex(c=>c.n==op.n);if(hi<0){pass++;cur=1-cur;continue}const hc=G.hand[cur].splice(hi,1)[0];G.gy[cur].push(hc.n);ev.hu=1;emit({t:'act',p:cur,n:op.n,x:op.x,k:'flip'});log(`${who(cur)}ทิ้ง ${op.n} จากมือ`);link={p:cur,n:op.n,x:op.x,fx:()=>{ev.nd=1;log(`${op.n}: ความเสียหายจากการต่อสู้ที่ ${who(cur)}จะได้รับครั้งนี้เป็น 0`)}}}
         else{ev.sk=1;link={p:cur,n:op.n,x:op.x,ref:ev.tg,fx:()=>{ev.zero=1;log(`${op.n}: ATK ของผู้โจมตีเป็น 0 ตอนคำนวณความเสียหาย`)}}}
         L.push(link);if(link.ref)link.ref.cl=L.length;log(`Chain ${L.length}: ${who(cur)}ใช้ ${link.n}`);hud();pass=0;await nap(700);
       }else pass++;
@@ -1720,11 +1743,11 @@ ATTFX['Gleaming Mane Cub']=['EARTH','WIND'];
 EFXT['Mortar Trooper']='สังเวยมอนสเตอร์ของเรา 1 ตัว (สังเวยตัวมันเองได้ · ตัวที่คว่ำอยู่ก็ได้): คู่ต่อสู้ได้รับความเสียหาย 500 (กดปุ่มที่การ์ดบนสนามใน Main Phase · ใช้ได้ไม่จำกัดครั้ง · ฝั่ง AI ยังไม่ใช้เอฟเฟกต์นี้)';
 EFXT['Irksome Rockling']='ATK และ DEF ของการ์ดนี้เพิ่มขึ้น 300 ต่อการ์ด 1 ใบบนมือของเรา (ขณะหงายหน้า)';
 EFXT['Gleaming Mane Cub']='มอนสเตอร์ธาตุ EARTH ทุกตัวบนสนาม (ทั้งสองฝั่ง) ได้รับ ATK +500 · มอนสเตอร์ธาตุ WIND ทุกตัวถูกลด ATK −400 (ขณะหงายหน้า)';
-function mtPick(hi){ // Mortar Trooper: เลือกมอนสเตอร์ของเราที่จะสังเวย
+function mtPick(hi,act){act=act||'mtr'; // Mortar Trooper / Ballista Tortoise: เลือกมอนสเตอร์ของเราที่จะสังเวย
   const ov=document.createElement('div');ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:99;display:flex;align-items:center;justify-content:center;padding:12px';
   const bx=document.createElement('div');bx.style.cssText='background:#1c1c2a;color:#fff;border:2px solid #d9b36a;border-radius:10px;padding:12px;max-width:420px;width:100%;max-height:80vh;overflow:auto;font:14px sans-serif';
-  bx.innerHTML='<div style="font-weight:700;margin-bottom:8px">Mortar Trooper: เลือกมอนสเตอร์ของคุณที่จะสังเวย (คู่ต่อสู้ได้รับความเสียหาย 500)</div>';
-  G.f[0].forEach((m,i)=>{if(!m)return;const b=document.createElement('button');b.textContent=`${m.n}${m.fd?' (คว่ำ)':` (ATK ${m.a} / DEF ${m.d})`}`;b.style.cssText='display:block;width:100%;margin:4px 0;text-align:left';b.onclick=()=>{ov.remove();doAct({a:'mtr',i:hi,t:i});G.sel=null;G.mode=null;render()};bx.appendChild(b)});
+  bx.innerHTML='<div style="font-weight:700;margin-bottom:8px">'+(act=='btt'?'Ballista Tortoise: เลือกมอนสเตอร์ของคุณที่จะสังเวย (คู่ต่อสู้ได้รับความเสียหายเท่าครึ่งหนึ่งของ ATK ของตัวที่สังเวย)':'Mortar Trooper: เลือกมอนสเตอร์ของคุณที่จะสังเวย (คู่ต่อสู้ได้รับความเสียหาย 500)')+'</div>';
+  G.f[0].forEach((m,i)=>{if(!m)return;const b=document.createElement('button');b.textContent=`${m.n}${m.fd?' (คว่ำ)':` (ATK ${m.a} / DEF ${m.d})`}`;b.style.cssText='display:block;width:100%;margin:4px 0;text-align:left';b.onclick=()=>{ov.remove();doAct({a:act,i:hi,t:i});G.sel=null;G.mode=null;render()};bx.appendChild(b)});
   const cx=document.createElement('button');cx.textContent='ยกเลิก';cx.onclick=()=>ov.remove();bx.appendChild(cx);ov.appendChild(bx);document.body.appendChild(ov);
 }
 /*ART18*/(()=>{const R=c=>`<rect width='100' height='80' fill='${c}'/>`,P=(d,f,s,w=2)=>`<path d='${d}' fill='${f}'${s?` stroke='${s}' stroke-width='${w}'`:''}/>`,C=(x,y,r,f)=>`<circle cx='${x}' cy='${y}' r='${r}' fill='${f}'/>`,L=(d,c,w=2)=>`<path d='${d}' stroke='${c}' stroke-width='${w}' fill='none'/>`,E=(x,y,c='#ffe040',r=2.4)=>C(x,y,r,c)+C(x,y,r/2.4,'#111');
@@ -1762,7 +1785,13 @@ const PK19S=[
  ['Celestial Warhorn','hoh','Counter Trap: ตอนคู่ต่อสู้อัญเชิญ/เปิดการ์ด (Flip) มอนสเตอร์ สังเวยมอนสเตอร์ของเรา 1 ตัว เพื่อลบล้างการอัญเชิญนั้นและทำลายมอนสเตอร์ตัวนั้น','UR','t']
 ];
 const PK19R=['Cub Chimaera','Razorwing Hornet','Novice Hexcaller']; // Little Chimera / Bladefly / Witch's Apprentice: ซ้ำจาก Booster Pack 06 (เอฟเฟกต์ออร่าธาตุมีอยู่แล้ว)
-const PK19C=['Fusion Gate']; // Polymerization: ซ้ำจาก Booster Pack Vol.1/2 (ระดับของการ์ดยังเป็นระดับเดิมในเกม)
+// Fusion Gate (Polymerization) ฉบับอาร์ตตามการ์ดจริงของ Vol.6: ชื่อและเอฟเฟกต์เหมือนเดิมทุกอย่าง (ใช้ตัวอักษรไร้ความกว้างต่อท้ายชื่อเพื่อแยกเป็นอีกใบในคอลเลกชัน) · นับรวมกับ Fusion Gate อาร์ตเดิมไม่เกิน 3 ใบ
+const FG2='Fusion Gate\u200b',FGX={'Fusion Gate':FG2,[FG2]:'Fusion Gate'},isFG=x=>x=='Fusion Gate'||x==FG2,fgCt=n=>(S.col[n]||0)+(S.col[FGX[n]]||0);
+if(CARDS['Fusion Gate']){CARDS[FG2]={...CARDS['Fusion Gate'],n:FG2};RAR[FG2]=RAR['Fusion Gate'];if(RARE.includes('Fusion Gate'))RARE.push(FG2)}
+/*ARTFG2*/(()=>{const P=(d,f,s,w=2)=>`<path d='${d}' fill='${f}'${s?` stroke='${s}' stroke-width='${w}'`:''}/>`,C=(x,y,r,f)=>`<circle cx='${x}' cy='${y}' r='${r}' fill='${f}'/>`,L=(d,c,w=2)=>`<path d='${d}' stroke='${c}' stroke-width='${w}' fill='none'/>`;
+ART[FG2]=`<rect width='100' height='80' fill='#1a0a3a'/>`+C(50,40,34,'#2a1060')+L('M50 40 Q56 30 66 34 Q78 40 70 54 Q56 66 40 58 Q26 48 32 32 Q42 16 62 18 Q84 24 88 46','#c080ff',3)+L('M50 40 Q44 48 36 44 Q28 38 34 30 Q44 22 54 28','#ff8ad0',2.4)+C(50,40,9,'#fff')+C(50,40,15,'rgba(255,200,255,.35)')+P('M6 14 L20 8 L16 22 L24 24 L10 30Z','#3aa0e0','#0a3a6a',1.4)+C(88,12,6,'#e0b080')+L('M88 18 V30 M84 24 H92','#c8d0e0',2)+P('M10 70 Q14 58 24 62 L22 72 L14 74Z','#8a6a3a','#3a2a10',1.4);
+})();
+const PK19C=[FG2]; // Polymerization: ซ้ำจาก Booster Pack Vol.1/2 (ระดับของการ์ดยังเป็นระดับเดิมในเกม)
 Object.assign(TYPES,{'Strutting Cockerel':'Winged Beast','Blackwood Enchantress':'Spellcaster','Tundra Pincer Scorpion':'Aqua','Stormhead Cloud':'Aqua','Blushing Winged Orb':'Fairy','Lady of Devotion':'Spellcaster','Gale-Winged Cat Huntress':'Beast-Warrior','Azure Crest Raptor':'Winged Beast'});
 Object.assign(ATTR,{'Strutting Cockerel':'EARTH','Blackwood Enchantress':'DARK','Tundra Pincer Scorpion':'WATER','Stormhead Cloud':'WATER','Blushing Winged Orb':'LIGHT','Lady of Devotion':'LIGHT','Gale-Winged Cat Huntress':'EARTH','Azure Crest Raptor':'WIND'});
 PK19.forEach(([n,a,d,l,r])=>{CARDS[n]={t:'m',n,a,d,l};RAR[n]=r;if(r=='UR'||r=='SR')RARE.push(n)});
@@ -1829,6 +1858,283 @@ Object.assign(ART,{
 'Thief\'s Seven Implements':R('#2a1a1a')+P('M6 74 H94 V80 H6Z','#4a2a1a')+P('M14 70 L22 30 L30 34 L26 70Z','#a0a8b8','#3a4050')+P('M36 70 V36 L44 28 V70Z','#c8a040','#6a4a0a')+P('M52 70 L56 24 L62 26 L60 70Z','#8a6a3a','#3a2a10')+P('M68 70 L66 40 Q78 34 82 44 L76 70Z','#a0a8b8','#3a4050')+C(88,28,5,'#d8b040')+L('M10 24 H34','#ffe0a0',2),
 'Celestial Warhorn':R('#2a4a8a')+P('M16 70 Q20 36 52 28 Q80 22 90 40 Q70 36 56 48 Q40 60 36 74Z','#f0d070','#7a5a10')+P('M84 34 Q96 30 96 44 Q90 42 84 40Z','#a07a20')+P('M24 50 Q6 44 4 24 Q20 28 30 42Z M34 44 Q20 30 22 14 Q34 20 42 36Z','#fff','#8aa0d0')+L('M30 64 Q44 46 70 38','#a07a20',2)
 });})();
+// ===== Booster Pack Vol.7 (18 ใบ: C ×14, R ×1, SR ×2, หลอมรวม C ×1) · ชื่อการ์ดเป็นชื่อเฉพาะของเกม · NR=R =====
+// Swamp Battleguard=Marshland Warden · Saggi the Dark Clown=Gloomjest Harlequin · Illusionist Faceless Mage=Blankvisage Illusionist · Kuriboh=Puffball Familiar · Dark Chimera=Umbral Chimaera · Catapult Turtle=Ballista Tortoise
+// Mystic Horseman=Arcane Centaur · Rabid Horseman=Rampaging Horsemaster (หลอมรวม: Battle Ox=Warhorn Minotaur + Mystic Horseman) · Zanki=Ironclad Reaver · Clown Zombie=Carnival Revenant · Hero of the East=Champion of the Orient
+// Ancient Tool=Relic Contraption · Arlownay=Mossglade Siren · Akakieisu=Crimson Gambler · Arma Knight=Whorlshell Knight · Fiend Sword=Hexed Sabre · Prevent Rat=Bulwark Rodent · D.D. Warrior=Voidstep Warrior
+const PK20=[
+ ['Marshland Warden',1800,1500,5,'C'],['Gloomjest Harlequin',600,1500,3,'C'],['Blankvisage Illusionist',1200,2200,5,'C'],
+ ['Puffball Familiar',300,200,1,'R'],['Umbral Chimaera',1610,1460,5,'C'],['Ballista Tortoise',1000,2000,5,'SR'],
+ ['Arcane Centaur',1300,1550,4,'C'],['Rampaging Horsemaster',2000,1700,6,'C'],['Ironclad Reaver',1500,1700,4,'C'],
+ ['Carnival Revenant',1350,0,3,'C'],['Champion of the Orient',1100,1000,3,'C'],['Relic Contraption',1700,1400,5,'C'],
+ ['Mossglade Siren',800,1000,3,'C'],['Crimson Gambler',1000,800,3,'C'],['Whorlshell Knight',1000,1200,4,'C'],
+ ['Hexed Sabre',1400,800,4,'C'],['Bulwark Rodent',500,2000,4,'C'],['Voidstep Warrior',1200,1000,4,'SR']
+];
+Object.assign(TYPES,{'Marshland Warden':'Beast-Warrior','Gloomjest Harlequin':'Spellcaster','Blankvisage Illusionist':'Spellcaster','Puffball Familiar':'Fiend','Umbral Chimaera':'Fiend','Ballista Tortoise':'Aqua','Arcane Centaur':'Beast','Rampaging Horsemaster':'Beast-Warrior','Ironclad Reaver':'Warrior','Carnival Revenant':'Zombie','Champion of the Orient':'Warrior','Relic Contraption':'Machine','Mossglade Siren':'Fiend','Crimson Gambler':'Spellcaster','Whorlshell Knight':'Aqua','Hexed Sabre':'Fiend','Bulwark Rodent':'Beast-Warrior','Voidstep Warrior':'Warrior'});
+Object.assign(ATTR,{'Marshland Warden':'EARTH','Gloomjest Harlequin':'DARK','Blankvisage Illusionist':'DARK','Puffball Familiar':'DARK','Umbral Chimaera':'DARK','Ballista Tortoise':'WATER','Arcane Centaur':'EARTH','Rampaging Horsemaster':'EARTH','Ironclad Reaver':'EARTH','Carnival Revenant':'DARK','Champion of the Orient':'EARTH','Relic Contraption':'DARK','Mossglade Siren':'EARTH','Crimson Gambler':'DARK','Whorlshell Knight':'WATER','Hexed Sabre':'DARK','Bulwark Rodent':'EARTH','Voidstep Warrior':'EARTH'});
+Object.assign(FUS,{'Rampaging Horsemaster':['Warhorn Minotaur','Arcane Centaur']}); // Rabid Horseman = Battle Ox + Mystic Horseman (อยู่ใน Extra Deck)
+PK20.forEach(([n,a,d,l,r])=>{CARDS[n]={t:'m',n,a,d,l};RAR[n]=r;if(r=='UR'||r=='SR')RARE.push(n)});
+// เอฟเฟกต์ Vol.7: Marshland Warden (Swamp Battleguard: ATK +500 เมื่อมี Lava Battleguard) · Puffball Familiar (Kuriboh: ทิ้งจากมือ ลดดาเมจการต่อสู้เป็น 0)
+//   Ballista Tortoise (Catapult Turtle: สังเวยมอนสเตอร์ ดาเมจ = ครึ่งหนึ่งของ ATK) · Voidstep Warrior (D.D. Warrior: โจมตีแล้วกำจัดทั้งคู่ออกจากเกม)
+const SWAMP_PARTNER='Moltenrock Warden'; // Lava Battleguard (ยังไม่มีการ์ดนี้ในเกม — เตรียมชื่อไว้ให้ชุดถัดไป)
+['Marshland Warden','Puffball Familiar','Ballista Tortoise','Voidstep Warrior'].forEach(n=>EFFM.add(n));
+EFXT['Marshland Warden']='ATK ของการ์ดนี้เพิ่มขึ้น 500 ขณะที่มี Moltenrock Warden (Lava Battleguard) หงายหน้าอยู่บนสนามฝั่งเดียวกัน (การ์ดใบนั้นยังไม่มีในเกม จึงยังไม่มีผลในเกมตอนนี้)';
+EFXT['Puffball Familiar']='ทิ้งการ์ดนี้จากมือ: ตอนมอนสเตอร์ของคู่ต่อสู้โจมตี (ก่อนคำนวณความเสียหาย) ความเสียหายจากการต่อสู้ครั้งนั้นที่เราจะได้รับเป็น 0 (ควิกเอฟเฟกต์จากมือ · ใช้ได้กับการโจมตีมอนสเตอร์ท่าโจมตีของเราและการโจมตี LP ตรง · AI ใช้เมื่อจะได้รับความเสียหายจริง)';
+EFXT['Ballista Tortoise']='สังเวยมอนสเตอร์ของเรา 1 ตัว (สังเวยตัวมันเองได้ · ตัวที่คว่ำอยู่ก็ได้): คู่ต่อสู้ได้รับความเสียหายเท่ากึ่งหนึ่งของ ATK ของมอนสเตอร์ที่สังเวย (กดปุ่มที่การ์ดบนสนามใน Main Phase · ใช้ได้ไม่จำกัดครั้ง · ฝั่ง AI ยังไม่ใช้เอฟเฟกต์นี้)';
+EFXT['Voidstep Warrior']='ถ้าการ์ดนี้โจมตีมอนสเตอร์ของคู่ต่อสู้ หลังคำนวณความเสียหาย ถ้าทั้งสองใบยังอยู่บนสนาม เจ้าของเลือกกำจัด (Banish) การ์ดนี้และมอนสเตอร์ตัวนั้นออกจากเกมได้ (AI ใช้เมื่อมอนสเตอร์เป้าหมายแข็งแกร่งกว่าหรือเท่ากัน)';
+function banish(p,i){const m=G.f[p][i];if(!m)return;(G.xb=G.xb||[[],[]])[p].push(m.n);G.f[p][i]=null;log(`${who(p)}: ${m.n} ถูกกำจัดออกจากเกม (Banish)`)} // ไม่ลงสุสาน (ดู toGy)
+/*ART20*/(()=>{const R=c=>`<rect width='100' height='80' fill='${c}'/>`,P=(d,f,s,w=2)=>`<path d='${d}' fill='${f}'${s?` stroke='${s}' stroke-width='${w}'`:''}/>`,C=(x,y,r,f)=>`<circle cx='${x}' cy='${y}' r='${r}' fill='${f}'/>`,L=(d,c,w=2)=>`<path d='${d}' stroke='${c}' stroke-width='${w}' fill='none'/>`,E=(x,y,c='#ffe040',r=2.4)=>C(x,y,r,c)+C(x,y,r/2.4,'#111'),W=c=>P('M0 64 Q12 56 25 64 T50 64 T75 64 T100 64 V80 H0Z',c);
+Object.assign(ART,{
+'Marshland Warden':R('#2a3a1a')+P('M18 80 Q20 44 50 40 Q80 44 82 80Z','#5a6a2a','#1a2a0a')+C(50,28,13,'#6a7a30')+P('M38 20 Q26 10 22 18 Q32 20 40 26Z M62 20 Q74 10 78 18 Q68 20 60 26Z','#e8d8a0')+E(44,28,'#ffe040',2.4)+E(56,28,'#ffe040',2.4)+L('M42 36 Q50 41 58 36','#1a2a0a',2)+P('M34 68 L50 80 L66 68Z','#7a2a8a')+L('M0 76 Q20 70 40 76 M60 78 Q80 72 100 78','#3a5a2a',2),
+'Gloomjest Harlequin':R('#1a1a4a')+P('M28 80 Q28 54 50 50 Q72 54 72 80Z','#6a2aaa','#220a4a')+C(50,34,11,'#f0e8f0')+P('M36 28 Q32 8 46 10 L50 20 L54 10 Q68 8 64 28 L50 22Z','#2a8a4a','#0a3a1a')+C(36,8,3.5,'#f0d040')+C(64,8,3.5,'#f0d040')+E(46,34,'#222',1.6)+E(55,34,'#222',1.6)+L('M44 42 Q50 47 56 42','#c02a4a',1.8)+C(50,62,3,'#f0d040')+C(50,70,3,'#f0d040'),
+'Blankvisage Illusionist':R('#4a1a5a')+P('M14 80 Q16 44 50 40 Q84 44 86 80Z','#c82a3a','#5a0a1a')+C(50,28,12,'#f0e0c0')+P('M36 26 Q34 6 50 6 Q66 6 64 26 Q58 14 50 16 Q42 14 36 26Z','#e08a3a')+L('M18 72 L6 48 M82 72 L94 48','#f0c040',4)+L('M40 50 Q50 58 60 50','#f0c040',3)+C(50,64,5,'#ffe060'),
+'Puffball Familiar':R('#4a2a5a')+C(50,44,24,'#8a5a2a')+L('M50 20 V12 M30 28 L24 22 M70 28 L76 22 M26 44 H18 M74 44 H82 M30 60 L24 66 M70 60 L76 66','#5a3a14',3)+E(41,40,'#fff',5)+E(59,40,'#fff',5)+P('M32 64 L26 76 L36 70Z M44 66 L42 78 L50 70Z M56 66 L58 78 L64 70Z M68 64 L74 76 L64 70Z','#5ab04a','#1a4a14',1.4),
+'Umbral Chimaera':R('#1a2a3a')+P('M14 78 Q14 44 42 40 Q76 40 86 78Z','#4a4a6a','#14142a')+P('M70 46 Q94 24 96 54 Q84 50 76 62Z','#2a2a4a','#0a0a1a')+C(38,30,12,'#6a6a8a')+P('M28 22 L24 8 L36 18Z M48 20 L54 6 L46 24Z','#e8e0b0')+E(34,29,'#ff3030',2.4)+E(44,29,'#ff3030',2.4)+L('M30 38 Q38 44 46 38','#0a0a1a',2),
+'Ballista Tortoise':R('#2a7ab0')+W('#1a5a90')+P('M14 66 Q18 34 50 30 Q82 34 86 66Z','#3a8a4a','#14461e')+L('M30 58 Q34 40 50 38 Q66 40 70 58 M22 52 H78','#1a5a2a',1.6)+P('M44 40 L82 18 L88 26 L50 50Z','#6a6a7a','#222')+C(86,22,3,'#ffa030')+C(18,56,8,'#8aaa5a')+E(15,54,'#ffe040',2),
+'Arcane Centaur':R('#3a5a2a')+P('M14 70 Q10 50 36 48 L74 48 Q92 50 88 70Z','#8a5a2a','#3a2008')+L('M24 70 V80 M40 70 V80 M66 70 V80 M80 70 V80','#3a2008',4)+P('M58 50 Q56 30 66 26 Q76 30 74 50Z','#c89a6a','#6a4a2a')+C(66,20,8,'#d8a878')+P('M58 18 Q60 8 70 10 Q76 12 74 20 Q66 14 58 18Z','#3a2a1a')+L('M82 72 L84 12','#8a6a3a',3)+C(84,10,4,'#a0f0c0'),
+'Rampaging Horsemaster':R('#4a1a1a')+P('M10 72 Q8 50 34 46 L76 46 Q94 50 90 72Z','#7a3a1a','#2a0a04')+L('M20 72 V80 M38 72 V80 M68 72 V80 M84 72 V80','#2a0a04',4)+P('M20 40 Q8 30 6 14 Q22 22 28 36Z','#f0e0b0','#7a6a3a',1.4)+C(24,44,10,'#a05a2a')+E(20,42,'#ff3020',2.2)+P('M56 48 Q54 22 66 18 Q78 22 76 48Z','#b02a2a','#4a0a0a')+C(66,14,8,'#8a5a30')+L('M86 76 L90 6','#c0c0d0',3)+P('M86 6 L96 10 L88 18Z','#e8e8f0'),
+'Ironclad Reaver':R('#2a2a3a')+P('M20 80 Q22 44 50 40 Q78 44 80 80Z','#8a2a2a','#3a0808')+C(50,28,12,'#5a5a6a')+P('M36 20 L50 2 L64 20Z','#d8b040','#6a4a08',1.4)+L('M42 28 H58','#0a0a14',3)+E(46,30,'#ffe040',1.8)+E(55,30,'#ffe040',1.8)+L('M82 78 L74 16','#d8d8e8',3)+P('M30 56 L50 62 L70 56 L66 70 L34 70Z','#c8a040','#6a4a08',1.4),
+'Carnival Revenant':R('#3a1a4a')+P('M24 80 Q24 50 50 46 Q76 50 76 80Z','#5a3a8a','#1a0a3a')+C(50,32,12,'#a8c8a0')+P('M34 28 L30 10 L42 22 L50 6 L58 22 L70 10 L66 28Z','#d02a8a')+L('M42 29 L47 34 M47 29 L42 34 M54 29 L59 34 M59 29 L54 34','#222',1.6)+L('M42 41 H58 M44 38 V44 M50 38 V44 M56 38 V44','#222',1.4)+C(36,62,4,'#f0d040')+C(64,66,4,'#40c0f0'),
+'Champion of the Orient':R('#1a4a3a')+P('M22 80 Q24 48 50 44 Q76 48 78 80Z','#2a8a4a','#0a3a1a')+C(50,30,11,'#e8c098')+P('M38 28 Q36 10 50 12 Q64 10 62 28 Q50 20 38 28Z','#1a1a1a')+L('M39 24 H61','#d8302a',3)+E(46,31,'#222',1.5)+E(55,31,'#222',1.5)+L('M44 38 Q50 41 56 38','#8a3a2a',1.5)+L('M80 78 L70 20','#c8d0e0',3)+P('M34 56 H66 V62 H34Z','#d8b040'),
+'Relic Contraption':R('#2a3a5a')+C(34,40,18,'#6a6a7a')+L('M34 18 V8 M34 62 V72 M12 40 H2 M56 40 H66 M18 24 L10 16 M50 24 L58 16 M18 56 L10 64 M50 56 L58 64','#6a6a7a',5)+C(34,40,8,'#2a2a3a')+E(34,40,'#ff4040',3)+C(66,54,14,'#8a7a5a')+C(66,54,5,'#3a2a1a')+P('M58 72 L92 64 L92 78Z','#c8c8d8','#4a4a5a',1.4),
+'Mossglade Siren':R('#1a1a4a')+P('M30 80 Q30 54 50 48 Q70 54 70 80Z','#2a6a4a','#0a2a1a')+C(50,34,10,'#6aaa80')+P('M38 32 Q34 10 50 10 Q66 10 62 32 Q56 18 50 20 Q44 18 38 32Z','#a02a4a')+E(46,35,'#222',1.5)+E(54,35,'#222',1.5)+P('M18 70 Q50 56 82 70 V80 H18Z','#8a1a3a','#3a0a1a',1.4)+L('M10 24 Q18 30 12 40 M90 24 Q82 30 88 40','#4a8aa0',2.4),
+'Crimson Gambler':R('#3a1a1a')+P('M22 80 Q24 46 50 42 Q76 46 78 80Z','#c82a2a','#4a0808')+C(50,30,11,'#f0e8e0')+P('M34 24 Q50 0 66 24Z','#6a2a8a','#2a0a3a',1.4)+E(46,31,'#222',1.5)+E(55,31,'#222',1.5)+L('M45 38 Q50 42 55 38','#c02a4a',1.6)+C(72,58,11,'#e8c040')+C(72,58,6,'#a07a10')+L('M72 52 V64','#e8c040',2),
+'Whorlshell Knight':R('#1a4a7a')+P('M30 50 Q24 12 56 10 Q82 16 74 50Z','#c87a5a','#5a2a14')+L('M54 28 Q68 24 66 38 Q60 46 52 38 Q50 32 56 32','#5a2a14',2)+P('M26 80 Q28 54 50 50 Q72 54 74 80Z','#4a6a9a','#14243a')+C(44,50,8,'#e8c8a8')+E(41,49,'#222',1.4)+E(47,49,'#222',1.4)+P('M8 58 L28 58 L28 76 L18 84 L8 76Z','#a0a8b8','#333',1.6)+L('M84 78 L80 24','#c8d0e0',3)+W('#0e3a64'),
+'Hexed Sabre':R('#8a2a1a')+L('M0 70 Q14 50 6 30 M100 66 Q86 46 94 24 M20 80 Q28 60 20 44','#f08a2a',3)+P('M50 4 L62 48 L50 68 L38 48Z','#8a8aa0','#2a2a3a')+L('M50 8 V60','#c8c8dc',1.6)+P('M30 52 H70 V60 H30Z','#c8a040','#5a3a08')+L('M50 60 V78','#5a2a1a',6)+C(50,40,5,'#ffe040')+C(50,40,2,'#a01010'),
+'Bulwark Rodent':R('#4a3a1a')+P('M10 70 Q12 40 46 38 Q82 40 88 70Z','#8a6a4a','#3a2a14')+L('M26 66 Q30 46 46 44 M44 66 Q48 46 62 44 M62 66 Q66 48 76 48','#5a4024',2.4)+C(82,58,9,'#a08060')+P('M78 50 L74 40 L84 48Z','#a08060')+E(85,56,'#ffe040',2)+L('M12 66 Q2 58 6 48','#8a6a4a',4)+L('M26 70 V78 M50 70 V78 M72 70 V78','#3a2a14',4),
+'Voidstep Warrior':R('#1a3a6a')+L('M50 6 A34 34 0 1 1 49.9 6','#7ad0ff',3)+L('M50 16 A24 24 0 1 0 50.1 16','#4a8ae0',2)+P('M24 80 Q26 48 50 44 Q74 48 76 80Z','#3a5a9a','#0a1a4a')+C(50,32,11,'#e8b890')+P('M38 30 Q34 8 52 10 Q68 12 62 30 Q56 18 48 22 Q42 18 38 30Z','#e8802a')+E(46,34,'#222',1.5)+E(55,34,'#222',1.5)+P('M64 54 L90 46 L88 60Z','#c8d0e0','#4a5a7a',1.4)
+});})();
+
+// ===== Booster Pack Vol.7 (ส่วนเสริม: อีก 18 ใบ จากภาพ — C ×15 (หลอมรวม 2), R ×2 (+1 C)) · ชื่อการ์ดเป็นชื่อเฉพาะของเกม · NR=R =====
+// Princess of Tsurugi=Swordcourt Queen · Gatekeeper=Portal Sentinel · Labyrinth Tank=Mazeforge Juggernaut (Giga-Tech Wolf=Gigaforge Wolf + Cannon Soldier=Mortar Trooper) · Toon Alligator=Hatchet Gator · Pendulum Machine=Scythe Pendulum Rig · Launcher Spider=Rocketpod Arachnid
+// Sword Slasher=Scythe-Arm Marauder · Cyber Soldier=Chrome Infantryman · Giganto=Hulking Sprocket · Thunder Dragon=Stormbolt Drake · Waterdragon Fairy=Ripple Nymph · 7 Colored Fish=Spectrum Pike · The Immortal of Thunder=Stormhermit Elder
+// Crazy Fish=Frenzied Gar · Cyber Saurus=Cogscale Saurian (Blast Juggler=Powderkeg Juggler + Two-Headed King Rex=Twin-Maw Tyrant) · Monstrous Bird=Colossal Condor · Togex=Spiketusk Brute · Dark Elf=Obsidian Elfmage
+const PK20B=[
+ ['Swordcourt Queen',900,700,3,'R'],['Portal Sentinel',1500,1800,5,'C'],['Mazeforge Juggernaut',2400,2400,7,'C'],
+ ['Hatchet Gator',800,1600,4,'C'],['Scythe Pendulum Rig',1750,2000,6,'C'],['Rocketpod Arachnid',2200,2500,7,'C'],
+ ['Scythe-Arm Marauder',1450,1500,5,'C'],['Chrome Infantryman',1500,1700,5,'C'],['Hulking Sprocket',1700,1800,5,'C'],
+ ['Stormbolt Drake',1600,1500,5,'R'],['Ripple Nymph',1100,700,3,'C'],['Spectrum Pike',1800,800,4,'C'],
+ ['Stormhermit Elder',1500,1300,4,'C'],['Frenzied Gar',1600,1200,4,'C'],['Cogscale Saurian',1800,1400,5,'C'],
+ ['Colossal Condor',2000,1900,6,'C'],['Spiketusk Brute',1600,1800,5,'C'],['Obsidian Elfmage',2000,800,4,'C']
+];
+Object.assign(TYPES,{'Swordcourt Queen':'Warrior','Portal Sentinel':'Machine','Mazeforge Juggernaut':'Machine','Hatchet Gator':'Reptile','Scythe Pendulum Rig':'Machine','Rocketpod Arachnid':'Machine','Scythe-Arm Marauder':'Machine','Chrome Infantryman':'Machine','Hulking Sprocket':'Machine','Stormbolt Drake':'Thunder','Ripple Nymph':'Aqua','Spectrum Pike':'Fish','Stormhermit Elder':'Thunder','Frenzied Gar':'Fish','Cogscale Saurian':'Machine','Colossal Condor':'Winged Beast','Spiketusk Brute':'Beast','Obsidian Elfmage':'Spellcaster'});
+Object.assign(ATTR,{'Swordcourt Queen':'WIND','Portal Sentinel':'DARK','Mazeforge Juggernaut':'DARK','Hatchet Gator':'WATER','Scythe Pendulum Rig':'DARK','Rocketpod Arachnid':'FIRE','Scythe-Arm Marauder':'DARK','Chrome Infantryman':'DARK','Hulking Sprocket':'DARK','Stormbolt Drake':'LIGHT','Ripple Nymph':'WATER','Spectrum Pike':'WATER','Stormhermit Elder':'LIGHT','Frenzied Gar':'WATER','Cogscale Saurian':'EARTH','Colossal Condor':'WIND','Spiketusk Brute':'EARTH','Obsidian Elfmage':'DARK'});
+Object.assign(FUS,{'Mazeforge Juggernaut':['Gigaforge Wolf','Mortar Trooper'],'Cogscale Saurian':['Powderkeg Juggler','Twin-Maw Tyrant']}); // อยู่ใน Extra Deck
+PK20B.forEach(([n,a,d,l,r])=>{CARDS[n]={t:'m',n,a,d,l};RAR[n]=r;if(r=='UR'||r=='SR')RARE.push(n)});
+// เอฟเฟกต์: Swordcourt Queen (ฟลิป: 500 ดาเมจต่อเวท/กับดักของคู่ต่อสู้) · Stormhermit Elder (ฟลิป: +1500 LP) · Stormbolt Drake (ทิ้งจากมือ: ค้นหาชื่อเดียวกันจากเด็คสูงสุด 2 ใบ) · Obsidian Elfmage (จ่าย 1000 LP ทุกครั้งที่โจมตี)
+const TDRG='Stormbolt Drake',DKE='Obsidian Elfmage';
+FLIPM.add('Swordcourt Queen');FLIPM.add('Stormhermit Elder');['Swordcourt Queen','Stormhermit Elder',TDRG,DKE].forEach(n=>EFFM.add(n));
+EFXT['Swordcourt Queen']='ฟลิป: ทำความเสียหายให้คู่ต่อสู้ 500 ต่อการ์ดเวทมนตร์/กับดักทุกใบที่อยู่บนสนามฝั่งคู่ต่อสู้ (นับรวมที่ตั้งคว่ำและเวทสนาม)';
+EFXT['Stormhermit Elder']='ฟลิป: ผู้เล่นฟื้น 1500 LP';
+EFXT[TDRG]='ทิ้งการ์ดนี้จากมือ (Main Phase): เลือกการ์ดชื่อ Stormbolt Drake จากเด็คขึ้นมือได้สูงสุด 2 ใบ แล้วสับเด็ค (กดปุ่มตอนแตะการ์ดในมือ · ฝั่ง AI ยังไม่ใช้เอฟเฟกต์นี้)';
+EFXT[DKE]='ทุกครั้งที่การ์ดนี้โจมตี ต้องจ่าย 1000 LP ก่อน (LP เหลือไม่เกิน 1000 จะโจมตีไม่ได้)';
+function tdrFx(p,i){ // Thunder Dragon: ทิ้งจากมือ ค้นหาชื่อเดียวกันจากเด็คสูงสุด 2 ใบ
+  const c=G.hand[p][i];if(!c||c.n!=TDRG)return;const n=c.n,dk=G.deck[p],ix=[];
+  dk.forEach((x,k)=>{if((x.n||x)==n&&ix.length<2)ix.push(k)});if(!ix.length)return;
+  G.hand[p].splice(i,1);G.gy[p].push(n);thorn(p,1);emit({t:'act',p,n,x:EFXT[n],k:'flip'});
+  ix.reverse().forEach(k=>{const x=dk.splice(k,1)[0];G.hand[p].push(typeof x=='string'?{...CARDS[x]}:x)});
+  sh(dk);log(`${who(p)}: ทิ้ง ${n} จากมือ ค้นหา ${n} ${ix.length} ใบจากเด็คขึ้นมือ`);chk();
+}
+/*ART20B*/(()=>{const R=c=>`<rect width='100' height='80' fill='${c}'/>`,P=(d,f,s,w=2)=>`<path d='${d}' fill='${f}'${s?` stroke='${s}' stroke-width='${w}'`:''}/>`,C=(x,y,r,f)=>`<circle cx='${x}' cy='${y}' r='${r}' fill='${f}'/>`,L=(d,c,w=2)=>`<path d='${d}' stroke='${c}' stroke-width='${w}' fill='none'/>`,E=(x,y,c='#ffe040',r=2.4)=>C(x,y,r,c)+C(x,y,r/2.4,'#111'),W=c=>P('M0 64 Q12 56 25 64 T50 64 T75 64 T100 64 V80 H0Z',c);
+Object.assign(ART,{
+'Swordcourt Queen':R('#2a4a3a')+P('M24 80 Q26 46 50 42 Q74 46 76 80Z','#c83a5a','#5a0a20')+C(50,30,11,'#f4d8c0')+P('M36 28 Q32 6 50 8 Q68 6 64 28 Q58 14 50 16 Q42 14 36 28Z','#e8c050')+E(46,31,'#222',1.5)+E(55,31,'#222',1.5)+L('M45 38 Q50 42 55 38','#a02040',1.6)+L('M82 76 L70 14','#d8e0f0',3)+P('M64 50 H84 V56 H64Z','#d8b040')+L('M18 70 L30 52','#d8e0f0',3),
+'Portal Sentinel':R('#2a2038')+P('M16 80 L16 30 Q16 8 50 8 Q84 8 84 30 L84 80Z','#4a3a5a')+P('M28 80 L28 34 Q28 20 50 20 Q72 20 72 34 L72 80Z','#14101e')+C(50,44,16,'#c0407a')+P('M34 44 Q50 30 66 44 Q50 58 34 44Z','#e86aa0')+E(50,44,'#ffe040',3.2)+L('M20 64 H36 M64 64 H80','#8a7aa0',3),
+'Mazeforge Juggernaut':R('#1a1a2e')+P('M10 62 H90 V74 H10Z','#3a3a4a')+C(22,68,8,'#555')+C(50,68,8,'#555')+C(78,68,8,'#555')+P('M18 62 L28 34 H72 L84 62Z','#4a3a6a','#14102a')+P('M40 36 L52 20 H70 L66 36Z','#6a4a8a')+L('M68 28 L96 22','#c8c8d8',4)+E(48,48,'#ff4040',3)+L('M24 54 H76','#2a1e44',2),
+'Hatchet Gator':R('#1e3a5a')+W('#12284a')+P('M20 70 Q18 40 40 36 Q64 32 82 46 Q88 58 74 70Z','#3a9a4a','#14461e')+P('M60 38 Q80 28 92 40 Q78 42 66 46Z','#4aaa5a')+E(62,38,'#ffe040',2.4)+L('M72 44 l3 4 3 -4 3 4 3 -4','#fff',1.2)+L('M30 70 L24 56 M44 70 L42 58','#14461e',3)+L('M18 46 L8 24','#8a6a3a',3)+P('M2 22 l10 -6 2 10z','#c8d0d8'),
+'Scythe Pendulum Rig':R('#1a2a5a')+L('M50 0 V30','#aaa',3)+P('M20 32 Q50 58 80 32 Q50 74 20 32Z','#d8e0f0','#6a7a9a',1.4)+C(50,18,10,'#8a2a2a')+P('M30 80 L36 66 H64 L70 80Z','#4a4a5a')+L('M26 40 L14 70 M74 40 L86 70','#6a6a7a',3),
+'Rocketpod Arachnid':R('#3a0a14')+L('M0 20 L100 40 M0 50 L100 20 M20 0 L60 80 M80 0 L40 80','#8a1a2a',1.2)+C(50,50,18,'#5a5a6a')+P('M32 40 L22 20 H34 L40 34Z M68 40 L78 20 H66 L60 34Z','#c8c8d8','#333',1.2)+C(50,44,6,'#ff5030')+L('M34 58 L14 74 M42 64 L30 80 M66 58 L86 74 M58 64 L70 80','#2a2a34',3),
+'Scythe-Arm Marauder':R('#1a3a2a')+P('M26 80 Q28 46 50 42 Q72 46 74 80Z','#2a3a6a','#0a1a3a')+C(50,30,12,'#aab0c0')+P('M38 24 L50 10 L62 24Z','#8a2a2a')+E(46,31,'#ff3030',1.8)+E(55,31,'#ff3030',1.8)+L('M82 4 Q96 40 70 66','#d8e0f0',4)+L('M30 56 L12 66','#6a6a7a',5),
+'Chrome Infantryman':R('#24304a')+C(50,48,24,'#6a8ad0')+P('M26 40 L18 20 L30 30Z M74 40 L82 20 L70 30Z','#c8d0e8')+P('M34 32 Q50 14 66 32Z','#8aa0e0')+E(44,40,'#ffe040',3)+E(56,40,'#ffe040',3)+L('M40 56 H60','#14204a',3)+L('M30 70 L24 80 M70 70 L76 80','#4a5a8a',4),
+'Hulking Sprocket':R('#0a3a1a')+L('M0 10 Q30 30 20 60 M100 14 Q70 34 80 66','#2a8a3a',3)+C(50,52,20,'#3a4a6a')+C(50,52,8,'#14203a')+L('M50 28 V18 M50 76 V86 M26 52 H16 M74 52 H84 M33 35 L26 28 M67 35 L74 28 M33 69 L26 76 M67 69 L74 76','#6a7aa0',5)+C(50,14,5,'#ff3030'),
+'Stormbolt Drake':R('#10102a')+P('M18 78 Q14 44 38 34 L32 14 L46 26 Q56 22 66 28 L76 12 L76 34 Q90 46 82 78Z','#2a6a3a','#0a2a14')+E(44,40,'#ffe840',3)+E(64,40,'#ffe840',3)+L('M60 0 L50 18 L62 20 L48 42','#ffe840',3)+L('M10 50 L22 58 L14 62 L26 72','#ffe840',2.4)+P('M40 58 Q52 66 64 58 L60 64 L56 58 L52 66 L48 58 L44 64Z','#f4f0e0'),
+'Ripple Nymph':R('#8ac0e8')+W('#2a6ab0')+P('M34 80 Q34 52 50 48 Q66 52 66 80Z','#2aa08a')+C(50,36,10,'#f4dcc8')+P('M38 34 Q34 10 50 12 Q66 10 62 34 Q56 20 50 22 Q44 20 38 34Z','#e04a8a')+E(46,36,'#222',1.4)+E(54,36,'#222',1.4)+L('M20 40 Q30 24 40 40 M60 40 Q70 24 80 40','#e8f4ff',3)+C(24,24,3,'#fff')+C(78,18,2.5,'#fff'),
+'Spectrum Pike':R('#1a3a6a')+W('#102a50')+P('M10 44 Q36 14 74 30 Q92 38 94 46 Q70 46 52 62 Q24 62 10 44Z','#2aa05a','#0a4a24')+L('M24 44 Q46 36 70 42','#e04a4a',3)+L('M26 50 Q46 46 64 52','#4a8ae0',3)+L('M30 38 Q46 30 64 34','#e8d040',3)+E(80,38,'#fff',2.6)+P('M52 28 L56 10 L64 30Z','#e04a4a'),
+'Stormhermit Elder':R('#4a4a7a')+P('M16 80 Q18 46 50 42 Q82 46 84 80Z','#2a3a8a','#0a1040')+C(50,30,13,'#e8d0b8')+P('M36 34 Q34 52 50 58 Q66 52 64 34 Q50 44 36 34Z','#f4f4f4')+P('M36 24 Q40 10 50 12 Q60 10 64 24 Q50 16 36 24Z','#f4f4f4')+E(45,30,'#e02030',2.2)+E(56,30,'#e02030',2.2)+L('M82 78 V10','#c8a040',3)+L('M76 8 Q82 0 88 8 M82 0 V16','#ffe840',2.4),
+'Frenzied Gar':R('#2a1a5a')+P('M10 30 Q30 8 66 22 Q84 30 90 56 Q60 44 40 62 Q20 56 10 30Z','#2a8a4a','#0a3a1a')+P('M40 54 Q56 44 72 54 L68 70 Q52 62 40 54Z','#c84a4a')+E(34,28,'#ffe040',3)+L('M20 40 Q30 46 44 42','#0a0a14',2)+L('M48 22 L56 8 M60 24 L72 12','#6ae890',3),
+'Cogscale Saurian':R('#4a1a3a')+P('M14 74 Q14 40 40 34 L36 16 L58 18 Q80 30 82 52 L90 74Z','#2a6a3a','#0a2a14')+P('M60 40 L90 36 L88 56 L64 54Z','#8a8a9a','#333',1.4)+E(46,26,'#ffe040',2.6)+L('M30 50 H56 M32 60 H60','#14461e',2.4)+C(72,46,5,'#ff3a3a')+L('M24 74 L20 80 M50 74 L52 80','#14461e',4),
+'Colossal Condor':R('#2a6a9a')+L('M0 60 Q30 50 50 60 T100 56','#e8f4ff',2)+P('M50 44 Q24 20 2 38 Q20 40 28 52 Q38 46 50 56Z','#2a2a3a','#0a0a14')+P('M50 44 Q76 20 98 38 Q80 40 72 52 Q62 46 50 56Z','#2a2a3a','#0a0a14')+P('M42 40 Q50 28 58 40 Q60 62 50 68 Q40 62 42 40Z','#4a3a2a')+C(50,32,8,'#f0f0f0')+P('M54 30 L66 34 L54 38Z','#e8a020')+E(48,30,'#111',1.4)+L('M44 68 L40 78 M56 68 L60 78','#e8a020',2.6),
+'Spiketusk Brute':R('#4a3a1a')+P('M18 78 Q16 44 50 38 Q84 44 82 78Z','#3a9a3a','#145a14')+C(50,30,14,'#4aaa3a')+P('M30 22 L26 8 L38 18 M70 22 L74 8 L62 18','#f0e8c0')+E(44,30,'#ffe040',2.4)+E(57,30,'#ffe040',2.4)+L('M42 40 H58 M44 36 V44 M56 36 V44','#0a2a0a',1.6)+P('M26 60 L16 50 L28 52Z M74 60 L84 50 L72 52Z','#f0e8c0')+P('M34 70 H66 V78 H34Z','#d8a020'),
+'Obsidian Elfmage':R('#1a0a2a')+P('M20 80 Q22 48 50 44 Q78 48 80 80Z','#3a2a6a','#14083a')+C(50,32,11,'#d8c0e0')+P('M34 30 Q34 8 50 8 Q66 8 66 30 Q60 18 50 20 Q40 18 34 30Z','#e8c050','#8a6a10',1.4)+P('M36 24 H64 L60 16 H40Z','#8a3aa8')+E(46,34,'#222',1.5)+E(55,34,'#222',1.5)+L('M45 40 Q50 43 55 40','#a02a6a',1.6)+L('M72 74 L78 36','#a870e0',3)+C(79,32,5,'#c8a0ff')
+});})();
+// ===== Booster Pack Vol.7 (ส่วนเสริม 2: อีก 16 ใบ จากภาพ — มอนสเตอร์ 8 (หลอมรวม 1), เวท 6, กับดัก 2) · ชื่อการ์ดเป็นชื่อเฉพาะของเกม · NR=R, ScR=UR =====
+// Mushroom Man #2=Capcap Sporeling · Lava Battleguard=Moltenrock Warden · B. Dragon Jungle King=Thicket Wyrm Sovereign · Ghoul with an Appetite=Gluttonous Ghoul · Twin-Headed Thunder Dragon=Twin-Crown Stormwyrm (Stormbolt Drake x2)
+// Royal Guard=Regal Bulwark · Barrel Dragon=Cylinder Drake · The Unhappy Maiden=Forlorn Damsel · Tremendous Fire=Inferno Cascade · Shield & Sword=Buckler and Blade · Sword of Deep-Seated=Ingrained Edge
+// Block Attack=Standstill Decree · Germ Infection=Microbe Blight · Robbin' Goblin=Pilfering Goblin · Mirror Force=Aegis Rebound · Paralyzing Potion=Numbing Elixir
+const PK20C=[
+ ['Capcap Sporeling',1250,800,3,'C'],['Moltenrock Warden',1550,1800,4,'C'],['Thicket Wyrm Sovereign',2100,1800,6,'C'],
+ ['Gluttonous Ghoul',1600,1200,4,'C'],['Twin-Crown Stormwyrm',2800,2100,7,'UR'],['Regal Bulwark',1900,2200,6,'C'],
+ ['Cylinder Drake',2600,2200,7,'UR'],['Forlorn Damsel',0,100,1,'SR']
+];
+const PK20CS=[
+ ['Inferno Cascade','tf','เวทมนตร์: ทำความเสียหายให้คู่ต่อสู้ 1000 LP และผู้ใช้เสีย 500 LP','R','s'],
+ ['Buckler and Blade','bs','เวทมนตร์: สลับค่า ATK กับ DEF ของมอนสเตอร์หงายหน้าทั้งหมดบนสนามทั้งสองฝ่าย (คืนค่าเมื่อเริ่มเทิร์นถัดไป)','UR','s'],
+ ['Standstill Decree','ba','เวทมนตร์: เลือกมอนสเตอร์ท่าโจมตีที่หงายหน้าของคู่ต่อสู้ 1 ตัว เปลี่ยนเป็นท่าป้องกัน','C','s'],
+ ['Aegis Rebound','mf','กับดัก: ตอนมอนสเตอร์ของคู่ต่อสู้ประกาศโจมตี ทำลายมอนสเตอร์ท่าโจมตีทั้งหมดของคู่ต่อสู้','UR','t']
+];
+Object.assign(TYPES,{'Capcap Sporeling':'Plant','Moltenrock Warden':'Fiend','Thicket Wyrm Sovereign':'Reptile','Gluttonous Ghoul':'Fiend','Twin-Crown Stormwyrm':'Thunder','Regal Bulwark':'Warrior','Cylinder Drake':'Machine','Forlorn Damsel':'Spellcaster'});
+Object.assign(ATTR,{'Capcap Sporeling':'EARTH','Moltenrock Warden':'EARTH','Thicket Wyrm Sovereign':'EARTH','Gluttonous Ghoul':'DARK','Twin-Crown Stormwyrm':'LIGHT','Regal Bulwark':'EARTH','Cylinder Drake':'DARK','Forlorn Damsel':'LIGHT'});
+Object.assign(FUS,{'Twin-Crown Stormwyrm':['Stormbolt Drake','Stormbolt Drake']}); // อยู่ใน Extra Deck
+PK20C.forEach(([n,a,d,l,r])=>{CARDS[n]={t:'m',n,a,d,l};RAR[n]=r;if(r=='UR'||r=='SR')RARE.push(n)});
+PK20CS.forEach(([n,k,x,r,t])=>{CARDS[n]={t,n,k,x};RAR[n]=r;if(r=='UR'||r=='SR')RARE.push(n)});
+// การ์ดที่อยู่ในเกมแล้วแต่ยังไม่มีเอฟเฟกต์: Ingrained Edge · Microbe Blight · Pilfering Goblin · Numbing Elixir · Cylinder Drake · Forlorn Damsel · Capcap Sporeling
+const PK20CR=[
+ ['Ingrained Edge','การ์ดเวทอุปกรณ์: เลือกมอนสเตอร์ของเรา 1 ตัว ATK/DEF +500 (เป็นอุปกรณ์ใช้ได้กับทุกชนิด)','C','s','ied'],
+ ['Microbe Blight','การ์ดเวทอุปกรณ์: สวมได้กับมอนสเตอร์ของฝ่ายใดก็ได้ ATK ของมอนสเตอร์ที่ไม่ใช่เผ่า Machine ที่สวมการ์ดนี้ลดลง 300 ทุก Standby Phase ของผู้ใช้การ์ดนี้ (ถ้าสวมกับเผ่า Machine จะไม่มีผล)','R','s','mbl'],
+ ['Pilfering Goblin','กับดักต่อเนื่อง: ตั้งไว้ก่อน ทุกครั้งที่มอนสเตอร์ของเราสร้างดาเมจการต่อสู้ให้คู่ต่อสู้ คู่ต่อสู้ทิ้งการ์ดบนมือแบบสุ่ม 1 ใบ','SR','t','pgb'],
+ ['Numbing Elixir','การ์ดเวทอุปกรณ์: สวมได้กับมอนสเตอร์ของฝ่ายใดก็ได้ มอนสเตอร์ที่ไม่ใช่เผ่า Machine ที่สวมการ์ดนี้โจมตีไม่ได้ (ถ้าสวมกับเผ่า Machine จะไม่มีผล)','R','s','nme']
+];
+PK20CR.forEach(([n,x,r,t,k])=>{CARDS[n]={t,n,k,x};RAR[n]=r;if(r=='UR'||r=='SR')RARE.push(n)});
+TRG.mf='atk';
+/*ART20C*/(()=>{const R=c=>`<rect width='100' height='80' fill='${c}'/>`,P=(d,f,s,w=2)=>`<path d='${d}' fill='${f}'${s?` stroke='${s}' stroke-width='${w}'`:''}/>`,C=(x,y,r,f)=>`<circle cx='${x}' cy='${y}' r='${r}' fill='${f}'/>`,L=(d,c,w=2)=>`<path d='${d}' stroke='${c}' stroke-width='${w}' fill='none'/>`,E=(x,y,c='#ffe040',r=2.4)=>C(x,y,r,c)+C(x,y,r/2.4,'#111');
+Object.assign(ART,{
+'Capcap Sporeling':R('#6a3a1a')+P('M12 44 Q50 -6 88 44Z','#3a7ad0','#12306a')+P('M40 44 H60 V80 H40Z','#c88a4a','#5a3a14')+E(46,58,'#222',1.6)+E(54,58,'#222',1.6),
+'Moltenrock Warden':R('#3a0a0a')+P('M14 80 Q16 40 50 36 Q84 40 86 80Z','#c83a5a','#5a0a20')+C(50,26,12,'#e0507a')+P('M36 20 Q26 6 22 14 Q32 16 38 24Z M64 20 Q74 6 78 14 Q68 16 62 24Z','#f0e0a0')+E(45,26,'#ffe040',2.2)+E(56,26,'#ffe040',2.2)+L('M0 74 Q20 66 40 74 T100 72','#ff7a20',3),
+'Thicket Wyrm Sovereign':R('#14301a')+P('M8 72 Q10 34 40 30 Q70 26 92 44 Q80 52 60 52 Q40 66 28 76Z','#3a2a5a','#12082a')+E(70,38,'#ffe040',3)+P('M72 46 L76 54 L80 46 L84 54Z','#fff')+L('M0 60 Q10 40 4 20 M96 70 Q90 56 98 40','#2a8a3a',3),
+'Gluttonous Ghoul':R('#2a1a4a')+C(50,48,26,'#6a3ab0')+E(42,40,'#ffe040',3)+E(58,40,'#ffe040',3)+P('M34 54 Q50 76 66 54 Q50 62 34 54Z','#2a0a2a')+P('M44 58 Q50 78 56 58Z','#e04a7a'),
+'Twin-Crown Stormwyrm':R('#2a1a4a')+P('M10 78 Q8 40 34 32 L28 12 L40 24 Q50 22 60 24 L72 12 L66 32 Q92 40 90 78Z','#8a5ad0','#2a0a5a')+E(36,40,'#ffe840',3)+E(64,40,'#ffe840',3)+L('M50 0 L42 20 L54 22 L44 44','#ffe840',3),
+'Regal Bulwark':R('#2a2a3a')+P('M18 80 Q20 42 50 38 Q80 42 82 80Z','#4a7ac0','#12306a')+P('M30 30 Q50 6 70 30 V42 H30Z','#8aa0d0','#2a3a6a')+L('M38 34 H62','#0a0a14',3)+C(26,64,10,'#8aa0d0')+C(74,64,10,'#8aa0d0')+P('M44 62 L50 50 L56 62Z','#e8c040'),
+'Cylinder Drake':R('#1a1a2a')+C(50,44,26,'#4a4a5a')+C(50,44,6,'#0a0a14')+C(50,26,5,'#0a0a14')+C(50,62,5,'#0a0a14')+C(32,44,5,'#0a0a14')+C(68,44,5,'#0a0a14')+P('M70 20 L92 6 L90 26Z','#c82a2a')+E(78,18,'#ffe040',2),
+'Forlorn Damsel':R('#e8d8f0')+C(50,60,26,'#fff0c0')+P('M36 80 Q36 52 50 48 Q64 52 64 80Z','#6a9ad0')+C(50,38,11,'#f4d8c0')+P('M38 34 Q36 14 50 14 Q64 14 62 34 Q54 22 50 24 Q44 22 38 34Z','#e0602a')+L('M44 40 Q50 36 56 40','#222',1.5),
+'Inferno Cascade':R('#5a0a0a')+P('M0 80 Q20 20 40 60 Q50 4 62 56 Q80 20 100 80Z','#ff7a20','#a01a00')+P('M20 80 Q40 40 50 80Z M50 80 Q70 36 82 80Z','#ffd040'),
+'Buckler and Blade':R('#1a3a4a')+C(32,44,22,'#d8a030')+L('M32 26 V62 M14 44 H50','#7a5a10',3)+L('M62 70 L84 10','#d8e0f0',5)+P('M56 58 H78 V64 H56Z','#c8a040'),
+'Standstill Decree':R('#1a3a2a')+C(50,40,24,'#d8d8e8')+L('M30 22 L70 58 M70 22 L30 58','#c82a2a',6)+P('M36 62 H64 V76 H36Z','#4a5a8a'),
+'Aegis Rebound':R('#1a1a4a')+C(50,40,30,'#e8f0ff')+C(50,40,24,'#a0c0ff')+P('M50 8 L56 36 L84 40 L56 46 L50 74 L44 46 L16 40 L44 36Z','#fff'),
+'Ingrained Edge':R('#2a1a3a')+P('M50 4 L60 52 L50 72 L40 52Z','#a050c0','#3a0a5a')+P('M30 54 H70 V62 H30Z','#c8a040'),
+'Microbe Blight':R('#14301a')+C(50,40,26,'#8ac060')+C(36,32,6,'#3a6a1a')+C(60,48,8,'#3a6a1a')+C(52,28,4,'#3a6a1a')+L('M20 20 L12 12 M80 62 L90 70','#6aa040',3),
+'Pilfering Goblin':R('#2a3a1a')+P('M26 80 Q28 48 50 44 Q72 48 74 80Z','#2a6a8a')+C(50,32,12,'#7aaa4a')+P('M38 26 L28 10 L42 20Z M62 26 L72 10 L58 20Z','#7aaa4a')+E(45,32,'#ffe040',2)+E(56,32,'#ffe040',2)+L('M74 70 L88 40','#c8d0e0',3),
+'Numbing Elixir':R('#14302a')+P('M38 30 H62 V40 L76 70 Q50 82 24 70 L38 40Z','#5ac0a0','#14504a')+P('M42 20 H58 V32 H42Z','#c8a040')+C(50,60,4,'#d8ffe8')
+});})();
+// ===== Booster Pack 07 (18 ใบจากภาพ: C ×17 + R ×1 ซ้ำจาก Vol.7) · ชื่อการ์ดเป็นชื่อเฉพาะของเกม =====
+// Mushroom Man=Toadstool Drifter · Koumori Dragon=Vesper Wyrm · Jellyfish=Tidal Medusa · Grappler=Gripfang Serpent · Megazowler=Triplehorn Behemoth · Castle of Dark Illusions=Citadel of Twilight Delusions
+// King of Yamimakai=Gloomrealm Overlord · Metal Guardian=Steelward Sentinel · Crass Clown=Grisly Jester · Pumpking the King of Ghosts=Gourdking, Lord of Specters · Job-Change Mirror=Vocation Swap Mirror · Dream Clown=Reverie Jester
+// Tainted Wisdom=Corrupted Cognition · Ancient Brain=Primeval Cerebrum · Ancient Sorcerer=Elder Hexmaster · The Little Swordsman of Aile=Aile Fledgling Blade · Princess of Tsurugi=Swordcourt Queen (ซ้ำจาก Vol.7) · Moon Envoy=Lunar Emissary
+const PK21=[
+ ['Toadstool Drifter',800,600,2,'C'],['Vesper Wyrm',1500,1200,4,'C'],['Tidal Medusa',1200,1500,4,'C'],
+ ['Gripfang Serpent',1300,1200,4,'C'],['Triplehorn Behemoth',1800,2000,5,'C'],['Citadel of Twilight Delusions',920,1930,4,'C'],
+ ['Gloomrealm Overlord',2000,1530,5,'C'],['Steelward Sentinel',1150,2150,5,'C'],['Grisly Jester',1350,1400,4,'C'],
+ ['Gourdking, Lord of Specters',1800,2000,6,'C'],['Vocation Swap Mirror',800,1300,3,'C'],['Reverie Jester',1200,900,3,'C'],
+ ['Corrupted Cognition',1250,800,3,'C'],['Primeval Cerebrum',2000,700,5,'C'],['Elder Hexmaster',1000,1300,4,'C'],
+ ['Aile Fledgling Blade',800,1000,3,'C'],['Lunar Emissary',1100,1000,4,'C']
+];
+Object.assign(TYPES,{'Toadstool Drifter':'Plant','Vesper Wyrm':'Dragon','Tidal Medusa':'Aqua','Gripfang Serpent':'Aqua','Triplehorn Behemoth':'Dinosaur','Citadel of Twilight Delusions':'Fiend','Gloomrealm Overlord':'Fiend','Steelward Sentinel':'Machine','Grisly Jester':'Fiend','Gourdking, Lord of Specters':'Zombie','Vocation Swap Mirror':'Fiend','Reverie Jester':'Warrior','Corrupted Cognition':'Fiend','Primeval Cerebrum':'Fiend','Elder Hexmaster':'Spellcaster','Aile Fledgling Blade':'Warrior','Lunar Emissary':'Fiend'});
+Object.assign(ATTR,{'Toadstool Drifter':'EARTH','Vesper Wyrm':'DARK','Tidal Medusa':'WATER','Gripfang Serpent':'WATER','Triplehorn Behemoth':'EARTH','Citadel of Twilight Delusions':'DARK','Gloomrealm Overlord':'DARK','Steelward Sentinel':'DARK','Grisly Jester':'DARK','Gourdking, Lord of Specters':'DARK','Vocation Swap Mirror':'DARK','Reverie Jester':'EARTH','Corrupted Cognition':'DARK','Primeval Cerebrum':'DARK','Elder Hexmaster':'DARK','Aile Fledgling Blade':'WATER','Lunar Emissary':'EARTH'});
+PK21.forEach(([n,a,d,l,r])=>{CARDS[n]={t:'m',n,a,d,l};RAR[n]=r});
+
+// ===== Booster Pack 07 (เพิ่มอีก 18 ใบจากภาพ: ใหม่ 14 ใบ + ซ้ำที่มีในเกมแล้ว 4 ใบ) · ชื่อการ์ดเป็นชื่อเฉพาะของเกม =====
+// Jirai Gumo=Landmine Weaver · Monster Tamer=Infernal Beastmaster · Ryu-Kishin Powered=Gargoyle Surgeclaw · Bickuribox=Springfright Box · Blocker=Barricade Puppet · Stone Dragon=Granite Drake
+// Beautiful Beast Trainer=Enchanting Menagerist · Millennium Golem=Aeon Golem · Insect Soldiers of the Sky=Skyborne Hive Troops · Yado Karu=Shellhermit · The Bistro Butcher=Hellkitchen Carver · Night Lizard=Gloamscale Lizard · Skull Knight=Bone Bishop
+// Ring of Magnetism=Lodestone Band (ใหม่) · ซ้ำที่มีแล้ว: Thunder Dragon=Stormbolt Drake · Tremendous Fire=Inferno Cascade · Germ Infection=Microbe Blight · Paralyzing Potion=Numbing Elixir
+const PK21B=[['Landmine Weaver',2200,100,4,'C'],['Infernal Beastmaster',1800,1600,4,'C'],['Gargoyle Surgeclaw',1600,1200,4,'C'],['Springfright Box',2300,2000,6,'C'],['Barricade Puppet',800,1800,4,'C'],['Granite Drake',2000,2300,6,'C'],['Enchanting Menagerist',1750,1500,5,'C'],['Aeon Golem',2000,2200,5,'C'],['Skyborne Hive Troops',1000,800,3,'C'],['Shellhermit',900,1700,4,'C'],['Hellkitchen Carver',1800,1000,4,'C'],['Gloamscale Lizard',1150,1200,4,'C'],['Bone Bishop',1650,1800,6,'C']];
+Object.assign(TYPES,{'Landmine Weaver':'Insect','Infernal Beastmaster':'Warrior','Gargoyle Surgeclaw':'Fiend','Springfright Box':'Fiend','Barricade Puppet':'Fiend','Granite Drake':'Dragon','Enchanting Menagerist':'Beast-Warrior','Aeon Golem':'Rock','Skyborne Hive Troops':'Insect','Shellhermit':'Aqua','Hellkitchen Carver':'Fiend','Gloamscale Lizard':'Reptile','Bone Bishop':'Spellcaster'});
+Object.assign(ATTR,{'Landmine Weaver':'EARTH','Infernal Beastmaster':'EARTH','Gargoyle Surgeclaw':'DARK','Springfright Box':'DARK','Barricade Puppet':'DARK','Granite Drake':'EARTH','Enchanting Menagerist':'EARTH','Aeon Golem':'EARTH','Skyborne Hive Troops':'WIND','Shellhermit':'WATER','Hellkitchen Carver':'DARK','Gloamscale Lizard':'WATER','Bone Bishop':'DARK'});
+PK21B.forEach(([n,a,d,l,r])=>{CARDS[n]={t:'m',n,a,d,l};RAR[n]=r});
+const PK21BS=[['Lodestone Band','rom','การ์ดอุปกรณ์: เลือกมอนสเตอร์ของเรา 1 ตัว (ใช้ได้กับทุกชนิด) ATK/DEF -500 · มอนสเตอร์ของคู่ต่อสู้ต้องโจมตีมอนสเตอร์ตัวที่ติดการ์ดนี้เท่านั้น ตราบที่ยังอยู่บนสนาม','C','s']];
+PK21BS.forEach(([n,k,x,r,t])=>{CARDS[n]={t,n,k,x};RAR[n]=r});
+const PK21CS=[
+ ['Shared Agony','stp','เวทมนตร์: สังเวยมอนสเตอร์ของเรา 1 ตัว แล้วคู่ต่อสู้ต้องเลือกสังเวยมอนสเตอร์ของเขา 1 ตัว','C','s'],
+ ['Adrenaline Vial','stm','การ์ดเวทอุปกรณ์: สวมได้กับมอนสเตอร์ของฝ่ายใดก็ได้ ATK +700 และ ATK ของมอนสเตอร์ที่สวมลดลง 200 ทุก Standby Phase ของผู้ใช้การ์ดนี้','C','s'],
+ ['Cataclysm Gale','hst','เวทมนตร์: ทำลายการ์ดเวทมนตร์และกับดักทั้งหมดบนสนามของทั้งสองฝ่าย','C','s'],
+ ["Griffin's Pinion",'gw','กับดัก: ตั้งไว้ก่อน เมื่อคู่ต่อสู้ใช้ Siren Plume Duster จะลบล้างการใช้ และทำลายการ์ดเวทมนตร์/กับดักทั้งหมดของคู่ต่อสู้เท่านั้นแทน (ใช้ได้ครั้งเดียว)','C','t']];
+PK21CS.forEach(([n,k,x,r,t])=>{CARDS[n]={t,n,k,x};RAR[n]=r});
+TRG.gw='spl';EQSIDE.stm='any';
+/*ART7C*/(()=>{const R=c=>`<rect width='100' height='80' fill='${c}'/>`,P=(d,f,s)=>`<path d='${d}' fill='${f}'${s?` stroke='${s}' stroke-width='2'`:''}/>`,C=(x,y,r,f)=>`<circle cx='${x}' cy='${y}' r='${r}' fill='${f}'/>`,L=(d,c,w=2)=>`<path d='${d}' stroke='${c}' stroke-width='${w}' fill='none'/>`;
+Object.assign(ART,{
+'Shared Agony':R('#3a1a3a')+P('M10 80 Q14 46 30 42 Q46 46 48 80Z','#5a6a8a','#1a2a4a')+P('M52 80 Q54 46 70 42 Q86 46 90 80Z','#8a3a3a','#3a0a0a')+C(30,32,9,'#d8b090')+C(70,32,9,'#d8b090')+L('M36 50 Q50 40 64 50','#ff4a6a',3)+L('M46 20 L50 30 L54 20','#ffe060',2),
+'Adrenaline Vial':R('#14403a')+P('M38 18 H62 V30 L72 70 Q50 80 28 70 L38 30Z','#c8e8f0','#4a7a8a')+P('M32 52 Q50 46 68 52 L72 70 Q50 80 28 70Z','#e83a4a')+P('M36 10 H64 V18 H36Z','#8a6a3a')+L('M44 38 V46 M56 40 V48','#fff',2)+L('M10 30 L22 22 M90 30 L78 22 M12 60 L24 56 M88 60 L76 56','#ffe060',3),
+'Cataclysm Gale':R('#14305a')+L('M6 22 Q50 4 94 24 M10 38 Q50 22 90 40 M16 54 Q50 40 84 56','#8ad0ff',4)+P('M30 60 L38 48 L46 62Z','#8a6a4a')+P('M58 30 L70 22 L72 36Z','#6a5a8a')+C(50,40,6,'#fff')+L('M50 40 Q70 30 64 14','#fff',2),
+'Griffin\'s Pinion':R('#4a1a4a')+P('M50 70 Q20 54 8 18 Q30 28 50 40Z M50 70 Q80 54 92 18 Q70 28 50 40Z','#c87a2a','#5a2a0a')+P('M40 44 Q50 32 60 44 L56 72 Q50 78 44 72Z','#4a6ab8')+C(50,36,9,'#e8c070')+P('M46 30 L40 24 L50 28 L60 24 L54 30Z','#e8c070')+L('M20 26 L32 40 M80 26 L68 40','#ffe8a0',2),
+});})();
+Object.assign(FUS,{'Springfright Box':['Grisly Jester','Reverie Jester'],'Bone Bishop':['Elder Hexmaster','Gourdking, Lord of Specters']}); // ฟิวชั่น (อยู่ใน Extra Deck): Bickuribox=Crass Clown+Dream Clown · Skull Knight=Elder Hexmaster+Gourdking
+// เอฟเฟกต์: Landmine Weaver (ทอยเหรียญตอนโจมตี ก้อย=เสีย 1000 LP) · Hellkitchen Carver (ทำดาเมจการต่อสู้ → คู่ต่อสู้จั่ว 2 ใบ) · Shellhermit (ฟลิป: เอาการ์ดบนมือ 1 ใบวางบนสุดของเด็ค)
+['Landmine Weaver','Hellkitchen Carver','Shellhermit','Skyborne Hive Troops'].forEach(n=>EFFM.add(n));
+EFXT['Landmine Weaver']='ทุกครั้งที่การ์ดนี้โจมตี ทอยเหรียญ 1 ครั้ง ถ้าออกก้อย LP ของผู้ใช้ลดลงครึ่งหนึ่ง';
+EFXT['Hellkitchen Carver']='เมื่อการ์ดนี้ทำความเสียหายจากการต่อสู้ให้ LP คู่ต่อสู้ คู่ต่อสู้จั่วการ์ด 2 ใบ';
+EFXT['Shellhermit']='เมื่อการ์ดนี้เปลี่ยนจากท่าโจมตีเป็นท่าป้องกัน: เลือกการ์ดบนมือกี่ใบก็ได้ วางไว้ใต้สุดของเด็คตามลำดับที่ต้องการ';
+EFXT['Skyborne Hive Troops']='เมื่อการ์ดนี้โจมตีมอนสเตอร์ธาตุ WIND ATK ของการ์ดนี้เพิ่ม 1000 เฉพาะตอนคำนวณความเสียหาย';
+/*ART7B*/(()=>{const R=c=>`<rect width='100' height='80' fill='${c}'/>`,P=(d,f,s)=>`<path d='${d}' fill='${f}'${s?` stroke='${s}' stroke-width='2'`:''}/>`,C=(x,y,r,f)=>`<circle cx='${x}' cy='${y}' r='${r}' fill='${f}'/>`,L=(d,c,w=2)=>`<path d='${d}' stroke='${c}' stroke-width='${w}' fill='none'/>`,E=(x,y,c='#ffe040',r=2.4)=>C(x,y,r,c)+C(x,y,r/2.4,'#111'),E2=(x,y,rx,ry,f)=>`<ellipse cx='${x}' cy='${y}' rx='${rx}' ry='${ry}' fill='${f}'/>`;
+Object.assign(ART,{
+'Landmine Weaver':R('#3a1a10')+L('M50 6 V74 M10 40 H90 M20 14 L80 66 M80 14 L20 66','#d8d0c0',1.2)+E2(50,48,22,16,'#8a2a1a')+C(50,30,10,'#a8402a')+E(45,28,'#ffe040',2.6)+E(55,28,'#ffe040',2.6)+L('M30 50 L10 38 M30 56 L8 60 M70 50 L90 38 M70 56 L92 60','#3a1008',3),
+'Infernal Beastmaster':R('#6a2a14')+P('M30 80 Q30 46 50 42 Q70 46 70 80Z','#a82020','#4a0a0a')+C(50,30,11,'#d8a070')+P('M36 26 Q50 6 64 26Z','#c82020')+L('M20 60 L36 52 M80 60 L64 52','#e8c030',3)+L('M16 40 L26 20 M84 40 L74 20','#f0d890',3),
+'Gargoyle Surgeclaw':R('#3a1a6a')+P('M50 44 Q10 20 6 52 Q22 44 38 56Z M50 44 Q90 20 94 52 Q78 44 62 56Z','#5a2a8a','#2a0a4a')+P('M36 44 Q50 38 64 44 L60 72 Q50 78 40 72Z','#b83a6a')+C(50,32,11,'#c84a7a')+E(45,30,'#ffe040',2.4)+E(55,30,'#ffe040',2.4)+L('M20 70 L12 78 M80 70 L88 78','#e8e0f0',3),
+'Springfright Box':R('#5a1a6a')+P('M24 80 V52 H76 V80Z','#7a2a9a','#2a0a3a')+P('M24 52 L18 40 H82 L76 52Z','#a850c8')+C(50,28,12,'#e8e8f0')+P('M44 30 L50 44 L56 30Z','#f0a020')+E(46,24,'#222',2.2)+E(56,24,'#222',2.2)+L('M34 52 L66 52','#f0d030',2),
+'Barricade Puppet':R('#4a2a14')+P('M30 80 L34 40 H66 L70 80Z','#b8601a','#4a2a08')+C(50,30,11,'#c88a3a')+L('M22 56 L78 44','#d0d8e0',5)+L('M44 40 V80 M56 40 V80','#7a3a10',2)+E(46,28,'#222',2)+E(55,28,'#222',2),
+'Granite Drake':R('#1a2a3a')+P('M10 70 Q10 30 40 26 L44 10 L54 22 Q80 20 92 40 Q80 52 62 50 Q60 64 56 74Z','#4a6a8a','#12243a')+L('M26 56 L44 40 M30 66 L56 50','#9ab0c8',3)+E(66,34,'#ffe040',3)+L('M66 44 l4 6 4 -6','#fff',1.5),
+'Enchanting Menagerist':R('#14306a')+P('M30 80 Q32 48 50 44 Q68 48 70 80Z','#2a9a5a','#0a4a24')+C(50,32,10,'#f4d4b8')+P('M38 30 Q34 6 54 8 Q70 14 62 34 Q58 20 50 20Z','#2a3ac0')+L('M70 46 Q90 52 86 74','#c8a050',2.5)+E(47,33,'#222',1.8)+E(54,33,'#222',1.8),
+'Aeon Golem':R('#2a2438')+P('M26 80 V40 H74 V80Z','#6a5a48','#2a2018')+P('M32 40 V22 H68 V40Z','#8a7a64','#2a2018')+C(50,52,9,'#e8c860')+C(50,52,4,'#2a1a08')+L('M26 66 H74 M38 40 V80 M62 40 V80','#3a2e22',2)+L('M42 30 H58','#ffd040',3),
+'Skyborne Hive Troops':R('#4a3a7a')+P('M50 44 Q16 16 8 42 Q26 38 42 52Z M50 44 Q84 16 92 42 Q74 38 58 52Z','#d8e8f8','#8aa8c8')+E2(50,52,10,20,'#8a2a1a')+C(50,30,8,'#a83a2a')+E(46,28,'#fff',2)+E(54,28,'#fff',2)+L('M42 72 L38 80 M58 72 L62 80','#3a1008',2.5),
+'Shellhermit':R('#14507a')+P('M0 62 Q25 54 50 62 T100 62 V80 H0Z','#0e3458')+P('M26 66 Q22 30 52 26 Q82 30 78 66Z','#2a8a4a','#0e4a24')+L('M36 60 Q40 40 52 36 Q62 44 64 60','#e8d890',3)+C(70,60,8,'#3a9a5a')+E(72,56,'#ffe040',2.2)+L('M30 62 L18 74 M70 66 L84 76','#1a5a2a',3),
+'Hellkitchen Carver':R('#4a1010')+P('M28 80 Q30 46 50 42 Q70 46 72 80Z','#7a1a2a','#3a0810')+P('M36 80 L40 52 H60 L64 80Z','#e8e0d0')+C(50,30,11,'#c04a5a')+P('M38 22 L32 8 L44 18Z M62 22 L68 8 L56 18Z','#e8e0c0')+E(45,30,'#ffe040',2.2)+E(55,30,'#ffe040',2.2)+L('M74 76 L84 24','#e0e8f0',4),
+'Gloamscale Lizard':R('#102a4a')+P('M30 80 Q30 46 50 42 Q70 46 70 80Z','#2a8a4a','#0a3a1a')+C(50,30,11,'#3aa85a')+P('M42 22 L36 12 L48 20Z M58 22 L64 12 L52 20Z','#2a8a4a')+E(45,30,'#ffe040',2.2)+E(55,30,'#ffe040',2.2)+L('M70 70 L82 16','#c8d0e0',3.5)+L('M20 66 Q6 60 10 44','#2a8a4a',5),
+'Bone Bishop':R('#2a1a3a')+P('M28 80 Q30 46 50 42 Q70 46 72 80Z','#4a2a6a','#1a0a2a')+C(50,30,12,'#e8e4d8')+P('M38 22 Q50 -2 62 22Z','#8a2a5a')+C(45,30,3,'#111')+C(55,30,3,'#111')+L('M44 38 H56 M46 36 v4 M50 36 v4 M54 36 v4','#222',1.4)+L('M78 76 V14','#c8a050',3)+C(78,12,5,'#e8e0d0'),
+'Lodestone Band':R('#14403a')+'<circle cx="50" cy="40" r="22" fill="none" stroke="#c8d0d8" stroke-width="8"/><circle cx="50" cy="40" r="22" fill="none" stroke="#d04040" stroke-width="3" stroke-dasharray="14 120"/>'+L('M14 20 Q30 40 14 60 M86 20 Q70 40 86 60','#6ab0f0',2)+L('M20 12 L30 20 M80 12 L70 20 M20 68 L30 60 M80 68 L70 60','#6ab0f0',1.5),
+});})();
+// เอฟเฟกต์: Gourdking (Pumpking) — มอนสเตอร์ชนิด Zombie ทุกตัวบนสนามทั้งสองฝ่าย ATK/DEF +200 ขณะที่หงายหน้าอยู่
+EFFM.add('Gourdking, Lord of Specters');
+EFXT['Gourdking, Lord of Specters']='ถ้า Citadel of Twilight Delusions (Castle of Dark Illusions) หงายหน้าอยู่บนสนาม ATK/DEF ของการ์ดนี้เพิ่ม 100 และเพิ่ม 100 ทุก Standby Phase ของเจ้าของ ตราบที่ Citadel ยังหงายหน้าอยู่ ผลนี้ต่อเนื่องจนถึงเทิร์นที่ 4 ของเจ้าของหลังจากเริ่มผล';
+function gourdFx(){ // Gourdking (Pumpking): ถ้า Citadel of Twilight Delusions (Castle of Dark Illusions) หงายหน้าอยู่บนสนาม ATK/DEF +100 และ +100 ทุก Standby Phase ของเจ้าของ จนถึงเทิร์นที่ 4 หลังเริ่มผล · ผลหมดเมื่อ Citadel ออกจากสนาม/คว่ำ
+  const cs=[0,1].some(z=>G.f[z].some(x=>x&&!x.fd&&x.n=='Citadel of Twilight Delusions'));
+  [0,1].forEach(z=>G.f[z].forEach(m=>{if(!m||m.n!='Gourdking, Lord of Specters')return;
+    if(cs&&!m.fd&&!m.gAct){m.gAct=1;m.gn=0;m.gb=100;m.a+=100;m.d+=100;log(`${m.n}: Citadel of Twilight Delusions หงายหน้าอยู่ ATK/DEF +100`)}
+    else if((!cs||m.fd)&&m.gAct){m.a=Math.max(0,m.a-m.gb);m.d=Math.max(0,m.d-m.gb);m.gAct=0;m.gb=0;m.gn=0}}))}
+// ===== เอฟเฟกต์ Booster Pack 07 ตามข้อความการ์ดจริง =====
+// Castle of Dark Illusions=Citadel of Twilight Delusions (ฟลิป) · Crass Clown=Grisly Jester · Dream Clown=Reverie Jester · Tainted Wisdom=Corrupted Cognition · The Little Swordsman of Aile=Aile Fledgling Blade (Pumpking=Gourdking ทำไว้แล้วด้านบน)
+FLIPM.add('Citadel of Twilight Delusions');
+['Citadel of Twilight Delusions','Grisly Jester','Reverie Jester','Corrupted Cognition','Aile Fledgling Blade'].forEach(n=>EFFM.add(n));
+EFXT['Citadel of Twilight Delusions']='ฟลิป: ATK/DEF ของมอนสเตอร์ชนิด Zombie ที่หงายหน้าอยู่บนสนามทั้งสองฝ่ายเพิ่ม 200 ตราบที่การ์ดนี้ยังหงายหน้าอยู่ ATK/DEF ของมอนสเตอร์เหล่านั้นจะเพิ่มอีก 200 ทุก Standby Phase ของเจ้าของ จนถึง Standby Phase ที่ 4 หลังฟลิป';
+EFXT['Grisly Jester']='เมื่อการ์ดนี้เปลี่ยนจากท่าป้องกันเป็นท่าโจมตี: ส่งมอนสเตอร์ของคู่ต่อสู้ 1 ตัวกลับขึ้นมือเจ้าของ (เลือกเอง)';
+EFXT['Reverie Jester']='เมื่อการ์ดนี้เปลี่ยนจากท่าโจมตีเป็นท่าป้องกัน: ทำลายมอนสเตอร์ของคู่ต่อสู้ 1 ตัว (เลือกเอง)';
+EFXT['Corrupted Cognition']='เมื่อการ์ดนี้เปลี่ยนจากท่าโจมตีเป็นท่าป้องกัน: สับเด็คของตัวเอง';
+EFXT['Aile Fledgling Blade']='สังเวยมอนสเตอร์อื่นของเรา 1 ตัว (กดปุ่มที่การ์ดบนสนามใน Main Phase): ATK ของการ์ดนี้เพิ่ม 700 จนจบเทิร์น ใช้ได้ทุกครั้งที่สังเวย · ฝั่ง AI ยังไม่ใช้เอฟเฟกต์นี้';
+const POSM=new Set(['Grisly Jester','Reverie Jester','Corrupted Cognition','Shellhermit']); // เอฟเฟกต์ที่ทำงานเมื่อเปลี่ยนท่า
+function citFx(){ // Citadel: ผลบวก Zombie จะหายเมื่อ Citadel ต้นทางไม่ได้หงายหน้าอยู่บนสนามแล้ว
+  const live=new Set();[0,1].forEach(z=>G.f[z].forEach(m=>{if(m&&!m.fd&&m.cAct)live.add(m.id)}));
+  [0,1].forEach(z=>G.f[z].forEach(t=>{if(t&&t.zm)for(const id in t.zm)if(!live.has(+id)){const v=t.zm[id];t.a=Math.max(0,t.a-v);t.d=Math.max(0,t.d-v);delete t.zm[id]}}))}
+async function jstPick(p,nm,vb){ // เลือกมอนสเตอร์ของคู่ต่อสู้ (คืนตำแหน่ง หรือ -1 ถ้าไม่มี) · บอทเลือกตัวที่ ATK สูงสุด
+  const q=1-p,idx=[];G.f[q].forEach((t,k)=>{if(t)idx.push(k)});if(!idx.length)return -1;let j=idx[0];
+  if(MODE!='pvp'&&p==1)idx.forEach(k=>{if(G.f[q][k].a>G.f[q][j].a)j=k});
+  else if(idx.length>1){const v=await askQ(p,`${nm}: เลือกมอนสเตอร์ของคู่ต่อสู้ 1 ตัวที่จะ${vb}`,idx.map(k=>({k:'m',n:G.f[q][k].n,x:G.f[q][k].fd?'(ตั้งคว่ำอยู่)':`ATK ${G.f[q][k].a} / DEF ${G.f[q][k].d}`})));if(v)j=idx[v-1]}
+  return j}
+async function posFx(p,m,from,to){ // เอฟเฟกต์เมื่อเปลี่ยนท่า: Grisly Jester (ป้องกัน→โจมตี) / Reverie Jester, Corrupted Cognition (โจมตี→ป้องกัน)
+  if(!m||m.fd)return;const q=1-p,n=m.n;
+  if(n=='Corrupted Cognition'&&from=='a'&&to=='d'){emit({t:'act',p,n,x:EFXT[n],k:'flip'});sh(G.deck[p]);log(`${who(p)}: ${n} เปลี่ยนเป็นท่าป้องกัน สับเด็คของตัวเอง`)}
+  else if(n=='Shellhermit'&&from=='a'&&to=='d'){
+    if(MODE!='pvp'&&p==1){log(`${who(p)}: ${n} เปลี่ยนเป็นท่าป้องกัน แต่ไม่ได้ใช้เอฟเฟกต์`)}
+    else{let k=0;while(G.hand[p].length){const v=await askQ(p,`${n}: เลือกการ์ดบนมือที่จะวางไว้ใต้เด็ค (${k?'ใบถัดไป · ':''}เลือกตามลำดับ · ปิดเพื่อเสร็จสิ้น)`,G.hand[p].map(c=>({k:'m',n:c.n,x:''})));if(!v)break;const c=G.hand[p].splice(v-1,1)[0];G.deck[p].push(c);k++;sync()}
+      if(k){emit({t:'act',p,n,x:EFXT[n],k:'flip'});log(`${who(p)}: ${n} วางการ์ดจากมือ ${k} ใบไว้ใต้เด็ค`)}}}
+  else if(n=='Grisly Jester'&&from=='d'&&to=='a'){
+    const j=await jstPick(p,n,'ส่งกลับขึ้นมือ');if(j<0){log(`${n}: คู่ต่อสู้ไม่มีมอนสเตอร์ให้ส่งกลับ`)}
+    else{const t=G.f[q][j];if(t){emit({t:'act',p,n,x:EFXT[n],k:'flip'});G.f[q][j]=null;if(G.snap&&G.snap.f[q][t.n])G.snap.f[q][t.n]--;if(FUS[t.n]&&G.extra[q])G.extra[q].push(t.n);else G.hand[q].push({...CARDS[t.n]});log(`${n}: ส่ง ${t.fd?'มอนสเตอร์ที่คว่ำอยู่':t.n} ของ${who(q)}กลับขึ้นมือ`)}}}
+  else if(n=='Reverie Jester'&&from=='a'&&to=='d'){
+    const j=await jstPick(p,n,'ทำลาย');if(j<0){log(`${n}: คู่ต่อสู้ไม่มีมอนสเตอร์ให้ทำลาย`)}
+    else{const t=G.f[q][j];if(t){emit({t:'act',p,n,x:EFXT[n],k:'flip'});G.f[q][j]=null;log(`${n}: ${t.fd?'มอนสเตอร์ที่คว่ำอยู่':t.n} ของ${who(q)}ถูกทำลาย`)}}}
+  chk();sync()}
+function ailPick(hi){ // Aile Fledgling Blade: เลือกมอนสเตอร์อื่นของเราที่จะสังเวย
+  const ov=document.createElement('div');ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:99;display:flex;align-items:center;justify-content:center;padding:12px';
+  const bx=document.createElement('div');bx.style.cssText='background:#1c1c2a;color:#fff;border:2px solid #d9b36a;border-radius:10px;padding:12px;max-width:420px;width:100%;max-height:80vh;overflow:auto;font:14px sans-serif';
+  bx.innerHTML='<div style="font-weight:700;margin-bottom:8px">Aile Fledgling Blade: เลือกมอนสเตอร์อื่นของคุณที่จะสังเวย (ATK ของการ์ดนี้ +700 จนจบเทิร์น)</div>';
+  G.f[0].forEach((m,i)=>{if(!m||i==hi)return;const b=document.createElement('button');b.textContent=`${m.n}${m.fd?' (คว่ำ)':` (ATK ${m.a} / DEF ${m.d})`}`;b.style.cssText='display:block;width:100%;margin:4px 0;text-align:left';b.onclick=()=>{ov.remove();doAct({a:'ail',i:hi,t:i});G.sel=null;G.mode=null;render()};bx.appendChild(b)});
+  const cx=document.createElement('button');cx.textContent='ยกเลิก';cx.onclick=()=>ov.remove();bx.appendChild(cx);ov.appendChild(bx);document.body.appendChild(ov);
+}
+/*ART21*/(()=>{const R=c=>`<rect width='100' height='80' fill='${c}'/>`,P=(d,f,s,w=2)=>`<path d='${d}' fill='${f}'${s?` stroke='${s}' stroke-width='${w}'`:''}/>`,C=(x,y,r,f)=>`<circle cx='${x}' cy='${y}' r='${r}' fill='${f}'/>`,L=(d,c,w=2)=>`<path d='${d}' stroke='${c}' stroke-width='${w}' fill='none'/>`,E=(x,y,c='#ffe040',r=2.4)=>C(x,y,r,c)+C(x,y,r/2.4,'#111');
+Object.assign(ART,{
+'Toadstool Drifter':R('#3a2a1a')+P('M24 40 Q50 4 76 40Z','#c03a5a','#5a0a20')+P('M40 40 H60 V78 H40Z','#d8c8a8','#6a5a3a')+E(45,54,'#ffe040',2.4)+E(55,54,'#ffe040',2.4)+C(36,32,3,'#fff')+C(62,30,3,'#fff'),
+'Vesper Wyrm':R('#1a0a2a')+P('M4 50 Q20 12 50 30 Q80 12 96 50 Q78 40 70 56 Q50 44 30 56 Q22 40 4 50Z','#4a2a6a','#1a0a3a')+C(50,44,12,'#6a3a8a')+E(45,42,'#ff3030',2.4)+E(55,42,'#ff3030',2.4)+P('M44 52 L47 60 L50 52 L53 60 L56 52Z','#fff'),
+'Tidal Medusa':R('#0a2a4a')+P('M16 44 Q16 8 50 8 Q84 8 84 44Z','#a0d8f0','#2a6a9a')+L('M26 44 Q22 62 28 76 M40 44 Q38 66 42 78 M54 44 Q58 66 54 78 M68 44 Q74 62 70 76','#e0f4ff',3)+C(40,28,3,'#2a6a9a')+C(60,28,3,'#2a6a9a'),
+'Gripfang Serpent':R('#0a3a5a')+P('M6 62 Q20 18 52 26 Q78 32 92 56 Q60 44 40 64Z','#2a5ab8','#0a1a5a')+P('M52 26 L60 44 L70 30Z','#e8f0ff')+E(44,36,'#ffe040',2.6)+L('M8 64 Q24 74 50 70','#0a1a5a',3),
+'Triplehorn Behemoth':R('#4a2a1a')+P('M12 70 Q10 40 36 36 Q70 30 88 52 L84 72Z','#c8602a','#5a2a0a')+P('M70 40 L88 22 L86 44Z M60 36 L68 14 L72 38Z','#f0e0b0')+E(80,50,'#ffe040',2.4)+L('M24 72 V80 M70 72 V80','#5a2a0a',4),
+'Citadel of Twilight Delusions':R('#14081e')+P('M16 80 V40 L24 28 V18 L30 28 L36 18 V40 H64 V18 L70 28 L76 18 V28 L84 40 V80Z','#3a2a4a','#0a0a14')+C(50,56,9,'#6a8aff')+L('M46 56 H54 M50 52 V60','#fff',1.6),
+'Gloomrealm Overlord':R('#1a0a1a')+P('M18 80 Q20 44 50 40 Q80 44 82 80Z','#6a1a2a','#2a0a10')+C(50,28,13,'#3a4a5a')+P('M36 20 L28 4 L42 14 M64 20 L72 4 L58 14','#e8e0b0')+E(45,28,'#ff3030',2.2)+E(56,28,'#ff3030',2.2)+L('M44 36 H56','#0a0a14',2),
+'Steelward Sentinel':R('#10182a')+P('M20 80 Q22 40 50 36 Q78 40 80 80Z','#6a7a9a','#222a40')+P('M34 36 Q50 10 66 36Z','#8a9ab8','#222a40')+L('M38 28 H62','#0a0a14',3)+E(45,30,'#ff4040',1.8)+E(56,30,'#ff4040',1.8)+C(50,60,7,'#4aa0ff'),
+'Grisly Jester':R('#3a1a1a')+P('M24 80 Q26 48 50 44 Q74 48 76 80Z','#2a8a4a','#0a3a1a')+C(50,32,11,'#e8e0d0')+P('M36 26 Q40 4 50 14 Q60 4 64 26Z','#c82a5a')+E(46,33,'#222',1.5)+E(55,33,'#222',1.5)+L('M44 40 Q50 46 56 40','#c02a2a',2)+C(50,62,3,'#f0d040'),
+'Gourdking, Lord of Specters':R('#2a1a0a')+C(50,46,30,'#e8802a')+P('M30 36 L38 28 L40 38Z M60 38 L62 28 L70 36Z','#1a0a00')+C(50,34,5,'#ffe040')+P('M28 52 L36 46 L42 54 L50 46 L58 54 L64 46 L72 52 Q50 74 28 52Z','#1a0a00'),
+'Vocation Swap Mirror':R('#2a0a2a')+C(50,48,24,'#e8f0ff')+C(50,48,18,'#a0b8e0')+P('M28 30 Q16 10 28 8 L34 20Z M72 30 Q84 10 72 8 L66 20Z','#e8d8c0','#5a4a3a')+C(50,14,8,'#f0f0e8')+E(47,13,'#111',1.8)+E(53,13,'#111',1.8),
+'Reverie Jester':R('#2a1a4a')+P('M22 80 Q24 48 50 44 Q76 48 78 80Z','#3a5ac0','#0a1a5a')+C(50,32,11,'#f0d8c0')+P('M36 26 Q34 8 50 8 Q66 8 64 26 Q56 14 50 16 Q44 14 36 26Z','#c82a4a')+E(46,33,'#222',1.5)+E(55,33,'#222',1.5)+C(50,22,3,'#ffe060')+L('M30 60 Q20 50 14 56','#f0d040',3),
+'Corrupted Cognition':R('#2a0a1a')+C(50,42,26,'#6a1a3a')+L('M30 34 Q40 28 50 36 Q60 28 70 36 M28 46 Q40 40 50 48 Q60 40 72 48 M32 58 Q44 52 52 60 Q60 54 68 58','#c04a7a',3),
+'Primeval Cerebrum':R('#1a2a1a')+C(50,42,28,'#7a4a6a')+L('M26 34 Q38 24 50 34 Q62 24 74 34 M24 48 Q38 40 50 50 Q62 40 76 48 M30 62 Q42 54 52 62 Q62 56 70 62','#e8a0c8',3)+C(50,42,4,'#ffe040'),
+'Elder Hexmaster':R('#1a1a3a')+P('M18 80 Q20 44 50 40 Q80 44 82 80Z','#5a4a8a','#1a0a4a')+C(50,28,12,'#e0d8e8')+P('M36 20 Q50 0 64 20 Q50 14 36 20Z','#8a8ab8')+E(45,29,'#222',1.6)+E(56,29,'#222',1.6)+C(70,56,7,'#a0f0c0')+L('M70 63 V78','#6a4a22',3),
+'Aile Fledgling Blade':R('#1a4a6a')+P('M26 80 Q28 48 50 44 Q72 48 74 80Z','#8a2a2a','#3a0a0a')+C(50,32,11,'#f0d0b0')+P('M36 28 Q50 6 64 28 Q50 22 36 28Z','#6a1a1a')+E(46,33,'#222',1.5)+E(55,33,'#222',1.5)+L('M76 74 L70 18','#d8e0f0',3)+P('M20 66 Q30 56 44 66 Q30 72 20 66Z','#3aa04a'),
+'Lunar Emissary':R('#0a0a2a')+C(30,26,18,'#f0f0d0')+P('M30 80 Q32 48 54 44 Q78 48 80 80Z','#2a2a5a','#0a0a2a')+C(56,32,11,'#d8c8e0')+P('M42 26 Q56 4 70 26Z','#4a2a8a')+E(52,34,'#ffe040',2)+E(61,34,'#ffe040',2)
+});})();
 // ซองการ์ด (เพิ่ม Vol.2, 3… ได้โดยเพิ่มอ็อบเจ็กต์ในอาร์เรย์นี้)
 // n=ใบต่อซอง p=โอกาสได้การ์ดหายากต่อใบ c1/c5=ราคา 1/5 ซอง com()=การ์ดธรรมดา rare()=การ์ดหายาก
 const PACKS=[{id:'v1',name:'Booster Pack Vol.1',t1:'Booster Pack',t2:'Vol.1',n:5,p:.04,c1:100,c5:450,
@@ -1864,16 +2170,22 @@ const PACKS=[{id:'v1',name:'Booster Pack Vol.1',t1:'Booster Pack',t2:'Vol.1',n:5
  {id:'v6',name:'Booster Pack Vol.6',t1:'Booster Pack',t2:'Vol.6',n:5,p:.08,c1:100,c5:450, // การ์ดหายาก (R/SR/UR) ออกได้ 8% ต่อใบ
    com:()=>PK17.filter(c=>c[4]=='C').map(c=>c[0]).concat(PK18.filter(c=>c[4]=='C').map(c=>c[0]),PK19.filter(c=>c[4]=='C').map(c=>c[0]),PK19C),
    rare:()=>PK17.filter(c=>c[4]!='C').map(c=>c[0]).concat(PK18.filter(c=>c[4]!='C').map(c=>c[0]),PK18R,PK19S.map(c=>c[0]),PK19R)},
+  {id:'v7',name:'Booster Pack Vol.7',t1:'Booster Pack',t2:'Vol.7',n:5,p:.08,c1:100,c5:450, // การ์ดหายาก (R/SR) ออกได้ 8% ต่อใบ
+   com:()=>PK20.concat(PK20B,PK20C).filter(c=>c[4]=='C').map(c=>c[0]).concat(PK20CS.filter(c=>c[3]=='C').map(c=>c[0]),PK20CR.filter(c=>c[2]=='C').map(c=>c[0])),
+   rare:()=>PK20.concat(PK20B,PK20C).filter(c=>c[4]!='C').map(c=>c[0]).concat(PK20CS.filter(c=>c[3]!='C').map(c=>c[0]),PK20CR.filter(c=>c[2]!='C').map(c=>c[0]))},
  {id:'b06',name:'Booster Pack 06',t1:'Booster Pack',t2:'06',n:5,p:.12,c1:100,c5:450, // การ์ดหายาก (R: มอนสเตอร์ 5 ใบ) ออกได้ 12% ต่อใบ
    com:()=>PK16.concat(PK16B).filter(c=>c[4]=='C').map(c=>c[0]).concat(PK16S.map(c=>c[0])),
    rare:()=>PK16.concat(PK16B).filter(c=>c[4]=='R').map(c=>c[0])},
+ {id:'b07',name:'Booster Pack 07',t1:'Booster Pack',t2:'07',n:5,p:.1,c1:100,c5:450, // การ์ดหายาก (R: Swordcourt Queen, Stormbolt Drake, Inferno Cascade, Microbe Blight, Numbing Elixir) ออกได้ 10% ต่อใบ
+   com:()=>PK21.map(c=>c[0]).concat(PK21B.map(c=>c[0]),['Lodestone Band'],PK21CS.map(c=>c[0])),
+   rare:()=>['Swordcourt Queen','Stormbolt Drake','Inferno Cascade','Microbe Blight','Numbing Elixir']},
  {id:'sd01',sd:1,name:'Starter Deck 01',t1:'Starter Deck',t2:'01',c1:800, // ซื้อแล้วได้การ์ดทุกใบอย่างละ 1 (ซื้อซ้ำได้)
   all:()=>PKS.map(c=>c[0]).concat(PKSS.map(c=>c[0])),
   com:()=>PKS.filter(c=>c[4]=='C').map(c=>c[0]).concat(PKSS.filter(c=>c[3]!='SR').map(c=>c[0])),
   rare:()=>PKS.filter(c=>c[4]=='UR').map(c=>c[0]).concat(PKSS.filter(c=>c[3]=='SR').map(c=>c[0]))}];
 
 // เรียงลำดับร้านค้า: Starter Deck ก่อน แล้ว 01, Vol.1, 02, Vol.2 ... ตามเลข
-{const _o=['sd01','b01','v1','b02','v2','b03','v3','b04','v4','b05','v5','b06','v6'];PACKS.sort((a,b)=>_o.indexOf(a.id)-_o.indexOf(b.id))}
+{const _o=['sd01','b01','v1','b02','v2','b03','v3','b04','v4','b05','v5','b06','v6','b07','v7'];PACKS.sort((a,b)=>_o.indexOf(a.id)-_o.indexOf(b.id))}
 // ---------- ตัวช่วย ----------
 const sh=a=>{for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
 
@@ -1888,9 +2200,9 @@ const pName=i=>{const q=G&&G.pf&&G.pf[i];return q&&q.name?esc(q.name):i==0?'ค�
 const pAv=i=>{const q=G&&G.pf&&G.pf[i];return q&&q.card&&CARDS[q.card]?`<span class="pav">${artOf(q.card)}</span>`:''};
 const L=l=>l.replace(/\{(\d)\}/g,(_,d)=>{const me=+d==(ROLE=='guest'?1:0);return me?'คุณ':pName(1)});
 const mk=ns=>sh(ns.map(n=>({...CARDS[n]})));
-const botDeck=()=>sh(Object.keys(CARDS).filter(n=>!FUS[n]).flatMap(n=>LIM(n)==1?[n]:[n,n,n])).slice(0,40);
+const botDeck=()=>sh(Object.keys(CARDS).filter(n=>!FUS[n]&&n!=FG2).flatMap(n=>LIM(n)==1?[n]:[n,n,n])).slice(0,40);
 const botExtra=()=>Object.keys(FUS).filter(n=>CARDS[n]).flatMap(n=>[n,n,n]).slice(0,15);
-let DK={sel:null,z:'c',f:'all'},RES=null,PF='all',SP=0,SHSEL=null,SHD=null;
+let DK={sel:null,z:'c',f:'all',pn:null,nm:'',del:-1},RES=null,PF='all',SP=0,SHSEL=null,SHD=null;
 let DETAIL=null,LT={k:null,t:0},XV=null,GV=null,LG=false;
 let G,S,MODE=null,ROLE=null,SCREEN='menu',NOTE='',RW='',PAID=0,GID=0,peer=null,conn=null,OPP=null,OPPX=[],OPPPF=null;
 
@@ -1953,10 +2265,51 @@ function draw(p,k=1){
   }
   return true;
 }
+
+// ===== เอฟเฟกต์การ์ด Vol.7 ส่วนเสริม 2 =====
+EQT.ied=[...new Set(Object.values(TYPES))];(typeof EQV!='undefined'?EQV:(window.EQV={})).ied=[500,500];EQT.rom=EQT.ied;EQV.rom=[-500,-500];EQT.mbl=EQT.nme=EQT.ied;EQV.mbl=[0,0];EQV.nme=[0,0];EQT.stm=EQT.ied;EQV.stm=[700,0]; // Lodestone Band ATK/DEF -500 (ของเราเท่านั้น) · Microbe Blight/Numbing Elixir สวมได้ทั้งสองฝ่าย ยกเว้นเผ่า Machine // Ingrained Edge: อุปกรณ์ใช้ได้กับทุกชนิด
+CTK.add('pgb');
+EFFM.add('Capcap Sporeling');EFFM.add('Cylinder Drake');EFFM.add('Forlorn Damsel');
+EFXT['Marshland Warden']='ATK ของการ์ดนี้เพิ่มขึ้น 500 ขณะที่มี Moltenrock Warden (Lava Battleguard) หงายหน้าอยู่บนสนามฝั่งเดียวกัน';
+EFXT['Capcap Sporeling']='ใน Standby Phase ของผู้ควบคุม การควบคุมการ์ดนี้ย้ายไปให้คู่ต่อสู้ (ถ้าฝั่งนั้นมีช่องว่าง)';
+EFXT['Cylinder Drake']='Main Phase (เทิร์นละครั้ง · กดปุ่มที่การ์ดบนสนาม): โยนเหรียญ 3 ครั้ง ถ้าออกหัว 2 ครั้งขึ้นไป ทำลายมอนสเตอร์ของคู่ต่อสู้ 1 ตัว (เจ้าของเลือกเป้าหมายเอง · ฝั่ง AI ยังไม่ใช้เอฟเฟกต์นี้)';
+EFXT['Forlorn Damsel']='ถ้าการ์ดนี้ถูกทำลายจากการต่อสู้แล้วส่งลงสุสาน: Battle Phase ของเทิร์นนี้จบลงทันที (ผู้เล่นฝั่งที่กำลังโจมตีโจมตีต่อไม่ได้)';
+function swampFx(){const P=SWAMP_PARTNER;[0,1].forEach(z=>{const has=G.f[z].some(x=>x&&!x.fd&&x.n==P);G.f[z].forEach(m=>{if(m&&m.n=='Marshland Warden'){const on=has&&!m.fd;if(on&&!m.sw){m.a+=500;m.sw=1}else if(!on&&m.sw){m.a-=500;m.sw=0}}})})}
+function pgbFx(p){ // Pilfering Goblin: ผู้โจมตี p สร้างดาเมจการต่อสู้ -> คู่ต่อสู้ทิ้งมือแบบสุ่ม 1 ใบ
+  if(RD()||!G.b[p].some(e=>e&&e.tr&&e.k=='pgb'))return;const q=1-p,h=G.hand[q];if(!h.length)return;
+  const c=h.splice(Math.floor(Math.random()*h.length),1)[0];G.gy[q].push(c.n);log(`Pilfering Goblin: ${who(q)}ต้องทิ้ง ${c.n} จากมือแบบสุ่ม`)}
+async function cylUse(p,i){ // Cylinder Drake (Barrel Dragon): เปิดใช้เองใน Main Phase เทิร์นละครั้ง
+  const dr=G.f[p][i],q=1-p;if(!dr||dr.fd||dr.n!='Cylinder Drake'||dr.cu===G.n)return;dr.cu=G.n;
+  emit({t:'act',p,n:dr.n,x:EFXT[dr.n],k:'flip'});
+  let h=0;for(let k=0;k<3;k++)if(Math.random()<.5)h++;log(`Cylinder Drake: โยนเหรียญ 3 ครั้ง ออกหัว ${h} ครั้ง`);
+  const idx=[];G.f[q].forEach((m,j)=>{if(m)idx.push(j)});
+  if(h>=2&&idx.length){let j=idx[0];
+    if(idx.length>1){const v=await askQ(p,'Cylinder Drake: เลือกมอนสเตอร์ของคู่ต่อสู้ 1 ตัวที่จะทำลาย',idx.map(k=>({k:'m',n:G.f[q][k].n,x:G.f[q][k].fd?'(ตั้งคว่ำอยู่)':`ATK ${G.f[q][k].a} / DEF ${G.f[q][k].d}`})));if(v)j=idx[v-1]}
+    if(G.f[q][j]){log(`Cylinder Drake: ${G.f[q][j].n} ถูกทำลาย`);G.f[q][j]=null}
+  }else if(h>=2)log('Cylinder Drake: คู่ต่อสู้ไม่มีมอนสเตอร์ให้ทำลาย');else log('Cylinder Drake: ออกหัวไม่ถึง 2 ครั้ง เอฟเฟกต์ไม่สำเร็จ');
+  chk();sync()}
+async function cylFx(p){
+  const q=1-p;if(!G.f[p].some(m=>m&&!m.fd&&m.n=='Cylinder Drake'))return;
+  for(const dr of G.f[p].filter(m=>m&&!m.fd&&m.n=='Cylinder Drake')){
+    let h=0;for(let k=0;k<3;k++)if(Math.random()<.5)h++;log(`Cylinder Drake: โยนเหรียญ 3 ครั้ง ออกหัว ${h} ครั้ง`);
+    if(h<2)continue;const idx=[];G.f[q].forEach((m,j)=>{if(m)idx.push(j)});if(!idx.length)continue;let j=idx[0];
+    if(MODE!='pvp'&&p==1)idx.forEach(k=>{if(G.f[q][k].a>G.f[q][j].a)j=k});
+    else if(idx.length>1){const v=await askQ(p,'Cylinder Drake: เลือกมอนสเตอร์ของคู่ต่อสู้ 1 ตัวที่จะทำลาย',idx.map(k=>({k:'m',n:G.f[q][k].n,x:G.f[q][k].fd?'(ตั้งคว่ำอยู่)':`ATK ${G.f[q][k].a} / DEF ${G.f[q][k].d}`})));if(v)j=idx[v-1]}
+    if(G.f[q][j]){log(`Cylinder Drake: ${G.f[q][j].n} ถูกทำลาย`);G.f[q][j]=null}
+  }chk();sync()}
+function stbNew(p){
+  const q=1-p;
+  G.f[p].forEach(m=>{if(m&&!m.fd&&m.cAct&&m.cn<4){m.cn++;let k=0;[0,1].forEach(z=>G.f[z].forEach(t=>{if(t&&!t.fd&&t.zm&&t.zm[m.id]){t.a+=200;t.d+=200;t.zm[m.id]+=200;k++}}));if(k)log(`${m.n}: Standby Phase ATK/DEF มอนสเตอร์ Zombie +200 (ครั้งที่ ${m.cn}/4)`)}});
+  G.f[p].forEach(m=>{if(m&&m.gAct&&!m.fd&&m.gn<4){m.gn++;m.gb+=100;m.a+=100;m.d+=100;log(`${m.n}: Standby Phase ATK/DEF +100 (ครั้งที่ ${m.gn}/4)`)}});
+  G.b[p].forEach(e=>{if(e&&e.k=='stm'&&e.on){const mm=G.f[0].concat(G.f[1]).find(m=>m&&m.id==e.on);if(mm){const d=Math.min(200,mm.a);mm.a-=d;e.dec=(e.dec||0)+d;log(`${e.n}: ${mm.n} ATK −${d} (Standby Phase ของ${who(p)})`)}}});
+  G.b[p].forEach(e=>{if(e&&e.k=='mbl'&&e.on){const mm=G.f[0].concat(G.f[1]).find(m=>m&&m.id==e.on);if(mm&&TYPES[mm.n]!='Machine'){const d=Math.min(300,mm.a);mm.a-=d;e.dec=(e.dec||0)+d;log(`${e.n}: ${mm.n} ATK −${d} (Standby Phase ของ${who(p)})`)}}}); // Germ Infection
+  G.f[p].forEach((m,k)=>{if(m&&m.n=='Capcap Sporeling'){const j=G.f[q].findIndex(x=>!x);if(j>=0){G.f[q][j]=m;G.f[p][k]=null;m.can=false;log(`Capcap Sporeling: การควบคุมย้ายไปให้${who(q)}`)}}});
+}
 function startTurn(p){
+  if(G.bsw&&G.bsw.length){G.bsw=[];[0,1].forEach(z=>G.f[z].forEach(m=>{if(m&&!m.fd){const t0=m.a;m.a=m.d;m.d=t0}}))} // Buckler and Blade: คืนค่า ATK/DEF
   G.turn=p;G.n++;G.sum=false;G.sel=null;G.mode=null;G.busy=false;G.intro=true;G.ph=0; // Standby Phase
-  G.f[p].forEach(m=>m&&(m.can=m.nx!==G.n,m.nw=false,m.fl=false)); // m.nx = เคยโจมตี Sparkjaw Newt: โจมตีไม่ได้ในเทิร์นถัดไปของเจ้าของ
-  standbyFx(p);
+  G.f[p].forEach(m=>m&&(m.can=m.nx!==G.n&&!m.nm&&!m.np,m.nw=false,m.fl=false)); // m.nx = เคยโจมตี Sparkjaw Newt: โจมตีไม่ได้ในเทิร์นถัดไปของเจ้าของ
+  standbyFx(p);stbNew(p);
   sync();
   const id=GID;
   (async()=>{
@@ -1991,7 +2344,7 @@ function killSpell(q,t){ // ทำลายเวทมนตร์ของ q 1
   let bi=G.b[q].findIndex(e=>e&&!e.tr);
   if(Number.isInteger(t)&&t>=0&&G.b[q][t]&&!G.b[q][t].tr)bi=t;else if(t==-2&&G.fz[q])bi=-1;
   if(bi>=0){const e=G.b[q][bi];
-    if(e.on){const mm=G.f[q].find(m=>m&&m.id==e.on);if(mm){const bv=(typeof EQV!='undefined'&&EQV[e.k])||[300,300];mm.a=Math.max(0,mm.a-bv[0]*(e.sg||1));mm.d=Math.max(0,mm.d-bv[1]*(e.sg||1));const ix=(mm.eq||[]).indexOf(e.n);if(ix>=0)mm.eq.splice(ix,1)}}
+    if(e.on)unequip(e);
     log(`${e.n} ถูกทำลาย`);G.b[q][bi]=null;return true}
   if(G.fz[q]){const fz=G.fz[q];G.gy[q].push(fz.n);G.fz[q]=null;G.fld=null;log(`${fz.n} ถูกทำลาย`);return true}
   return false;
@@ -2045,11 +2398,14 @@ function flipFx(p,m,ap,asi,pt){ // pt = เป้าหมายที่ผู�
     if(ts.length){ts.forEach(x=>{const t=G.f[x.z][x.j];if(!t)return;log(`${n} ฟลิป ส่ง ${t.n} กลับขึ้นมือ${x.z==p?' (ของตัวเอง)':''}`);G.f[x.z][x.j]=null;if(G.snap&&G.snap.f[x.z][t.n])G.snap.f[x.z][t.n]--;G.hand[x.z].push({...CARDS[t.n]})});gone=true}
     else log(`${n} ฟลิป แต่ไม่ได้เลือก/ไม่มีมอนสเตอร์ให้ส่งกลับ`)}
   else if(n=='Winged Egg Sprite'){G.lp[p]+=500;log(`${who(p)}: ${n} ฟลิป ฟื้น 500 LP`)}
+  else if(n=='Swordcourt Queen'){const k=G.b[q].filter(Boolean).length+(G.fz[q]?1:0);if(k){G.lp[q]-=500*k;log(`${n} ฟลิป ทำความเสียหาย ${500*k} (เวท/กับดักของ${who(q)} ${k} ใบ)`)}else log(`${n} ฟลิป แต่คู่ต่อสู้ไม่มีเวท/กับดักบนสนาม`)}
+  else if(n=='Stormhermit Elder'){G.lp[p]+=1500;log(`${who(p)}: ${n} ฟลิป ฟื้น 1500 LP`)}
   else if(n=='Shapeshift Urn'){[p,q].forEach(z=>{const hh=G.hand[z].splice(0);hh.forEach(cc=>G.gy[z].push(cc.n));thorn(z,hh.length);draw(z,5)});log(`${n} ฟลิป: ทั้งสองฝ่ายทิ้งมือทั้งหมดแล้วจั่ว 5 ใบ`)}
+  else if(n=='Citadel of Twilight Delusions'){let k=0;m.cAct=1;m.cn=0;[0,1].forEach(z=>G.f[z].forEach(t=>{if(t&&!t.fd&&t!==m&&TYPES[t.n]=='Zombie'){t.a+=200;t.d+=200;t.zm=t.zm||{};t.zm[m.id]=(t.zm[m.id]||0)+200;k++}}));log(`${n} ฟลิป: มอนสเตอร์ Zombie ${k} ตัว ATK/DEF +200`)}
   else if(n=='Spikeworm Burrower'){let k=0;while(k<5&&G.deck[q].length){G.gy[q].push(G.deck[q].shift().n);k++}log(`${n} ฟลิป: ส่งการ์ด ${k} ใบจากเด็ค${who(q)}ลงสุสาน`)}
   chk();return gone;
 }
-function endPhaseFx(p){ // End Phase ของเทิร์นที่ p: Sandglass of Valor ที่ครบกำหนดจะเพิ่มเป็น 2 เท่า · Zone Devourer/Stranger Swordsman: ทำลายเป้าหมายเมื่อครบ 5 เทิร์น · Malign Wormbeast กลับขึ้นมือ
+function endPhaseFx(p){[0,1].forEach(z=>G.f[z].forEach(t=>{if(t&&t.ab){t.a=Math.max(0,t.a-t.ab);t.ab=0}})); // End Phase ของเทิร์นที่ p: Sandglass of Valor ที่ครบกำหนดจะเพิ่มเป็น 2 เท่า · Zone Devourer/Stranger Swordsman: ทำลายเป้าหมายเมื่อครบ 5 เทิร์น · Malign Wormbeast กลับขึ้นมือ
   let ch=false;
   [0,1].forEach(z=>G.f[z].forEach((x,j)=>{if(x&&x.dd&&G.n>=x.dd){log(`${x.n} ถูกทำลาย (ครบ End Phase ที่ 5 หลังถูกโจมตี)`);G.f[z][j]=null;ch=true}}));
   G.f[p].forEach((x,j)=>{if(x&&!x.fd&&x.n=='Malign Wormbeast'){log(`${who(p)}: ${x.n} กลับขึ้นมือใน End Phase`);G.f[p][j]=null;if(G.snap&&G.snap.f[p][x.n])G.snap.f[p][x.n]--;G.hand[p].push({...CARDS[x.n]});ch=true}});
@@ -2104,6 +2460,7 @@ function refield(){
     if(m.n=='Iron Sovereign Mech'){const w=m.fd?0:mc*100,ow=m.kb||0;if(w!=ow){m.a=Math.max(0,m.a+w-ow);m.kb=w}}
     if(m.n=='Gloomghast Specter'){const w=m.fd?0:G.gy[p].filter(x=>CARDS[x]&&CARDS[x].t=='m').length*100,ow=m.gb||0;if(w!=ow){m.a=Math.max(0,m.a+w-ow);m.gb=w}}
     if(m.n=='Irksome Rockling'){const w=m.fd?0:G.hand[p].length*300,ow=m.hb||0;if(w!=ow){m.a=Math.max(0,m.a+w-ow);m.d=Math.max(0,m.d+w-ow);m.hb=w}} // Muka Muka: ATK/DEF +300 ต่อการ์ดในมือ
+    if(m.n=='Marshland Warden'){const w=m.fd?0:(G.f[p].some(x=>x&&!x.fd&&x.n==SWAMP_PARTNER)?500:0),ow=m.sw||0;if(w!=ow){m.a=Math.max(0,m.a+w-ow);m.sw=w}} // Swamp Battleguard: ATK +500 เมื่อมี Lava Battleguard หงายหน้าฝั่งเดียวกัน
   }))}
 function pupGain(nid){[0,1].forEach(pp=>G.f[pp].forEach(m=>{if(m&&!m.fd&&m.n=='Enigmatic Stringmaster'&&m.id!==nid){G.lp[pp]+=500;log(`${who(pp)}: ${m.n} ฟื้นฟู +500 LP`)}}))} // Mysterious Puppeteer: อัญเชิญปกติ/ฟลิปอัญเชิญ (ไม่นับ Set / ตัวมันเอง)
 const fieldNet=(k,p)=>G.f[p].reduce((t,m)=>t+(m?bonusOf(k,m):0),0)-G.f[1-p].reduce((t,m)=>t+(m?bonusOf(k,m):0),0);
@@ -2126,9 +2483,11 @@ function usable(p,c,fr){ // fr = ใช้การ์ดที่ตั้ง�
   const fo=G.f[1-p].some(Boolean),fm=G.f[p].some(Boolean);
   if(FLD[c.k])return false;
   if(!fr&&!G.b[p].includes(null))return false; // เวทมนตร์ทุกใบ (ยกเว้นเวทสนาม) ต้องมีช่องเวท/กับดักว่างอย่างน้อย 1 ช่อง
-  if(EQT[c.k])return G.f[p].some(m=>eqOk(m,c.k));
+  if(EQT[c.k])return eqT(p,c.k).length>0;
+  if(c.k=='stp')return G.f[p].some(Boolean)&&G.f[1-p].some(Boolean);
+  if(c.k=='hst')return [0,1].some(z=>G.b[z].some(e=>e&&!e.rs)||!!G.fz[z]);
   if(XT[c.k])return [0,1].some(z=>G.f[z].some(m=>m&&TYPES[m.n]==XT[c.k]));
-  if(c.k=='fsg')return G.deck[p].some(h=>(h.n||h)=='Fusion Gate');
+  if(c.k=='fsg')return G.deck[p].some(h=>isFG(h.n||h));
   if(c.k=='gc')return G.deck[p].length>=3;
   if(c.k=='dh')return fo||fm;
   if(c.k=='dsc')return G.hand[p].length>=2&&fo;
@@ -2173,12 +2532,16 @@ async function useSpell(p,i,t,fn,z,src){
   const REST=async()=>{ // ผลของเวท (Chain 1) — ประมวลผลหลังสุด
   if(ev.neg){if(rsE){const bi=G.b[p].indexOf(rsE);if(bi>=0)G.b[p][bi]=null}return chk()}
   if(EQT[c.k]){ // การ์ดอุปกรณ์: เลือกเป้าหมายเอง ถ้าไม่ได้เลือกจะสวมให้ตัวที่แรงสุดในชนิดนั้น
-    const ok=j=>eqOk(G.f[p][j],c.k);
-    let w=t;
-    if(!(w>=0&&ok(w))){w=-1;G.f[p].forEach((m,j)=>{if(ok(j)&&(w<0||m.a>G.f[p][w].a))w=j})}
-    const m=G.f[p][w];let bv=(typeof EQV!='undefined'&&EQV[c.k])||[300,300],sg=1;if(ev.sg<0){sg=-1;bv=[-bv[0],-bv[1]]}
+    const ts=(typeof t=='number'&&t>=100)?1:0,tj=ts?t-100:t,any=eqSide(c.k)=='any';
+    let tz=p,w=-1;
+    if(tj>=0&&G.f[ts?q:p][tj]&&eqOk(G.f[ts?q:p][tj],c.k)&&(!ts||any)){tz=ts?q:p;w=tj}
+    if(w<0){const good=((typeof EQV!='undefined'&&EQV[c.k])||[300,300])[0]>0,all=eqT(p,c.k),lst=any?(good?all.filter(x=>x.z==p).concat(all.filter(x=>x.z==q)):all.filter(x=>x.z==q).concat(all.filter(x=>x.z==p))):all; // ถ้าไม่ได้เลือก: เป้าหมายที่แรงสุด (อุปกรณ์ที่ระบุฝั่งใดก็ได้ เลือกฝั่งคู่ต่อสู้ก่อน)
+      if(lst.length){const z0=lst[0].z;lst.filter(x=>x.z==z0).forEach(x=>{if(w<0||G.f[z0][x.j].a>G.f[z0][w].a)w=x.j});tz=z0}}
+    const m=G.f[tz][w];let bv=(typeof EQV!='undefined'&&EQV[c.k])||[300,300],sg=1;if(ev.sg<0){sg=-1;bv=[-bv[0],-bv[1]]}
     G.b[p][pickZ(G.b[p],z)]={n:c.n,k:c.k,x:c.x,on:m.id,sg};m.a=Math.max(0,m.a+bv[0]);m.d=Math.max(0,m.d+bv[1]);(m.eq=m.eq||[]).push(c.n);
-    log(`${who(p)}ใช้ ${c.n}: ${m.n} ATK ${bv[0]>=0?'+':''}${bv[0]} / DEF ${bv[1]>=0?'+':''}${bv[1]}`);
+    const mch=TYPES[m.n]=='Machine'&&(c.k=='nme'||c.k=='mbl'); // เผ่า Machine สวมได้ แต่ไม่แสดงผลความสามารถ
+    if(c.k=='nme'&&!mch){m.np=1;m.can=false}
+    log(`${who(p)}ใช้ ${c.n}${tz!=p?' กับมอนสเตอร์ของคู่ต่อสู้':''}: ${m.n}${mch?' (เผ่า Machine: สวมได้ แต่ไม่มีผล)':c.k=='mbl'?' ATK -300 ทุก Standby Phase ของผู้ใช้':c.k=='nme'?' โจมตีไม่ได้':` ATK ${bv[0]>=0?'+':''}${bv[0]} / DEF ${bv[1]>=0?'+':''}${bv[1]}`}`);
     return chk();
   }
   if(c.k=='sw'){G.b[p][pickZ(G.b[p],z)]={n:c.n,k:c.k,x:c.x,tl:3};log(`${who(p)}ใช้ ${c.n}: มอนสเตอร์ของ${who(q)}โจมตีไม่ได้ 3 เทิร์น`);return chk()}
@@ -2188,9 +2551,19 @@ async function useSpell(p,i,t,fn,z,src){
   if(c.k=='heal6')G.lp[p]+=600;
   if(c.k=='tel'){const top=G.deck[q].slice(0,5);log(`${who(p)}ดูการ์ด 5 ใบบนสุดของเด็คคู่ต่อสู้`);if(p==0&&typeof MODE!='undefined'&&MODE!='pvp')say('การ์ดบนสุดของเด็คคู่ต่อสู้ (บนสุดก่อน): '+top.join(' → '))}
   if(c.k=='pg')draw(p,2);
+  if(c.k=='stp'){const pk=async z=>{const idx=[];G.f[z].forEach((m,j)=>m&&idx.push(j));if(!idx.length)return -1;let j=idx[0];
+      if(MODE!='pvp'&&z==1){idx.forEach(k=>{if(G.f[z][k].a<G.f[z][j].a)j=k})}
+      else if(idx.length>1){const v=await askQ(z,`${c.n}: เลือกมอนสเตอร์ของคุณ 1 ตัวที่จะสังเวย`,idx.map(k=>({k:'m',n:G.f[z][k].n,x:G.f[z][k].fd?'(ตั้งคว่ำอยู่)':`ATK ${G.f[z][k].a} / DEF ${G.f[z][k].d}`})));if(v)j=idx[v-1]}
+      return j};
+    for(const z of [p,q]){const j=await pk(z);if(j>=0&&G.f[z][j]){log(`${c.n}: ${who(z)}สังเวย ${G.f[z][j].fd?'มอนสเตอร์ที่คว่ำอยู่':G.f[z][j].n}`);G.f[z][j]=null;chk()}}}
+  if(c.k=='hst'){const a=destroyST(p,rsE),b=destroyST(q,rsE);log(`${c.n}: การ์ดเวทมนตร์/กับดักถูกทำลาย ${a+b} ใบ (ของ${who(p)} ${a} · ของ${who(q)} ${b})`)}
+  if(c.k=='tf'){G.lp[q]-=1000;G.lp[p]-=500;log(`${c.n}: ${who(q)}รับดาเมจ 1000 LP / ${who(p)}รับดาเมจ 500 LP`)}
+  if(c.k=='bs'){[0,1].forEach(z=>G.f[z].forEach(m=>{if(m&&!m.fd){const t0=m.a;m.a=m.d;m.d=t0}}));G.bsw=[1];log(`${c.n}: ATK/DEF ของมอนสเตอร์หงายหน้าทั้งหมดถูกสลับ (คืนค่าเมื่อเริ่มเทิร์นถัดไป)`)}
+  if(c.k=='ba'){let w=-1;G.f[q].forEach((m,j)=>{if(m&&m.pos=='a'&&!m.fd&&(w<0||m.a>G.f[q][w].a))w=j});if(t>=0&&G.f[q][t]&&G.f[q][t].pos=='a'&&!G.f[q][t].fd)w=t;if(w>=0){const m=G.f[q][w];m.pos='d';log(`${m.n} ถูกเปลี่ยนเป็นท่าป้องกัน`);if(POSM.has(m.n))posFx(q,m,'a','d').catch(()=>{})}}
+  if(c.k=='mbl'||c.k=='nme'){let w=-1;G.f[q].forEach((m,j)=>{if(m&&!m.fd&&(w<0||m.a>G.f[q][w].a))w=j});if(t>=0&&G.f[q][t]&&!G.f[q][t].fd)w=t;if(w>=0){const m=G.f[q][w];if(c.k=='mbl'){m.mb=1;m.a=Math.max(0,m.a-300);log(`${c.n}: ${m.n} ATK -300 และเจ้าของรับดาเมจ 300 ทุก Standby Phase`)}else{m.nm=1;m.can=false;log(`${c.n}: ${m.n} โจมตีและเปลี่ยนท่าไม่ได้`)}}}
   if(c.k=='rr'){const k=G.hand[q].length;G.lp[q]-=200*k;log(`${c.n}: การ์ดบนมือ${who(q)} ${k} ใบ รับความเสียหาย ${200*k} LP`)}
-  if(c.k=='fsg'){const di=G.deck[p].findIndex(h=>(h.n||h)=='Fusion Gate');if(di>=0){G.deck[p].splice(di,1);G.hand[p].push({...CARDS['Fusion Gate']});G.deck[p].sort(()=>Math.random()-.5);log(`${who(p)}: ${c.n} นำ Fusion Gate จากเด็คขึ้นมือ`)}}
-  if(c.k=='sd'){let w=-1;G.f[q].forEach((m,j)=>{if(m&&m.pos=='d'&&!m.fd&&(w<0||m.a<G.f[q][w].a))w=j});if(t>=0&&G.f[q][t]&&G.f[q][t].pos=='d'&&!G.f[q][t].fd)w=t;if(w>=0){const m=G.f[q][w];m.pos='a';m.fd=false;log(`${m.n} ถูกเปลี่ยนเป็นท่าโจมตี`)}}
+  if(c.k=='fsg'){const di=G.deck[p].findIndex(h=>isFG(h.n||h));if(di>=0){const hh=G.deck[p].splice(di,1)[0];G.hand[p].push({...CARDS[hh.n||hh]});G.deck[p].sort(()=>Math.random()-.5);log(`${who(p)}: ${c.n} นำ Fusion Gate จากเด็คขึ้นมือ`)}}
+  if(c.k=='sd'){let w=-1;G.f[q].forEach((m,j)=>{if(m&&m.pos=='d'&&!m.fd&&(w<0||m.a<G.f[q][w].a))w=j});if(t>=0&&G.f[q][t]&&G.f[q][t].pos=='d'&&!G.f[q][t].fd)w=t;if(w>=0){const m=G.f[q][w];m.pos='a';m.fd=false;log(`${m.n} ถูกเปลี่ยนเป็นท่าโจมตี`);if(POSM.has(m.n))posFx(q,m,'d','a').catch(()=>{})}}
   if(c.k=='gg'&&Array.isArray(t)&&t.length){track();const by={};t.slice(0,2).forEach(x=>{const z=x.r=='o'?q:p;(by[z]=by[z]||[]).push(x.j)});Object.keys(by).forEach(z=>by[z].sort((a,b)=>b-a).forEach(j=>{const n=G.gy[z][j],cc=CARDS[n];if(cc&&cc.t=='m'){log(`${n} ถูกนำออกจากเกม`);G.gy[z].splice(j,1)}}))}else if(c.k=='gg'){track();let k=0;[q,p].forEach(z=>{for(let j=G.gy[z].length-1;j>=0&&k<2;j--){const cc=CARDS[G.gy[z][j]];if(cc&&cc.t=='m'){log(`${G.gy[z][j]} ถูกนำออกจากเกม`);G.gy[z].splice(j,1);k++}}})}
   if(c.k=='fire2')G.lp[q]-=200;
   if(c.k=='heal4')G.lp[p]+=400;
@@ -2227,7 +2600,7 @@ async function useSpell(p,i,t,fn,z,src){
     if(w&&si>=0){const B=CARDS[w.n];G.gy[w.z].splice(w.j,1);G.f[p][si]={id:++G.uid,n:B.n,a:B.a,d:B.d,l:B.l,pos:spPos(p),fd:false,can:true,nw:true,rv:1};log(`${who(p)}ชุบชีวิต ${B.n} จากสุสาน${w.z==p?'ของตัวเอง':'ของคู่ต่อสู้'}`)}}
   if(c.k=='ds'){let bi=G.b[q].findIndex(e=>e&&!e.tr&&!e.sf&&!e.rs);if(t>=0&&G.b[q][t]&&!G.b[q][t].tr&&!G.b[q][t].sf&&!G.b[q][t].rs)bi=t;
     if(bi>=0){const e=G.b[q][bi];
-      if(e.on){const mm=G.f[q].find(m=>m&&m.id==e.on);if(mm){const bv=(typeof EQV!='undefined'&&EQV[e.k])||[300,300];mm.a=Math.max(0,mm.a-bv[0]*(e.sg||1));mm.d=Math.max(0,mm.d-bv[1]*(e.sg||1));const ix=(mm.eq||[]).indexOf(e.n);if(ix>=0)mm.eq.splice(ix,1)}}
+      if(e.on)unequip(e);
       log(`${e.n} ถูกทำลาย`);G.b[q][bi]=null}
     else if(G.fz[q]){const fz=G.fz[q];G.gy[q].push(fz.n);G.fz[q]=null;G.fld=null;log(`${fz.n} ถูกทำลาย`)}}
   if(c.k=='mir'){const hi2=G.hand[p].findIndex(h=>h.n=='Songstress Sisterhood'),di=G.deck[p].findIndex(h=>(h.n||h)=='Songstress Sisterhood'),si=pickZ(G.f[p],z),B=CARDS['Songstress Sisterhood'];
@@ -2240,8 +2613,9 @@ async function useSpell(p,i,t,fn,z,src){
   };
   await chainWin(ev,[{p,n:c.n,x:c.x,fx:REST,ref:rsE}]); // เวทที่ใช้ = Chain 1 · อีกฝั่งตอบโต้ด้วยกับดักได้
 }
-function bdFx(p,m){ // เอฟเฟกต์เมื่อทำความเสียหายจากการต่อสู้ให้ LP คู่ต่อสู้
+function bdFx(p,m){pgbFx(p); // เอฟเฟกต์เมื่อทำความเสียหายจากการต่อสู้ให้ LP คู่ต่อสู้
   const q=1-p;
+  if(m.n=='Hellkitchen Carver'){draw(q,2);log(`${m.n}: ทำความเสียหายจากการต่อสู้ ${who(q)}จั่วการ์ด 2 ใบ`)}
   if(m.n=='Masked Hexer'){draw(p,1);log(`${m.n}: ทำความเสียหายจากการต่อสู้ จั่วการ์ด 1 ใบ`)}
   if(m.n=='Pale Top-Hat Thief'&&G.hand[q].length){const j=Math.random()*G.hand[q].length|0,c=G.hand[q].splice(j,1)[0];G.gy[q].push(c.n);thorn(q,1);log(`${m.n}: ทำความเสียหายจากการต่อสู้ ${who(q)}ต้องทิ้งการ์ดบนมือแบบสุ่ม 1 ใบ (${c.n})`)}
 }
@@ -2309,15 +2683,18 @@ function qaUI(){ // หน้าต่างถามใช้การ์ด/�
 }
 async function attack(p,si,ti){
   const m=G.f[p][si],q=1-p;m.can=false;
+  {const mg=G.f[q].findIndex(t=>t&&!t.fd&&(t.eq||[]).includes('Lodestone Band'));if(mg>=0&&ti!=mg){ti=mg;log(`Lodestone Band: ${m.n} ต้องโจมตี ${G.f[q][mg].n}`)}} // Ring of Magnetism
+  if(m.n=='Landmine Weaver'){if(Math.random()<.5){const h=Math.floor(G.lp[p]/2);G.lp[p]-=h;log(`${who(p)}: ${m.n} ทอยเหรียญ ออกก้อย LP ลดลงครึ่งหนึ่ง (−${h})`)}else log(`${who(p)}: ${m.n} ทอยเหรียญ ออกหัว ไม่เกิดผล`)}
+  if(m.n==DKE){G.lp[p]-=1000;log(`${who(p)}: จ่าย 1000 LP เพื่อให้ ${m.n} โจมตี`)} // Dark Elf
   emit({t:'atk',p,si,ti,a:m.a});const wb0=G.busy;G.busy=true;sync(); // แสดงลูกศรโจมตีให้เห็นก่อนวัดผล
   try{await nap(1100)}catch(e){return}
   G.busy=wb0;
-  let zq=false;{const ev={t:'atk',p,m,tg:ti>=0?G.f[q][ti]:null};await chainWin(ev,[]);zq=!!ev.zero; // Pincer Strike / Karmic Reckoning: เลือกใช้เองผ่าน Chain
+  let zq=false,nd0=false;{const ev={t:'atk',p,m,tg:ti>=0?G.f[q][ti]:null};await chainWin(ev,[]);zq=!!ev.zero;nd0=!!ev.nd; // Pincer Strike / Karmic Reckoning: เลือกใช้เองผ่าน Chain
    if(G.lp[p]<=0||G.f[p][si]!==m)return chk()}
-  let tmp=null,tmpM=null; // ค่าชั่วคราวจากกับดัก Reinforcement Troops / Bulwark Rampart
-  if(ti<0){G.lp[q]-=m.a;log(`${who(p)}: ${m.n} โจมตีตรง −${m.a} LP`);if(m.a>0)bdFx(p,m);}
+  let tmp=null,tmpM=null,tgt=null; // ค่าชั่วคราวจากกับดัก Reinforcement Troops / Bulwark Rampart
+  if(ti<0){if(nd0)log(`${who(p)}: ${m.n} โจมตีตรง แต่ความเสียหายเป็น 0`);else{G.lp[q]-=m.a;log(`${who(p)}: ${m.n} โจมตีตรง −${m.a} LP`);if(m.a>0)bdFx(p,m);}}
   else{
-    const t=G.f[q][ti];
+    const t=G.f[q][ti];tgt=t;
     if(t.fd){ // เปิดมอนสเตอร์คว่ำให้เห็นก่อน หยุดให้ดู แล้วค่อยวัดพลังป้องกัน
       t.fd=false;log(`${m.n} โจมตีมอนสเตอร์คว่ำ — เปิดเป็น ${t.n} (DEF ${t.d})`);
       const wb=G.busy;G.busy=true;sync();
@@ -2327,10 +2704,11 @@ async function attack(p,si,ti){
       log(`วัดพลัง: ATK ${m.a} ปะทะ DEF ${t.n=='Shadow Illusionist'&&ATTR[m.n]=='LIGHT'?Math.floor(t.d/2)+' (ลดครึ่งจาก '+t.d+')':t.d}`);
     }
     const ev={t:'bat',p,m,tg:t,sk:zq,zero:zq};await chainWin(ev,[]); // Reinforcement Troops / Bulwark Rampart / สกิล Sangar-Kazan
-    tmp=ev.tmp||null;tmpM=ev.tgm||null;let ma=ev.zero?0:m.a;
+    tmp=ev.tmp||null;tmpM=ev.tgm||null;let ma=ev.zero?0:m.a;const nd1=!!ev.nd;
+    if(m.n=='Skyborne Hive Troops'&&ATTR[t.n]=='WIND'&&!ev.zero){ma+=1000;log(`${m.n}: โจมตีมอนสเตอร์ธาตุ WIND ATK +1000 (ตอนคำนวณความเสียหาย)`)}
     if(t.pos=='a'){
       const d=ma-t.a;
-      if(d>0){G.f[q][ti]=null;G.lp[q]-=d;log(`${m.n} ทำลาย ${t.n} (−${d} LP)`);bdFx(p,m);}
+      if(d>0){G.f[q][ti]=null;if(nd1)log(`${m.n} ทำลาย ${t.n} (ความเสียหายเป็น 0)`);else{G.lp[q]-=d;log(`${m.n} ทำลาย ${t.n} (−${d} LP)`);bdFx(p,m)}}
       else if(d<0){G.f[p][si]=null;G.lp[p]+=d;log(`${m.n} แพ้ ${t.n} (−${-d} LP)`)}
       else{G.f[q][ti]=G.f[p][si]=null;log(`${m.n} กับ ${t.n} ทำลายกัน`)}
     }else{
@@ -2345,13 +2723,18 @@ async function attack(p,si,ti){
     if(t.n=='Sparkjaw Newt'&&TYPES[m.n]!='Zombie'&&G.f[p][si]===m){m.nx=G.n+2;log(`${t.n}: ${m.n} จะโจมตีไม่ได้ในเทิร์นถัดไปของเจ้าของ`)}
     if(m.n=='Clockwork Arachnid'&&ATTR[t.n]=='DARK'&&G.f[q][ti]===t){log(`${m.n}: ${t.n} (DARK) ถูกทำลายหลังคำนวณความเสียหาย`);G.f[q][ti]=null}
     if((m.n=='Stranger Swordsman'||m.n=='Zone Devourer')&&G.f[q][ti]===t){t.dd=Math.min(t.dd||99999,G.n+4);log(`${m.n}: ${t.n} จะถูกทำลายใน End Phase ของเทิร์นที่ 5 นับจากการโจมตีนี้`)}
+    if(m.n=='Voidstep Warrior'&&G.f[p][si]===m&&G.f[q][ti]===t){ // D.D. Warrior: หลังคำนวณความเสียหาย กำจัดทั้งคู่ออกจากเกมได้
+      const bot=MODE!='pvp'&&p==1,ok=bot?((t.pos=='a'?t.a:t.d)>=m.a):await askQ(p,`${m.n}: ต้องการกำจัด (Banish) ${m.n} และ ${t.n} ที่ต่อสู้ด้วยออกจากเกมหรือไม่?`);
+      if(ok&&G.f[p][si]===m&&G.f[q][ti]===t){banish(p,si);banish(q,ti)}}
   }
+  if((m.n=='Forlorn Damsel'&&G.f[p][si]!==m)||(tgt&&tgt.n=='Forlorn Damsel'&&G.f[q][ti]!==tgt)){G.f[p].forEach(x=>x&&(x.can=false));log('Forlorn Damsel: ถูกทำลายจากการต่อสู้ Battle Phase จบลง')}
   if(tmp&&tmpM&&G.f[q].includes(tmpM))tmpM[tmp]-=500; // จบการต่อสู้: ค่าชั่วคราวหมดผล
   chk();
 }
-function clean(){[0,1].forEach(p=>{const ids=new Set(G.f[p].filter(Boolean).map(m=>m.id));G.b[p]=G.b[p].map(e=>e&&e.on&&!ids.has(e.on)?null:e)});if(CDK())[0,1].forEach(p=>{G.f[p]=G.f[p].map(m=>{if(m&&m.rv){log(`${m.n} ที่ถูกชุบด้วย Soul Recall ถูกส่งลงสุสาน (Whispers from Darkness)`);return null}return m})})} // อุปกรณ์หายเมื่อมอนสเตอร์ออกจากสนาม
+function clean(){[0,1].forEach(p=>{const ids=new Set(G.f[0].concat(G.f[1]).filter(Boolean).map(m=>m.id));G.b[p]=G.b[p].map(e=>e&&e.on&&!ids.has(e.on)?null:e)});if(CDK())[0,1].forEach(p=>{G.f[p]=G.f[p].map(m=>{if(m&&m.rv){log(`${m.n} ที่ถูกชุบด้วย Soul Recall ถูกส่งลงสุสาน (Whispers from Darkness)`);return null}return m})})} // อุปกรณ์หายเมื่อมอนสเตอร์ออกจากสนาม
 const cnt=a=>{const o={};a.forEach(x=>x&&(o[x.n]=(o[x.n]||0)+1));return o};
 function toGy(p,n,from){ // ส่งการ์ดลงสุสาน (Roach Squire กลับไปบนสุดของเด็คแทน)
+  {const xb=G.xb&&G.xb[p],ix=xb?xb.indexOf(n):-1;if(ix>=0){xb.splice(ix,1);G.bn[p].push(n);return}} // ถูกกำจัดออกจากเกม (Voidstep Warrior)
   if(n=='Roach Squire'&&CARDS[n]){G.deck[p].unshift({...CARDS[n]});log(`${n} ถูกส่งลงสุสาน → กลับไปอยู่บนสุดของเด็ค`)}else{G.gy[p].push(n);if(from=='f'&&n=='Tri-Eye Gobbler')sanganFx(p);if(from=='f'&&n=='Blackwood Enchantress')witchFx(p)}
 }
 function track(){ // การ์ดที่หายไปจากสนามมอนสเตอร์/เวทกับดัก -> ไปสุสานของเจ้าของ
@@ -2362,7 +2745,7 @@ function track(){ // การ์ดที่หายไปจากสนา�
     G.snap[k][p]=now;
   }));
 }
-function chk(){clean();refield();track();
+function chk(){swampFx();gourdFx();citFx();clean();refield();track();
   G.lp=G.lp.map(x=>Math.max(0,x));
   if(G.lp[0]<=0){G.over=true;G.win=1}
   else if(G.lp[1]<=0){G.over=true;G.win=0}
@@ -2537,6 +2920,8 @@ async function ai(){
     if(c.k=='dh'&&G.f[0].filter(Boolean).length<=G.f[1].filter(Boolean).length+1)continue;
     if(c.k=='fis'&&!G.f[0].some(m=>m&&!m.fd))continue;
     if(c.k=='spy'||c.k=='cf'||c.k=='sr')continue;
+    if(c.k=='stp'&&G.f[0].filter(Boolean).length<=G.f[1].filter(Boolean).length)continue;
+    if(c.k=='hst'&&G.b[0].filter(e=>e&&!e.rs).length+(G.fz[0]?1:0)<=G.b[1].filter(e=>e&&!e.rs).length+(G.fz[1]?1:0)+1)continue;
     if(c.k=='dsc'&&G.hand[1].length<3)continue;
     if(c.k=='coh'&&!G.f[0].some(m=>m&&!m.fd&&m.a>=1500))continue;
     await useSpell(1,i);render();await nap(800);
@@ -2556,7 +2941,7 @@ async function ai(){
   }
   G.ph=3;render();await nap(500); // Battle Phase
   for(let i=0;i<5&&!G.over&&G.n>1;i++){ // เทิร์นแรกสุดของเกม (G.n==1) โจมตีไม่ได้
-    const m=G.f[1][i];if(!m||!m.can||m.pos!='a'||m.fd||swb(1))continue;
+    const m=G.f[1][i];if(!m||!m.can||m.pos!='a'||m.fd||swb(1)||(m.n==DKE&&G.lp[1]<=1000))continue;
     const ts=G.f[0].map((t,j)=>({t,j})).filter(x=>x.t);
     if(!ts.length||DIRECT.has(m.n))await attack(1,i,-1);
     else{
@@ -2621,7 +3006,7 @@ function paint(){
     const m=G.f[p][i],hid=m&&m.fd;let h='';
     if(m){
       const trb=p==0&&G.mode=='z'&&G.zp&&G.zp.row=='f'&&G.zp.msg.tr&&G.zp.msg.tr.includes(i);
-      const cls=`card ${trb?'trb':''} ${m.pos=='d'?'def':''} ${m.fd?'fd':''} ${FUS[m.n]&&!m.fd?'fu':''} ${EFFM.has(m.n)&&!m.fd?'efm':''} ${p==0&&s&&s.z=='f'&&s.i==i?'sel':''} ${p==1&&G.mode=='t'?'tgt':''} ${p==0&&eqk&&eqOk(m,eqk)?'tgt':''} ${p==0&&G.mode=='s'?(G.sp&&G.sp.tr.includes(i)?'sel':'tgt'):''}`;
+      const cls=`card ${trb?'trb':''} ${m.pos=='d'?'def':''} ${m.fd?'fd':''} ${FUS[m.n]&&!m.fd?'fu':''} ${EFFM.has(m.n)&&!m.fd?'efm':''} ${p==0&&s&&s.z=='f'&&s.i==i?'sel':''} ${p==1&&G.mode=='t'?'tgt':''} ${eqk&&(p==0||eqSide(eqk)=='any')&&eqOk(m,eqk)?'tgt':''} ${p==0&&G.mode=='s'?(G.sp&&G.sp.tr.includes(i)?'sel':'tgt'):''}`;
       h=hid?`<div class="${cls} cbk">${BK}</div>`:
         `<div class="${cls}">${artOf(m.n)}<b>${m.n}</b><small>${attrB(m.n)}Lv${m.l} · ${m.fd?'คว่ำ':m.pos=='d'?'ป้องกัน':'โจมตี'}${m.eq&&m.eq.length?' · ⚔'+m.eq.length:''}</small><em>${m.pos=='d'?'DEF '+m.d:'ATK '+m.a}</em></div>`;
     }
@@ -2660,7 +3045,7 @@ function paint(){
       if(c.t=='m'){
         const ok=canSummon(0,c)&&mp;
         info=`${c.n} · Lv${c.l} · ATK ${c.a} / DEF ${c.d}`+(TYPES[c.n]?` · ${TYPES[c.n]}`:'')+(c.l>4&&c.n!='Songstress Sisterhood'?` · ต้องสังเวย ${need(c)} ตัว`:'')+(G.sum?' · เทิร์นนี้ลงแล้ว':'');
-        btns=`<button data-a="sa" ${ok?'':'disabled'}>ลงท่าโจมตี</button><button data-a="sd" ${ok?'':'disabled'}>ตั้งป้องกัน (คว่ำ)</button>`;
+        btns=`<button data-a="sa" ${ok?'':'disabled'}>ลงท่าโจมตี</button><button data-a="sd" ${ok?'':'disabled'}>ตั้งป้องกัน (คว่ำ)</button>`+(c.n==TDRG?`<button data-a="tdr" ${mp&&G.deck[0].some(x=>(x.n||x)==c.n)?'':'disabled'}>ทิ้งเพื่อค้นหา ${c.n} (สูงสุด 2 ใบ)</button>`:'');
       }else{
         info=`${c.n} · ${c.t=='t'?(isCtc(c)?'กับดักต่อเนื่อง':isCnc(c)?'กับดักสวนกลับ':'กับดัก'):EQT[c.k]?'เวทอุปกรณ์':FLD[c.k]?'เวทสนาม':'เวทมนตร์'} · แตะ 2 ครั้งเพื่อดูความสามารถ`;
         const free=G.b[0].includes(null);
@@ -2677,13 +3062,13 @@ function paint(){
       const m=G.f[0][s.i];
       if(m){
         info=`${m.n} · ATK ${m.a} / DEF ${m.d}${m.fd?' · คว่ำ':''}`+(m.can?(m.nw?(m.fl?' · เพิ่งเปิด (ตีได้ แต่เปลี่ยนท่าไม่ได้)':' · เพิ่งลง (ตีได้ แต่เปลี่ยนท่าไม่ได้)'):''):(m.nw?' · เพิ่งตั้งคว่ำ (เทิร์นนี้ยังเปิดไม่ได้)':' · ใช้แล้วในเทิร์นนี้'));
-        btns=m.fd?`<button data-a="flp" ${m.can&&mp?'':'disabled'}>เปิดการ์ด (ท่าโจมตี)</button>`:`<button data-a="atk" ${m.can&&m.pos=='a'&&G.n>1&&bp&&!swb(0)?'':'disabled'}>โจมตี</button><button data-a="chg" ${m.can&&!m.lock&&!m.nw&&mp?'':'disabled'}>เปลี่ยนท่า</button>`+(m.n=='Patchwork Frank'?`<button data-a="cs" ${mp&&G.lp[0]>5000&&G.extra[0].length&&G.f[0].includes(null)?'':'disabled'}>จ่าย 5000 LP เรียก Fusion</button>`:'')+(m.n=='Striped Gale Crawler'?`<button data-a="gd" ${mp&&G.lp[0]>3000&&G.extra[0].length?'':'disabled'}>จ่าย 3000 LP ส่ง Extra Deck ลงสุสาน</button>`:'')+(m.n=='Mortar Trooper'?`<button data-a="mtr" ${mp&&G.f[0].some(Boolean)?'':'disabled'}>สังเวยมอนสเตอร์ 1 ตัว: ดาเมจ 500</button>`:'');
+        btns=m.fd?`<button data-a="flp" ${m.can&&mp?'':'disabled'}>เปิดการ์ด (ท่าโจมตี)</button>`:`<button data-a="atk" ${m.can&&m.pos=='a'&&G.n>1&&bp&&!swb(0)&&!(m.n==DKE&&G.lp[0]<=1000)?'':'disabled'}>โจมตี</button><button data-a="chg" ${m.can&&!m.lock&&!m.nw&&mp?'':'disabled'}>เปลี่ยนท่า</button>`+(m.n=='Patchwork Frank'?`<button data-a="cs" ${mp&&G.lp[0]>5000&&G.extra[0].length&&G.f[0].includes(null)?'':'disabled'}>จ่าย 5000 LP เรียก Fusion</button>`:'')+(m.n=='Striped Gale Crawler'?`<button data-a="gd" ${mp&&G.lp[0]>3000&&G.extra[0].length?'':'disabled'}>จ่าย 3000 LP ส่ง Extra Deck ลงสุสาน</button>`:'')+(m.n=='Mortar Trooper'?`<button data-a="mtr" ${mp&&G.f[0].some(Boolean)?'':'disabled'}>สังเวยมอนสเตอร์ 1 ตัว: ดาเมจ 500</button>`:'')+(m.n=='Aile Fledgling Blade'?`<button data-a="ail" ${mp&&G.f[0].some((t,k)=>t&&k!=s.i)?'':'disabled'}>สังเวยมอนสเตอร์อื่น 1 ตัว: ATK +700 จนจบเทิร์น</button>`:'')+(m.n=='Ballista Tortoise'?`<button data-a="btt" ${mp&&G.f[0].some(Boolean)?'':'disabled'}>สังเวยมอนสเตอร์ 1 ตัว: ดาเมจเท่าครึ่งหนึ่งของ ATK</button>`:'')+(m.n=='Cylinder Drake'?`<button data-a="cyl" ${mp&&m.cu!==G.n?'':'disabled'}>โยนเหรียญ 3 ครั้ง (เทิร์นละครั้ง): หัว 2 ครั้งขึ้นไป ทำลายมอนสเตอร์คู่ต่อสู้ 1 ตัว</button>`:'');
       }
     }
   }
   if(G.mode=='z'&&G.zp){info=G.zp.row=='f'?(G.zp.msg.tr?'มอนสเตอร์ที่สังเวยจะลงสุสานก่อน แล้วเลือกช่องที่จะวาง — วางทับช่องเดิมของที่สังเวยได้ (ช่องที่กะพริบ)':'เลือกช่องมอนสเตอร์ที่จะวางการ์ด (ช่องที่กะพริบ)'):'เลือกช่องเวทมนตร์/กับดักที่จะวางการ์ด (ช่องที่กะพริบ)';btns='<button data-a="cx">ยกเลิก</button>'}
   if(G.mode=='t')info='เลือกมอนสเตอร์ฝ่ายตรงข้ามที่จะโจมตี';
-  if(G.mode=='e')info='เลือกมอนสเตอร์ของคุณที่จะสวมการ์ด (ตัวที่กะพริบ)';
+  if(G.mode=='e'){const hc0=G.hand[0][G.sel&&G.sel.i];info=hc0&&eqSide(hc0.k)=='any'?'เลือกมอนสเตอร์ของฝ่ายใดก็ได้ที่จะสวมการ์ด (ตัวที่กะพริบ)':'เลือกมอนสเตอร์ของคุณที่จะสวมการ์ด (ตัวที่กะพริบ)'}
   if(G.mode=='s'&&G.sp&&hc){const nd=need(hc);info=`เลือกมอนสเตอร์ของคุณที่จะสังเวย ${nd} ตัว (เลือกแล้ว ${G.sp.tr.length}/${nd})`;btns='<button data-a="cx">ยกเลิก</button>'}
   if(G.mode=='f'&&hc&&hc.k=='poly'){info='เลือกมอนสเตอร์หลอมรวมที่จะเรียกจาก Extra Deck (ใช้วัตถุดิบจากมือก่อน แล้วค่อยใช้จากสนาม)';btns=fusionPlans(0).map(f=>`<button data-a="fx" data-fn="${f.n}">${f.n} (${CARDS[f.n].a}/${CARDS[f.n].d})</button>`).join('')+'<button data-a="cx">ยกเลิก</button>'}
   if(G.busy&&G.turn==0&&!G.over)info='กำลังดำเนินการ…';
@@ -2728,6 +3113,8 @@ function load(txt){
   {const u={};S.extra=S.extra.filter(n=>{u[n]=(u[n]||0)+1;return u[n]<=Math.min(LIM(n),S.col[n]||0)}).slice(0,15)} // Extra Deck สูงสุด 15 ใบ
   if(!S.prof||typeof S.prof!='object')S.prof={name:'',card:''};S.prof.name=cleanName(S.prof.name);if(!(S.prof.card&&CARDS[S.prof.card]&&S.col[S.prof.card]>0))S.prof.card=''; // โปรไฟล์: การ์ดปกต้องยังอยู่ในคลัง
   if(!S.start1500){S.start1500=1;S.coins=Math.max(S.coins||0,1500)} // ทุกคนเริ่มที่ 1500 เหรียญ
+  if(!Array.isArray(S.decks))S.decks=[];
+  S.decks=S.decks.filter(d=>d&&typeof d=='object'&&typeof d.name=='string').slice(0,30).map(d=>({name:d.name.slice(0,24),deck:(Array.isArray(d.deck)?d.deck:[]).filter(n=>CARDS[n]&&!FUS[n]).slice(0,60),extra:(Array.isArray(d.extra)?d.extra:[]).filter(n=>CARDS[n]&&FUS[n]).slice(0,15)})); // เด็คที่บันทึกไว้ (ช่องเด็ค)
   qSync();save();return true;
 }
 function save(){try{localStorage.setItem('duel_save_v1',JSON.stringify(S))}catch(e){}}
@@ -2784,8 +3171,8 @@ function pull(k,P=PACKS[0]){
   const roll=()=>{const l=Math.random()<P.p?rr:cm;return l[Math.random()*l.length|0]};
   for(let i=0;i<k;i++){
     let n=roll();
-    if((S.col[n]||0)>=3)n=roll(); // ครบ 3 ใบแล้ว: สุ่มใหม่ 1 ครั้ง
-    const ex=(S.col[n]||0)>=3; // ยังซ้ำอีก: ไม่เข้าคอลเลกชัน แปลงเป็นเหรียญ
+    if(fgCt(n)>=3)n=roll(); // ครบ 3 ใบแล้ว: สุ่มใหม่ 1 ครั้ง
+    const ex=fgCt(n)>=3; // ยังซ้ำอีก: ไม่เข้าคอลเลกชัน แปลงเป็นเหรียญ
     if(ex)S.coins+=EXC(n);else S.col[n]=(S.col[n]||0)+1;
     r.push({n,ex});
   }
@@ -2797,7 +3184,7 @@ function buy(){
   if(S.coins<P.c1)return say('เหรียญไม่พอ');
   S.coins-=P.c1;QP('pack');const had={...S.col},seen={};
   if(P.sd){ // Starter Deck: ได้การ์ดทุกใบอย่างละ 1 (ถ้ามีครบ 3 ใบแล้วแปลงเป็นเหรียญ) ไม่มีแอนิเมชันเปิดซอง
-    const r=P.all().map(n=>{const ex=(S.col[n]||0)>=3;if(ex)S.coins+=EXC(n);else S.col[n]=(S.col[n]||0)+1;return{n,nw:!ex&&!had[n],ex}});
+    const r=P.all().map(n=>{const ex=fgCt(n)>=3;if(ex)S.coins+=EXC(n);else S.col[n]=(S.col[n]||0)+1;return{n,nw:!ex&&!had[n],ex}});
     save();RES=r;const gain=r.filter(x=>x.ex).reduce((t,x)=>t+EXC(x.n),0);
     return say(`ได้การ์ดครบ ${r.length} ใบ`+(gain?` · ซ้ำเกิน 3 ใบ แปลงเป็น ${gain} เหรียญ`:''));
   }
@@ -2838,7 +3225,7 @@ function opRender(){
 function applySave(t){if(!load(t))return say('ไฟล์หรือรหัสเซฟไม่ถูกต้อง ข้อมูลเดิมไม่ถูกเปลี่ยน');say('โหลดข้อมูลสำเร็จ · เหรียญ '+S.coins)}
 const dcount=n=>(FUS[n]?S.extra:S.deck).filter(x=>x==n).length;
 const okDeck=(d,e=[])=>Array.isArray(d)&&d.length>=40&&d.length<=60&&d.every(n=>CARDS[n]&&!FUS[n]) // เด็คหลักห้ามมีมอนสเตอร์หลอมรวม
-  &&d.filter(n=>CARDS[n].t=='m'&&CARDS[n].l<=4).length>=3&&[...new Set(d)].every(n=>d.filter(x=>x==n).length<=LIM(n))
+  &&d.filter(n=>CARDS[n].t=='m'&&CARDS[n].l<=4).length>=3&&[...new Set(d)].every(n=>d.filter(x=>x==n||x==FGX[n]).length<=LIM(n))
   &&Array.isArray(e)&&e.length<=15&&e.every(n=>CARDS[n]&&FUS[n])&&[...new Set(e)].every(n=>e.filter(x=>x==n).length<=3); // Extra Deck สูงสุด 15 ใบ
 
 // ---------- หน้าจอเมนู ----------
@@ -2875,7 +3262,7 @@ function packCover2(P){ // ปกซองสไตล์ห่อพลาส�
 }
 function packCover3(P){ // ปกซองสไตล์ห่อพลาสติกสีน้ำเงิน/เขียว กรอบสีส้มตรงกลาง แถบชื่อด้านล่าง (Vol.2 และ 02) — ออกแบบเองทั้งหมด
   const u='pd'+(++_pcu),v2=0, // Vol.2 และ 02 ใช้ภาพปกเดียวกัน (ต่างกันที่ป้ายชื่อ)
-  c=P.id=='b06'?{a:'#6a8a3a',b:'#26401a',fr:'#d8b050',fr2:'#5e3a14',pan:'#ece4c0',ban:'#1e3414',pt:'#26401a',r1:'#fff4c0',r2:'#e0a040',bar:'#3a5a1e'}:(P.id=='v5'||P.id=='b05')?{a:'#3f8a90',b:'#1c555d',fr:'#d8a850',fr2:'#5e3a14',pan:'#e6dcc0',ban:'#14484f',pt:'#14484f',r1:'#8a5a9c',r2:'#2a1640',bar:'#1a2a5a'}:P.id=='v4'?{a:'#b0452a',b:'#4a1410',fr:'#e0a838',fr2:'#7a3a10',pan:'#f6e4c4',ban:'#2e0e0a',pt:'#8a1c10',r1:'#fff4c0',r2:'#f0703a',bar:'#9a2a1a'}:P.id=='b04'?{a:'#c8683a',b:'#5a2418',fr:'#d89a30',fr2:'#7a4414',pan:'#f2dcc0',ban:'#3a1810',pt:'#7a2a14',r1:'#fff0b0',r2:'#ee8a4a',bar:'#a8442a'}:{a:'#7b6cb0',b:'#352c62',fr:'#cf8a2c',fr2:'#7a4414',pan:'#d4d8ee',ban:'#2a2250',pt:'#3a2e78',r1:'#fff0b0',r2:'#8a9ae0',bar:'#4a3a9a'},
+  c=P.id=='v7'?{a:'#c47a2a',b:'#5a3410',fr:'#e0b048',fr2:'#6a3a10',pan:'#f4e6c0',ban:'#3a1e08',pt:'#8a4a10',r1:'#fff4c0',r2:'#f0a040',bar:'#a86418'}:P.id=='b06'?{a:'#6a8a3a',b:'#26401a',fr:'#d8b050',fr2:'#5e3a14',pan:'#ece4c0',ban:'#1e3414',pt:'#26401a',r1:'#fff4c0',r2:'#e0a040',bar:'#3a5a1e'}:(P.id=='v5'||P.id=='b05')?{a:'#3f8a90',b:'#1c555d',fr:'#d8a850',fr2:'#5e3a14',pan:'#e6dcc0',ban:'#14484f',pt:'#14484f',r1:'#8a5a9c',r2:'#2a1640',bar:'#1a2a5a'}:P.id=='v4'?{a:'#b0452a',b:'#4a1410',fr:'#e0a838',fr2:'#7a3a10',pan:'#f6e4c4',ban:'#2e0e0a',pt:'#8a1c10',r1:'#fff4c0',r2:'#f0703a',bar:'#9a2a1a'}:P.id=='b04'?{a:'#c8683a',b:'#5a2418',fr:'#d89a30',fr2:'#7a4414',pan:'#f2dcc0',ban:'#3a1810',pt:'#7a2a14',r1:'#fff0b0',r2:'#ee8a4a',bar:'#a8442a'}:{a:'#7b6cb0',b:'#352c62',fr:'#cf8a2c',fr2:'#7a4414',pan:'#d4d8ee',ban:'#2a2250',pt:'#3a2e78',r1:'#fff0b0',r2:'#8a9ae0',bar:'#4a3a9a'},
   zig=(y,d)=>{let s=`M0 ${y}`;for(let x=0;x<=200;x+=5)s+=` L${x} ${y+(x/5%2?0:d)}`;return s+` L200 ${y}Z`},
   rays=(cx,cy,r,n,a,b)=>Array.from({length:n},(_,i)=>{const q=i*2*Math.PI/n,q2=q+Math.PI/n;return `<polygon points="${cx},${cy} ${(cx+r*Math.cos(q)).toFixed(1)},${(cy+r*Math.sin(q)).toFixed(1)} ${(cx+r*Math.cos(q2)).toFixed(1)},${(cy+r*Math.sin(q2)).toFixed(1)}" fill="${i%2?a:b}"/>`}).join(''),
   hero=(x,y,s,coat,hair,tip,skin)=>`<g transform="translate(${x} ${y}) scale(${s})"><path d="M-22 0 Q-24 -34 0 -38 Q24 -34 22 0Z" fill="${coat}"/><rect x="-5" y="-44" width="10" height="8" fill="${skin}"/><circle cy="-56" r="14" fill="${skin}"/><path d="M-16 -58 L-22 -76 L-10 -68 L-8 -86 L0 -70 L8 -86 L10 -68 L22 -76 L16 -58 Q0 -72 -16 -58Z" fill="${hair}"/><path d="M-22 -76 L-18 -70 M22 -76 L18 -70 M-8 -86 L-6 -78 M8 -86 L6 -78" stroke="${tip}" stroke-width="3"/><circle cx="-5" cy="-55" r="1.8" fill="#222"/><circle cx="5" cy="-55" r="1.8" fill="#222"/><path d="M-4 -48 Q0 -45 4 -48" stroke="#a04a3a" stroke-width="1.2" fill="none"/></g>`,
@@ -2953,10 +3340,42 @@ function packCover6(P){ // ปก Vol.6 / 06: ซองสีชมพูม่�
 <text x="100" y="243" font-family="Georgia,serif" font-size="13" font-weight="700" fill="#fff" text-anchor="middle" letter-spacing="2">BOOSTER PACK</text>
 <rect x="64" y="249" width="72" height="26" rx="13" fill="#fff" stroke="#e6b84a" stroke-width="2.4"/><text x="100" y="267.5" font-family="Georgia,serif" font-size="17" font-weight="700" font-style="italic" fill="#5a1a5e" text-anchor="middle">${P.t2}</text></svg>`;
 }
+function packCover7(P){ // ปก Vol.7 / 07: ซองน้ำเงินกรมท่า กรอบทองแดง ฉากหลังลายริ้วแดง-ครีมพร้อมดาว ตัวละครสองคน (ชายสวมแว่นกันแดดทรงวิซเซอร์ + ดูเอลลิสต์ผมแหลมถือการ์ด) แถบล่างน้ำเงินเข้ม — วาดเป็น SVG ออกแบบเองทั้งหมด (ไม่ใช้รูปหรือตัวละครต้นฉบับ)
+  const u='p7'+(++_pcu),o=P.id=='b07',c1=o?'#3a6ab8':'#2e58a8',c2=o?'#14285a':'#10204a',
+  zig=(y,d)=>{let q=`M0 ${y}`;for(let x=0;x<=200;x+=5)q+=` L${x} ${y+(x/5%2?0:d)}`;return q+` L200 ${y}Z`},
+  star=(x,y,r)=>{let p='';for(let i=0;i<10;i++){const a=-Math.PI/2+i*Math.PI/5,q=i%2?r*.42:r;p+=`${(x+q*Math.cos(a)).toFixed(1)},${(y+q*Math.sin(a)).toFixed(1)} `}return `<polygon points="${p}" fill="#fff8dc"/>`},
+  rays=Array.from({length:18},(_,i)=>{const a=i*Math.PI/9,b=a+Math.PI/18,cx=100,cy=180,r=150;return `<polygon points="${cx},${cy} ${(cx+r*Math.cos(a)).toFixed(1)},${(cy+r*Math.sin(a)).toFixed(1)} ${(cx+r*Math.cos(b)).toFixed(1)},${(cy+r*Math.sin(b)).toFixed(1)}" fill="${i%2?'#bfe6e0':'#7cc4c0'}"/>`}).join(''),
+  stars=[[48,116,4],[154,112,3.5],[120,108,3],[40,140,3]].map(q=>star(...q)).join('');
+  return `<svg viewBox="0 0 200 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${P.name}"><defs><linearGradient id="${u}g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${c1}"/><stop offset="1" stop-color="${c2}"/></linearGradient><linearGradient id="${u}f" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c8883a"/><stop offset="1" stop-color="#6a3c14"/></linearGradient><linearGradient id="${u}b" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1e3a82"/><stop offset="1" stop-color="#0a1638"/></linearGradient><pattern id="${u}t" width="6" height="6" patternUnits="userSpaceOnUse"><path d="M0 6 L6 0" stroke="#fff" stroke-opacity=".10" stroke-width="1.2"/></pattern><clipPath id="${u}c"><rect x="31" y="101" width="138" height="106"/></clipPath></defs>
+<rect width="200" height="300" rx="5" fill="url(#${u}g)"/><rect width="200" height="300" rx="5" fill="url(#${u}t)"/>
+<path d="${zig(0,7)}" fill="#d6dae2"/><path d="${zig(300,-7)}" fill="#d6dae2"/>
+<rect x="10" y="12" width="50" height="17" rx="3" fill="#fff"/><text x="35" y="24" font-family="Georgia,serif" font-size="6.5" font-weight="700" fill="${c2}" text-anchor="middle" textLength="42" lengthAdjust="spacingAndGlyphs">DUEL TABLE</text>
+<rect x="138" y="11" width="52" height="19" rx="3" fill="#fff" stroke="#d8503c" stroke-width="1.4"/><text x="164" y="24" font-family="Georgia,serif" font-size="9" font-weight="700" fill="#d8503c" text-anchor="middle">5 CARDS</text>
+<rect x="16" y="40" width="168" height="174" rx="3" fill="url(#${u}f)" stroke="#2a1608" stroke-width="2"/><rect x="20" y="44" width="160" height="166" fill="none" stroke="#f0cc6a" stroke-width="2"/>
+<rect x="24" y="48" width="152" height="158" fill="#e8d6a8" stroke="#f8e8b8" stroke-width="1"/>
+<text x="100" y="63" font-family="Georgia,serif" font-size="7.5" font-weight="700" fill="#4a2a0a" text-anchor="middle" letter-spacing="2">OFFICIAL CARD GAME</text>
+<text x="100" y="90" font-family="Georgia,serif" font-size="26" font-weight="900" fill="#f6d65a" stroke="#14285a" stroke-width="3" paint-order="stroke" text-anchor="middle" textLength="132" lengthAdjust="spacingAndGlyphs">DUEL TABLE</text>
+<rect x="30" y="99" width="140" height="110" fill="#2a1608"/>
+<g clip-path="url(#${u}c)"><rect x="31" y="101" width="138" height="106" fill="#a8dcd6"/>${rays}${stars}
+<path d="M30 207 Q34 178 58 174 Q82 178 90 207Z" fill="#2a2a3a" stroke="#0a0a14" stroke-width="1.3"/><path d="M50 176 L58 192 L66 176Z" fill="#f2cba4"/>
+<path d="M44 150 Q42 128 58 126 Q74 128 72 150 Q72 170 58 172 Q44 170 44 150Z" fill="#f2cba4" stroke="#6a3a1a" stroke-width="1"/>
+<path d="M42 142 Q40 118 58 118 Q76 118 74 142 Q66 130 58 133 Q50 130 42 142Z" fill="#8a2a2a" stroke="#2a1608" stroke-width="1"/><path d="M40 140 Q58 128 76 140 L80 144 Q58 136 38 144Z" fill="#6a1a1a" stroke="#2a1608" stroke-width="1"/>
+<circle cx="51" cy="150" r="5.5" fill="#f0cc6a" stroke="#4a2a0a" stroke-width="1.2"/><circle cx="65" cy="150" r="5.5" fill="#f0cc6a" stroke="#4a2a0a" stroke-width="1.2"/><circle cx="51" cy="150" r="2.4" fill="#241018"/><circle cx="65" cy="150" r="2.4" fill="#241018"/><path d="M56 150 L60 150" stroke="#4a2a0a" stroke-width="1.5"/><path d="M52 166 Q58 169 64 166" stroke="#7a2a1a" stroke-width="1.4" fill="none"/>
+<path d="M98 207 Q104 176 130 172 Q158 176 168 207Z" fill="#c83a2a" stroke="#401010" stroke-width="1.3"/><path d="M118 174 L130 190 L142 174Z" fill="#f6dcc0"/>
+<path d="M112 150 L104 122 L118 132 L120 106 L131 128 L143 104 L146 130 L160 120 L151 150 Q131 126 112 150Z" fill="#2a8a7a" stroke="#0a3a34" stroke-width="1"/>
+<path d="M104 122 L109 130 M120 106 L122 116 M143 104 L141 116 M160 120 L154 128" stroke="#bff4e8" stroke-width="3" stroke-linecap="round"/>
+<circle cx="131" cy="156" r="14" fill="#f8dcc0" stroke="#6a3a1a" stroke-width="1"/><circle cx="125" cy="156" r="2.4" fill="#241018"/><circle cx="137" cy="156" r="2.4" fill="#241018"/><path d="M126 164 Q131 167 136 164" stroke="#a04a3a" stroke-width="1.3" fill="none"/>
+<g transform="translate(88 164) rotate(10)"><rect width="22" height="32" rx="2" fill="#2a3e86" stroke="#f0cc6a" stroke-width="1.4"/><rect x="3" y="3" width="16" height="26" fill="#0c1640"/><path d="M11 9 L13.5 15 L19 15.5 L14.8 19.5 L16 25 L11 22 L6 25 L7.2 19.5 L3 15.5 L8.5 15Z" fill="#f0cc6a"/></g></g>
+<rect x="30" y="99" width="140" height="110" fill="none" stroke="#2a1608" stroke-width="2"/>
+<rect x="8" y="222" width="184" height="66" fill="url(#${u}b)"/><rect x="8" y="222" width="184" height="2" fill="#f0cc6a"/>
+<text x="100" y="243" font-family="Georgia,serif" font-size="13" font-weight="700" fill="#fff" text-anchor="middle" letter-spacing="2">BOOSTER PACK</text>
+<rect x="64" y="249" width="72" height="26" rx="13" fill="#fff" stroke="#f0cc6a" stroke-width="2.4"/><text x="100" y="267.5" font-family="Georgia,serif" font-size="17" font-weight="700" font-style="italic" fill="${c2}" text-anchor="middle">${P.t2}</text></svg>`;
+}
 function packCover(P){
+  if(P.id=='v7'||P.id=='b07')return packCover7(P);
   if(P.id=='v6'||P.id=='b06')return packCover6(P);
   if(P.id=='v4'||P.id=='b04')return packCover4(P);
-  if(P.id=='v3'||P.id=='v4'||P.id=='v5'||P.id=='b03'||P.id=='b04'||P.id=='b05'||P.id=='b06')return packCover3(P);
+  if(P.id=='v3'||P.id=='v4'||P.id=='v5'||P.id=='v7'||P.id=='b03'||P.id=='b04'||P.id=='b05'||P.id=='b06'||P.id=='b07')return packCover3(P);
   if(P.id=='v2'||P.id=='b02')return packCover2(P);
   const u='pc'+(++_pcu),sd=!!P.sd,rays=(cx,cy,r,n,a,b)=>Array.from({length:n},(_,i)=>{const t=i*2*Math.PI/n,t2=t+Math.PI/n;return `<polygon points="${cx},${cy} ${(cx+r*Math.cos(t)).toFixed(1)},${(cy+r*Math.sin(t)).toFixed(1)} ${(cx+r*Math.cos(t2)).toFixed(1)},${(cy+r*Math.sin(t2)).toFixed(1)}" fill="${i%2?a:b}"/>`}).join('');
   const zig=(y,d)=>{let p=`M0 ${y}`;for(let x=0;x<=200;x+=5)p+=` L${x} ${y+(x/5%2?0:d)}`;return p+` L200 ${y}Z`};
@@ -2999,13 +3418,21 @@ ${fig(300,128,'#e8eef2','#7a8aa8','#d8e0ea','#f0c8a0',true)}${fig(342,112,'#c828
 <rect x="260" y="28" width="250" height="314" fill="none" stroke="#2a3410" stroke-width="5"/></svg>`;
 }
 function say(t){NOTE=t;renderScr()}
+function dkPanel(){ // แผงบันทึก/โหลดเด็ค (ช่องเด็ค)
+  const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])),L=S.decks||[];
+  if(DK.pn=='save')return `<div class="dkpn"><input id="dkn" maxlength="24" placeholder="พิมพ์ชื่อเด็ค" value="${esc(DK.nm)}" autocomplete="off"><button data-m="dsv">บันทึก</button><button data-m="dpx">ยกเลิก</button></div>`+(L.length?`<div class="meta">ใช้ชื่อซ้ำ = ทับเด็คเดิม · เด็คที่บันทึกแล้ว ${L.length}/30</div>`:'');
+  if(DK.pn=='load')return `<div class="dkpn col">${L.length?L.map((d,i)=>`<div class="dkr"><span class="dkn"><b>${esc(d.name)}</b><small>เด็คหลัก ${d.deck.length} · Extra ${d.extra.length}</small></span><button data-m="dld" data-i="${i}">โหลด</button><button data-m="ddl" data-i="${i}">${DK.del==i?'ยืนยันลบ?':'ลบ'}</button></div>`).join(''):'<div class="meta">ยังไม่มีเด็คที่บันทึกไว้</div>'}<button data-m="dpx">ปิด</button></div>`;
+  return ''}
+function dkOwned(list,mx){const u={},o=[];let miss=0;for(const n of list){u[n]=(u[n]||0)+1;if(o.length<mx&&u[n]<=Math.min(LIM(n),S.col[n]||0))o.push(n);else miss++}return [o,miss]}
 function go(s){SCREEN=s;renderScr()}
 function dkMatch(n){const q=(DK.q||'').trim().toLowerCase();if(!q)return true;const c=CARDS[n];return (n+' '+(c.x||'')+' '+(TYPES[n]||'')+' '+(ATTR[n]||'')).toLowerCase().includes(q)}
 function dkRows(pl,sel){ // คลังการ์ดแบบเห็นหน้าการ์ด เลื่อนหาได้ยาวๆ
   if(!pl.length)return '<div class="meta">ไม่พบการ์ด</div>';
   return pl.map(n=>{const mx=dcount(n)>=Math.min(LIM(n),S.col[n]);
     return `<div class="cw">${tile(n,{m:1,z:'c',sel:n==sel,badge:dcount(n)+'/'+S.col[n],mx})}<div class="qb2"><button data-m="sub" data-n="${n}" aria-label="เอาออก">−</button><button data-m="add" data-n="${n}" aria-label="ใส่เด็ค">+</button></div></div>`}).join('')}
+document.addEventListener('keydown',e=>{if(e.key=='Enter'&&e.target.id=='dkn'){e.preventDefault();DK.nm=e.target.value;const b=document.querySelector('[data-m="dsv"]');if(b)b.click()}});
 document.addEventListener('input',e=>{ // ค้นหาแบบสดๆ โดยไม่วาดทั้งหน้าใหม่ (ช่องค้นหาไม่หลุดโฟกัส)
+  if(e.target.id=='dkn'){DK.nm=e.target.value;return}
   if(e.target.id!='dkq')return;DK.q=e.target.value;
   const pl=Object.keys(S.col).filter(n=>DK.f=='all'||(DK.f=='fu'?!!FUS[n]:DK.f=='q'?isEq(n):DK.f=='s'?CARDS[n].t=='s'&&!isEq(n):DK.f=='t'?CARDS[n].t=='t'&&!isCt(n)&&!isCn(n):DK.f=='ct'?isCt(n):DK.f=='cn'?isCn(n):CARDS[n].t==DK.f)).filter(dkMatch)
    .sort((a,b)=>((CARDS[b].t=='m')-(CARDS[a].t=='m'))||(CARDS[b].l||0)-(CARDS[a].l||0)||(CARDS[b].a||0)-(CARDS[a].a||0)||a.localeCompare(b));
@@ -3070,7 +3497,7 @@ function renderScr(){
       <div class="btns" style="margin-top:6px"><button data-m="add" data-n="${sel}">${FUS[sel]?'+ ใส่ Extra Deck':'+ ใส่เด็ค'}</button><button data-m="sub" data-n="${sel}">− เอาออก</button></div></div></div>`
       :`<div class="dt meta">แตะการ์ดเพื่อดูรายละเอียด แตะซ้ำเพื่อใส่หรือเอาออกจากเด็ค</div>`;
     h=`<div class="dkgrid"><div class="dkinfo">${dt}</div>
-    <div class="dkmain"><div class="dkh">เด็คของคุณ</div><div class="stat"><span class="${ok?'ok':'bad'}">เด็คหลัก ${S.deck.length}/60</span><span class="${S.extra.length<=15?'ok':'bad'}">Extra ${S.extra.length}/15</span><button data-m="clr">ล้างเด็ค</button></div>
+    <div class="dkmain"><div class="dkh">เด็คของคุณ</div><div class="stat"><span class="${ok?'ok':'bad'}">เด็คหลัก ${S.deck.length}/60</span><span class="${S.extra.length<=15?'ok':'bad'}">Extra ${S.extra.length}/15</span><button data-m="clr">ล้างเด็ค</button><button data-m="dsp">💾 บันทึกเด็ค</button><button data-m="dlp">📂 โหลดเด็ค (${(S.decks||[]).length})</button></div>${dkPanel()}
     <div class="meta" style="margin-bottom:6px">ขั้นต่ำ 40 ใบ · ซ้ำได้ไม่เกิน 3 ใบ · ต้องมีมอนสเตอร์ Lv≤4 อย่างน้อย 3 ใบ · มอนสเตอร์หลอมรวมใส่ได้เฉพาะ Extra Deck (สูงสุด 15 ใบ)</div>
     <div class="pool dkd">${cur.map(n=>tile(n,{m:1,z:'d',sel:n==sel})).join('')||'<div class="meta">เด็คว่าง แตะการ์ดด้านล่างเพื่อเพิ่ม</div>'}</div>
     <div class="meta" style="margin:10px 0 6px"><b>Extra Deck</b> (มอนสเตอร์หลอมรวม) ${S.extra.length}/15</div>
@@ -3122,6 +3549,20 @@ function menu(a,el){
   if(a=='pf'){PF=el.dataset.f;return renderScr()}
   if(a=='flt'){DK.f=el.dataset.f;return renderScr()}
   if(a=='clr'){S.deck=[];S.extra=[];save();return renderScr()}
+  if(a=='dsp'){DK.pn=DK.pn=='save'?null:'save';DK.del=-1;renderScr();const t=$('dkn');if(t)t.focus();return}
+  if(a=='dlp'){DK.pn=DK.pn=='load'?null:'load';DK.del=-1;return renderScr()}
+  if(a=='dpx'){DK.pn=null;DK.del=-1;return renderScr()}
+  if(a=='dsv'){const nm=String(($('dkn')||{}).value||DK.nm||'').replace(/[\u0000-\u001f<>]/g,'').trim().slice(0,24);
+    if(!nm){DK.nm='';return say('กรุณาพิมพ์ชื่อเด็คก่อนบันทึก')}
+    if(!S.deck.length&&!S.extra.length)return say('เด็คว่างอยู่ ยังบันทึกไม่ได้')
+    if(!S.decks)S.decks=[];const i=S.decks.findIndex(d=>d.name==nm),d={name:nm,deck:[...S.deck],extra:[...S.extra]};
+    if(i>=0)S.decks[i]=d;else if(S.decks.length>=30)return say('บันทึกเด็คได้สูงสุด 30 เด็ค กรุณาลบเด็คเก่าก่อน');else S.decks.push(d);
+    save();DK.pn=null;DK.nm='';return say(`${i>=0?'ทับเด็ค':'บันทึกเด็ค'} "${nm}" แล้ว`)}
+  if(a=='dld'){const d=(S.decks||[])[+el.dataset.i];if(!d)return;
+    const [m,m1]=dkOwned(d.deck,60),[x,m2]=dkOwned(d.extra,15);S.deck=m;S.extra=x;save();DK.pn=null;DK.del=-1;
+    return say(`โหลดเด็ค "${d.name}" แล้ว`+(m1+m2?` · ข้ามการ์ดที่ไม่มีในคลังแล้ว ${m1+m2} ใบ`:''))}
+  if(a=='ddl'){const i=+el.dataset.i;if(DK.del!=i){DK.del=i;return renderScr()}
+    const nm=S.decks[i]&&S.decks[i].name;S.decks.splice(i,1);DK.del=-1;save();return say(`ลบเด็ค "${nm}" แล้ว`)}
   if(a=='sdl'){const b=new Blob([JSON.stringify(S)],{type:'application/json'}),l=document.createElement('a');
     l.href=URL.createObjectURL(b);l.download='duel_save.json';document.body.appendChild(l);l.click();l.remove();setTimeout(()=>URL.revokeObjectURL(l.href),1000);return}
   if(a=='sld')return $('sfile').click();
@@ -3192,7 +3633,7 @@ function tLeave(){try{TC&&TC.close()}catch(e){}try{TP&&TP.destroy()}catch(e){}TC
 function tSend(m){try{TC&&TC.open&&TC.send(m)}catch(e){}}
 function tErr(){ // ตรวจว่าดีลนี้ทำได้จริงฝั่งเรา: เรามีการ์ดพอ และไม่ได้รับจนเกิน 3 ใบต่อชื่อ
   for(const n in TR.my)if((S.col[n]||0)<TR.my[n])return 'คุณมี '+n+' ไม่พอ';
-  for(const n in TR.th)if((S.col[n]||0)-(TR.my[n]||0)+TR.th[n]>3)return 'คุณจะมี '+n+' เกิน 3 ใบ';
+  for(const n in TR.th)if(fgCt(n)-(TR.my[n]||0)+TR.th[n]>3)return 'คุณจะมี '+n+' เกิน 3 ใบ';
   const cs=tCost();if(cs&&batt()<cs)return 'แบตเตอรี่ไม่พอ (ดีลนี้ใช้ '+cs+' ก้อน · เหลือ '+batt()+')';
   return '';
 }
@@ -3306,8 +3747,12 @@ function act(p,m){
     G.lp[p]-=3000;G.extra[p].splice(G.extra[p].indexOf(m.fn),1);G.gy[p].push(m.fn);emit({t:'act',p,n:x.n,x:EFXT[x.n],k:'flip'});
     log(`${who(p)}จ่าย 3000 LP: ${x.n} ส่ง ${m.fn} จาก Extra Deck ลงสุสาน`);chk()}}
   else if(m.a=='mtr'){const tt=G.f[p][m.t];if(x&&!x.fd&&x.n=='Mortar Trooper'&&tt){G.f[p][m.t]=null;emit({t:'act',p,n:x.n,x:EFXT[x.n],k:'flip'});G.lp[1-p]-=500;log(`${who(p)}: ${x.n} สังเวย ${tt.fd?'มอนสเตอร์ที่คว่ำอยู่':tt.n} → ${who(1-p)}ได้รับความเสียหาย 500`);chk()}}
-  else if(m.a=='chg'){if(x&&x.can&&!x.fd&&!x.lock&&!x.nw){x.pos=x.pos=='a'?'d':'a';x.can=false}}
-  else if(m.a=='atk'){if(G.ph==3&&!swb(p)&&x&&x.can&&!x.fd&&x.pos=='a'&&G.n>1&&(m.t<0?(!G.f[1-p].some(Boolean)||DIRECT.has(x.n)):G.f[1-p][m.t])){attack(p,m.i,m.t).then(()=>sync()).catch(()=>{});return}}
+  else if(m.a=='ail'){const tt=G.f[p][m.t];if(x&&!x.fd&&x.n=='Aile Fledgling Blade'&&mp&&tt&&tt!==x){G.f[p][m.t]=null;x.a+=700;x.ab=(x.ab||0)+700;emit({t:'act',p,n:x.n,x:EFXT[x.n],k:'flip'});log(`${who(p)}: ${x.n} สังเวย ${tt.fd?'มอนสเตอร์ที่คว่ำอยู่':tt.n} → ATK +700 จนจบเทิร์น (ATK ${x.a})`);chk()}}
+  else if(m.a=='tdr'){if(c&&c.t=='m'&&c.n==TDRG)A(tdrFx(p,m.i))}
+  else if(m.a=='cyl'){if(x&&!x.fd&&x.n=='Cylinder Drake')cylUse(p,m.i)}
+  else if(m.a=='btt'){const tt=G.f[p][m.t];if(x&&!x.fd&&x.n=='Ballista Tortoise'&&tt){const dm=Math.floor(Math.max(0,tt.a)/2);G.f[p][m.t]=null;emit({t:'act',p,n:x.n,x:EFXT[x.n],k:'flip'});G.lp[1-p]-=dm;log(`${who(p)}: ${x.n} สังเวย ${tt.fd?'มอนสเตอร์ที่คว่ำอยู่':tt.n} (ATK ${tt.a}) → ${who(1-p)}ได้รับความเสียหาย ${dm}`);chk()}}
+  else if(m.a=='chg'){if(x&&x.can&&!x.fd&&!x.lock&&!x.nw&&!x.nm){const pf=x.pos;x.pos=pf=='a'?'d':'a';x.can=false;if(POSM.has(x.n))A(posFx(p,x,pf,x.pos))}}
+  else if(m.a=='atk'){if(G.ph==3&&!swb(p)&&x&&x.can&&!x.fd&&x.pos=='a'&&G.n>1&&!(x.n==DKE&&G.lp[p]<=1000)&&(m.t<0?(!G.f[1-p].some(Boolean)||DIRECT.has(x.n)):G.f[1-p][m.t])){attack(p,m.i,m.t).then(()=>sync()).catch(()=>{});return}}
   sync();
 }
 const doAct=m=>{
@@ -3354,7 +3799,11 @@ document.addEventListener('click',e=>{
   if(h){G.sel={z:'h',i:+h.dataset.h};G.mode=null}
   else if(sl){
     const p=+sl.dataset.p,i=+sl.dataset.i;
-    if(p==0&&G.mode=='e'&&G.f[0][i]){
+    if(p==1&&G.mode=='e'&&G.f[1][i]){ // สวมอุปกรณ์ให้มอนสเตอร์ของคู่ต่อสู้ (เฉพาะการ์ดที่ไม่ได้ระบุว่าใช้กับของเราเท่านั้น)
+      const c=G.hand[0][G.sel.i];
+      if(c&&eqSide(c.k)=='any'&&eqOk(G.f[1][i],c.k)){G.mode=null;useZ({a:'use',i:G.sel.i,t:100+i},c)}
+    }
+    else if(p==0&&G.mode=='e'&&G.f[0][i]){
       const c=G.hand[0][G.sel.i];
       if(c&&eqOk(G.f[0][i],c.k)){G.mode=null;useZ({a:'use',i:G.sel.i,t:i},c)}
     }
@@ -3374,6 +3823,7 @@ document.addEventListener('click',e=>{
     if(!s)return;
     if(x=='fx'){const c=G.hand[0][s.i];G.mode=null;useZ({a:'use',i:s.i,fn:b.dataset.fn},c)}
     if(x=='bact'){doAct({a:'bact',i:s.i});G.sel=null}
+    if(x=='tdr'){doAct({a:'tdr',i:s.i});G.sel=null}
     if(x=='sa'||x=='sd'){
       const c=G.hand[0][s.i],pos=x=='sa'?'a':'d',nd=need(c),own=G.f[0].map((m,j)=>m?j:-1).filter(j=>j>=0);
       if(nd>0&&own.length>nd){G.mode='s';G.sp={pos,tr:[]}} // ให้ผู้เล่นเลือกมอนสเตอร์ที่จะสังเวยเอง
@@ -3381,7 +3831,7 @@ document.addEventListener('click',e=>{
     }
     if(x=='use'){
       const c=G.hand[0][s.i];
-      if(c&&EQT[c.k]&&G.f[0].filter(m=>eqOk(m,c.k)).length>1)G.mode='e';
+      if(c&&EQT[c.k]&&eqT(0,c.k).length>1)G.mode='e';
       else if(c&&CH[c.k]&&pickSpell(c,s.i)){G.mode=null}
        else if(c&&c.k=='poly'&&fusionPlans(0).length>1)G.mode='f'; // มีหลายตัวให้เลือก
       else if(c&&c.k=='mir'&&pickMir(c,s.i)){G.mode=null}
@@ -3390,7 +3840,7 @@ document.addEventListener('click',e=>{
     if(x=='set')place({a:'set',i:s.i},'b',emp(G.b[0]));
     if(x=='fld'){doAct({a:x,i:s.i});G.sel=null}
     if(x=='flp'){if(!pickFlip(s.i))doAct({a:'flp',i:s.i})}
-    if(x=='cs'||x=='gd')csPick(s.i);if(x=='mtr')mtPick(s.i);
+    if(x=='cs'||x=='gd')csPick(s.i);if(x=='mtr')mtPick(s.i);if(x=='ail')ailPick(s.i);if(x=='btt')mtPick(s.i,'btt');if(x=='cyl'){doAct({a:'cyl',i:s.i});G.sel=null}
     if(x=='chg')doAct({a:'chg',i:s.i});
     if(x=='atk'){
       if(G.f[1].some(Boolean)){if(DIRECT.has(G.f[0][s.i].n))dirAsk(s.i);else G.mode='t'}
@@ -3399,6 +3849,71 @@ document.addEventListener('click',e=>{
   }
   render();
 });
+// ---------- ลากการ์ดจากมือไปวางบนสนาม (กดเล่นตามปกติยังใช้ได้) ----------
+// ลากมอนสเตอร์ลงช่องมอนสเตอร์ = ลงท่าโจมตี · ลงช่องเวท/กับดัก = ตั้งป้องกัน(คว่ำ) · เวทมนตร์ = ใช้การ์ด (ใช้ไม่ได้จะตั้งคว่ำ) · กับดัก = ตั้งคว่ำ · เวทสนาม = วางโซนสนาม
+let DRG=null;
+function dragToast(t){let d=document.getElementById('dgt');if(!d){d=document.createElement('div');d.id='dgt';document.body.appendChild(d)}d.textContent=t;d.classList.add('on');clearTimeout(dragToast.t);dragToast.t=setTimeout(()=>d.classList.remove('on'),1800)}
+function dragEnd(){
+  if(!DRG)return;const d=DRG;DRG=null;
+  document.removeEventListener('pointermove',dragMove,true);document.removeEventListener('pointerup',dragUp,true);document.removeEventListener('pointercancel',dragCancel,true);
+  if(d.ghost)d.ghost.remove();if(d.el)d.el.classList.remove('dragsrc');
+  document.body.classList.remove('dragging');document.querySelectorAll('.dropok,.drophov').forEach(x=>x.classList.remove('dropok','drophov'));
+  return d}
+function dragSlot(x,y){const t=document.elementFromPoint(x,y);return t&&t.closest?t.closest('[data-p],[data-bp]'):null}
+function dragMove(e){
+  const d=DRG;if(!d||e.pointerId!=d.id)return;const dx=e.clientX-d.x0,dy=e.clientY-d.y0;
+  if(!d.on){
+    if(Math.hypot(dx,dy)<8)return;
+    if(e.pointerType=='touch'&&Math.abs(dx)>Math.abs(dy)*1.2){dragEnd();return} // ปัดซ้ายขวา = เลื่อนมือการ์ดตามปกติ
+    d.on=true;const r=d.el.getBoundingClientRect(),g=d.el.cloneNode(true);g.className+=' dragghost';g.style.cssText=`position:fixed;left:0;top:0;width:${r.width}px;height:${r.height}px;margin:0;pointer-events:none;z-index:9999;opacity:.92;transform:translate(${r.left}px,${r.top}px) scale(1.08);transition:none`;
+    document.body.appendChild(g);d.ghost=g;d.ox=d.x0-r.left;d.oy=d.y0-r.top;d.el.classList.add('dragsrc');document.body.classList.add('dragging');
+    document.querySelectorAll('[data-p="0"],[data-bp="0"]').forEach(x=>x.classList.add('dropok'));
+  }
+  e.preventDefault();d.ghost.style.transform=`translate(${e.clientX-d.ox}px,${e.clientY-d.oy}px) scale(1.08)`;
+  const sl=dragSlot(e.clientX,e.clientY);document.querySelectorAll('.drophov').forEach(x=>x.classList.remove('drophov'));
+  if(sl&&(sl.dataset.p=='0'||sl.dataset.bp=='0'))sl.classList.add('drophov');
+}
+function dragCancel(e){if(DRG&&e.pointerId==DRG.id)dragEnd()}
+function dragUp(e){
+  if(!DRG||e.pointerId!=DRG.id)return;const was=DRG.on,i=DRG.i,sl=was?dragSlot(e.clientX,e.clientY):null;
+  dragEnd();if(!was)return;
+  const sup=ev=>{if(!ev.isTrusted)return;ev.stopPropagation();ev.preventDefault()};window.addEventListener('click',sup,true);setTimeout(()=>window.removeEventListener('click',sup,true),60); // กันคลิกค้างหลังปล่อยนิ้ว
+  if(!sl||!(sl.dataset.p=='0'||sl.dataset.bp=='0')||!G||G.over||G.turn||G.busy||G.intro)return;
+  const c=G.hand[0][i];if(!c)return;const onM=sl.dataset.p=='0',zi=onM?+sl.dataset.i:+sl.dataset.bi;
+  const fin=b=>{ // กดปุ่มคำสั่งแล้ววางลงช่องที่ปล่อยการ์ด (ถ้ามีหลายช่องว่าง)
+    b.click();
+    if(G.mode=='z'&&G.zp){
+      const zz=G.zp.row=='f'?(onM?zi:-1):(onM?-1:zi);
+      if(zz>=0&&G.zp.ok.includes(zz)){const mg={...G.zp.msg,z:zz};G.mode=null;G.zp=null;G.sel=null;doAct(mg);render()}
+    }};
+  LT={k:null,t:0};const hc=document.querySelector(`[data-h="${i}"]`);if(!hc)return;hc.click();RQ=false;paint(); // render() ถูกหน่วงไว้ วาดทันทีเพื่อให้ปุ่มคำสั่งโผล่
+  const q=a=>{const x=document.querySelector(`[data-a="${a}"]`);return x&&!x.disabled?x:null};
+  if(c.t=='m'){ // มอนสเตอร์: ถามก่อนว่าจะลงท่าโจมตี หรือตั้งป้องกัน (คว่ำ)
+    const sa=q('sa'),sd=q('sd');
+    if(!sa&&!sd){dragToast('ลงมอนสเตอร์ตัวนี้ตอนนี้ไม่ได้');return}
+    dragAsk(c.n,[['ลงท่าโจมตี (หงายหน้า)',sa],['ตั้งป้องกัน (คว่ำ)',sd]],pick=>{
+      if(!pick){G.sel=null;G.mode=null;render();return}
+      if(!G||G.over||G.turn||G.busy||G.intro)return;
+      LT={k:null,t:0};const cur=document.querySelector(`[data-h="${i}"]`);if(cur){cur.click();RQ=false;paint()}
+      const b=q(pick=='0'?'sa':'sd');if(b)fin(b);else dragToast('ลงมอนสเตอร์ตัวนี้ตอนนี้ไม่ได้')});
+    return}
+  const want=c.t=='t'?['set']:FLD[c.k]?['fld']:['use','set'];
+  let b=null;for(const w of want){const x=q(w);if(x){b=x;break}}
+  if(!b){dragToast('วางการ์ดใบนี้ตอนนี้ไม่ได้');return}
+  fin(b);
+}
+function dragAsk(name,opts,cb){ // กล่องถามท่าที่จะลง (มอนสเตอร์ที่ลากลงสนาม)
+  const ov=document.createElement('div');ov.className='dgask';
+  ov.innerHTML=`<div class="dgbx"><div class="dgt1">${name.replace(/[<>&]/g,'')}</div>${opts.map(([l,en],k)=>`<button data-k="${k}" ${en?'':'disabled'}>${l}</button>`).join('')}<button data-k="x" class="dgx">ยกเลิก</button></div>`;
+  const done=v=>{ov.remove();cb(v)};
+  ov.addEventListener('click',e=>{e.stopPropagation();const b=e.target.closest('button[data-k]');if(b){if(!b.disabled)done(b.dataset.k=='x'?null:b.dataset.k)}else if(e.target==ov)done(null)});
+  document.body.appendChild(ov)}
+document.addEventListener('pointerdown',e=>{
+  if(DRG||SCREEN!='game'||!G||G.over||G.turn||G.busy||G.intro||DETAIL||e.button>0||(e.pointerType=='mouse'&&e.buttons!=1))return;
+  const el=e.target.closest&&e.target.closest('.hand [data-h]');if(!el)return;
+  DRG={id:e.pointerId,el,i:+el.dataset.h,x0:e.clientX,y0:e.clientY,on:false};
+  document.addEventListener('pointermove',dragMove,{capture:true,passive:false});document.addEventListener('pointerup',dragUp,true);document.addEventListener('pointercancel',dragCancel,true);
+},true);
 const CH={dsc:1,coh:1,sr:1,sd:1,fis:1,ds:1,rt:1,rev:1,gg:1}; // เอฟเฟกต์ที่ให้เจ้าของการ์ดเลือกเป้าหมายเอง
 function mkSec(bx,o){ // ถ้าตัวเลือกมีทั้งของเราและของคู่ต่อสู้: แยกเป็น 2 หน้าต่าง บน=ของเรา ล่าง=ของคู่ต่อสู้
   if(!(o.some(x=>x.s=='s')&&o.some(x=>x.s=='o')))return()=>bx;
@@ -3421,6 +3936,8 @@ function pickMir(c,hi){ // Kaleidoscope Mirrorself: ถ้า Songstress Sisterh
 function pickSpell(c,hi){
   const o=[],fl=m=>m.fd?'มอนสเตอร์ที่คว่ำอยู่':`${m.n} (ATK ${m.a})`;
   if(c.k=='sd')G.f[1].forEach((m,j)=>m&&m.pos=='d'&&!m.fd&&o.push({l:fl(m),t:j}));
+  if(c.k=='ba')G.f[1].forEach((m,j)=>m&&m.pos=='a'&&!m.fd&&o.push({l:fl(m),t:j}));
+  if(c.k=='mbl'||c.k=='nme')G.f[1].forEach((m,j)=>m&&!m.fd&&o.push({l:fl(m),t:j}));
   else if(c.k=='fis')G.f[1].forEach((m,j)=>m&&!m.fd&&o.push({l:fl(m)+` · ช่อง ${j+1}`,t:j}));
   else if(c.k=='sr'){if(G.gy[1].length)o.push({l:`สุสานของคู่ต่อสู้ (${G.gy[1].length} ใบ)`,t:'o'});if(G.gy[0].length)o.push({l:`สุสานของเรา (${G.gy[0].length} ใบ)`,t:'s'})}
   else if(c.k=='dsc')G.f[1].forEach((m,j)=>m&&o.push({l:fl(m)+` · ช่อง ${j+1}`,t:j}));
@@ -3429,7 +3946,7 @@ function pickSpell(c,hi){
   else if(c.k=='rt')G.b[1].forEach((e,j)=>e&&e.tr&&o.push({l:`การ์ดกับดักที่วางไว้ · ช่อง ${j+1}`,t:j}));
   else [['o',1],['s',0]].forEach(([r,z])=>G.gy[z].forEach((n,j)=>{const cc=CARDS[n];if(cc&&cc.t=='m'&&!(c.k=='rev'&&FUS[n]))o.push({l:n+(r=='o'?' · สุสานคู่ต่อสู้':' · สุสานของเรา'),t:{r,j},s:r})}));
   const mx=c.k=='gg'?2:1;
-  if(!o.length||(o.length<=mx&&c.k!='rt'&&c.k!='ds'&&c.k!='fis'&&c.k!='sd'&&c.k!='dsc'&&c.k!='coh')||o.length==1)return false;
+  if(!o.length||(o.length<=mx&&c.k!='rt'&&c.k!='ds'&&c.k!='fis'&&c.k!='sd'&&c.k!='ba'&&c.k!='mbl'&&c.k!='nme'&&c.k!='dsc'&&c.k!='coh')||o.length==1)return false;
   const ov=document.createElement('div');ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:99;display:flex;align-items:center;justify-content:center;padding:12px';
   const bx=document.createElement('div');bx.style.cssText='background:#1c1c2a;color:#fff;border:2px solid #d9b36a;border-radius:10px;padding:12px;max-width:420px;width:100%;max-height:80vh;overflow:auto;font:14px sans-serif';
   bx.innerHTML=`<div style="font-weight:700;margin-bottom:8px">${c.n}: เลือกเป้าหมาย${mx>1?' (สูงสุด 2)':''}</div>`;
