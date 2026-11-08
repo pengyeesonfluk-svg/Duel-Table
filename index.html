@@ -473,8 +473,8 @@ main.wide{max-width:100%!important;padding:4px!important}
 }
 
 /* ลดภาระ GPU มือถือ (แก้จอซ่า/บัค): ไม่เรนเดอร์การ์ดนอกจอ + ตัดเลเยอร์ที่ไม่จำเป็น */
-.mc{content-visibility:auto;contain-intrinsic-size:auto 84px auto 118px}
-.pfg .mc{contain-intrinsic-size:auto 86px auto 112px}
+.mc{content-visibility:visible} /* ปิด content-visibility:auto: ทำให้ Android Chrome เรนเดอร์เป็นแถบเพี้ยนตอนเลื่อนรายการ */
+
 .side.opp .oh{contain:layout paint;overflow:hidden}
 .side.opp .oh i{box-shadow:none}
 .dc,.fxn,.fuc{box-shadow:none}
