@@ -63,11 +63,11 @@ footer{text-align:center;color:var(--mute);font-size:11px;padding:10px}
 .opk{width:200px;height:300px;position:relative}
 .opb{position:absolute;inset:36px 0 0 0;background:linear-gradient(160deg,#1f6b5f,#0d3a42);border:2px solid var(--brass);border-top:0;border-radius:0 0 10px 10px;display:flex;flex-direction:column;align-items:center;justify-content:center;font:700 22px Georgia,serif;color:var(--brass)}
 .opb span{font-size:14px}
-.oph{position:absolute;top:0;left:0;right:0;height:36px;background:repeating-linear-gradient(90deg,#c9a23a,#c9a23a 6px,#a8841f 6px,#a8841f 12px);border:2px solid var(--brass);border-radius:10px 10px 0 0;display:flex;align-items:center;justify-content:center;cursor:grab;touch-action:none;color:#2b1d00;font-weight:700;letter-spacing:8px;z-index:2}
+.oph{position:absolute;top:0;left:0;right:0;height:36px;background:repeating-linear-gradient(90deg,#c9a23a,#c9a23a 4px,#a8841f 8px,#c9a23a 12px);border:2px solid var(--brass);border-radius:10px 10px 0 0;display:flex;align-items:center;justify-content:center;cursor:grab;touch-action:none;color:#2b1d00;font-weight:700;letter-spacing:8px;z-index:2}
 .ops{position:relative;width:100%;height:430px;touch-action:none}
 .opc,.opx{position:absolute;left:50%;top:50%;width:100px;margin:-70px 0 0 -50px;transform:scale(2.5)}
 .opc{touch-action:none;cursor:grab;animation:opfi .25s}
-.opx{height:140px;transform:translate(14px,10px) scale(2.4);background:repeating-linear-gradient(45deg,#3a2a14,#3a2a14 6px,#2c2412 6px,#2c2412 12px);border:2px solid #8a6a2a;border-radius:5px;opacity:.8}
+.opx{height:140px;transform:translate(14px,10px) scale(2.4);background:repeating-linear-gradient(45deg,#3a2a14,#3a2a14 4px,#2c2412 8px,#3a2a14 12px);border:2px solid #8a6a2a;border-radius:5px;opacity:.8}
 @keyframes opfi{from{opacity:0}}
 .opr{position:absolute;top:100%;left:-10px;right:-10px;margin-top:5px;text-align:center;font:700 7px Georgia,serif;letter-spacing:.5px;color:#cfd8dc}
 .opr.R{color:#6ab7ff}.opr.SR{color:#c58cff}.opr.UR{color:#ffd24a;text-shadow:0 0 4px #ffb300}
@@ -96,7 +96,7 @@ footer{text-align:center;color:var(--mute);font-size:11px;padding:10px}
 .slot.fz{border-style:solid;border-color:var(--brass);align-items:center;justify-content:center}
 .zl{font-size:9px;color:var(--mute);text-align:center}
 .card.eqp{background:#1c3320;border-color:var(--leaf)}
-.card.fd{background:repeating-linear-gradient(45deg,#3a2a14,#3a2a14 6px,#2c2412 6px,#2c2412 12px);border-color:#8a6a2a}
+.card.fd{background:repeating-linear-gradient(45deg,#3a2a14,#3a2a14 4px,#2c2412 8px,#3a2a14 12px);border-color:#8a6a2a}
 .mn{display:grid;gap:10px;margin:14px 0}.mn button{padding:14px;font-size:16px}
 .bat{display:inline-flex;gap:3px;vertical-align:middle;margin:0 6px}.bat i{width:20px;height:11px;border:1px solid var(--brass);border-radius:2px}.bat i.on{background:var(--leaf);border-color:var(--leaf)}
 .qr{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid #24406b55}.qt{flex:1;display:flex;flex-direction:column;gap:3px}.qbar{height:5px;background:#0b1220;border-radius:3px;overflow:hidden}.qbar i{display:block;height:100%;background:var(--brass)}.qr button:disabled{opacity:.4;cursor:default}
@@ -138,7 +138,7 @@ main.wide{background:linear-gradient(#0d1526,#0a101c)}
 .pkart{flex:0 0 84px;aspect-ratio:3/4.4;border-radius:6px;background:linear-gradient(160deg,#3fd0f0,#2b4fb8 55%,#16213f);border:2px solid #d8b25a;display:flex;flex-direction:column;justify-content:center;align-items:center;font:700 12px Georgia,serif;color:#fff;text-align:center}
 .pkart span{font-size:26px;color:#ffe9a8}
 .pkart.cv{background:none;border:0;display:block;aspect-ratio:2/3;flex:0 0 96px}.pkart.cv.box{flex:0 0 150px;aspect-ratio:535/370}
-.pkart.cv svg,.opb.cv svg{width:100%;height:100%;display:block;filter:drop-shadow(0 2px 5px #000a)}
+.pkart.cv svg,.opb.cv svg{width:100%;height:100%;display:block}
 .opb.cv{inset:0;background:none;border:0;border-radius:0}
 summary{cursor:pointer}
 @media(min-width:900px){
@@ -184,7 +184,7 @@ html,body,button,input{touch-action:manipulation;-webkit-tap-highlight-color:tra
 .xv{width:min(360px,100%);max-height:100%;overflow:auto;background:#1a1408;border:3px solid #a070d0;border-radius:10px;padding:10px;color:#fff}
 .xv .nm{font:700 16px Georgia,"Noto Serif Thai",serif;margin-bottom:8px}.xv .hint{text-align:center;font-size:11px;opacity:.75;margin-top:8px}
 .xv .pool{grid-template-columns:repeat(3,1fr)}
-.mc.back{background:repeating-linear-gradient(45deg,#5a3a14,#5a3a14 6px,#3a2a14 6px,#3a2a14 12px);color:#fff;align-items:center;justify-content:center;border-color:#a8642a}
+.mc.back{background:repeating-linear-gradient(45deg,#5a3a14,#5a3a14 4px,#3a2a14 8px,#5a3a14 12px);color:#fff;align-items:center;justify-content:center;border-color:#a8642a}
 .dc .hint{text-align:center;font-size:11px;opacity:.75;margin-top:8px}
 
 /* ---- หลังการ์ด + สุสาน ---- */
@@ -470,6 +470,16 @@ main.wide{max-width:100%!important;padding:4px!important}
  main.gm .phs .ph,main.gm .phs .phn{padding:2px 3px;font-size:10px}
  main.gm .phs .ph small,main.gm .phs .phn small{display:none}
 }
+
+/* ลดภาระ GPU มือถือ (แก้จอซ่า/บัค): ไม่เรนเดอร์การ์ดนอกจอ + ตัดเลเยอร์ที่ไม่จำเป็น */
+.mc{content-visibility:auto;contain-intrinsic-size:auto 84px auto 118px}
+.pfg .mc{contain-intrinsic-size:auto 86px auto 112px}
+.side.opp .oh{contain:layout paint;overflow:hidden}
+.side.opp .oh i{box-shadow:none}
+.dc,.fxn,.fuc{box-shadow:none}
+.mc.rare{box-shadow:0 0 0 2px #7fe3ff88}
+/* ลากมอนสเตอร์บนสนามไปโจมตี: กันเบราว์เซอร์แย่งท่าลากไปเลื่อนหน้า */
+.slot[data-p="0"] .card{touch-action:none}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
 </head>
@@ -1921,11 +1931,11 @@ Object.assign(TYPES,{'Swordcourt Queen':'Warrior','Portal Sentinel':'Machine','M
 Object.assign(ATTR,{'Swordcourt Queen':'WIND','Portal Sentinel':'DARK','Mazeforge Juggernaut':'DARK','Hatchet Gator':'WATER','Scythe Pendulum Rig':'DARK','Rocketpod Arachnid':'FIRE','Scythe-Arm Marauder':'DARK','Chrome Infantryman':'DARK','Hulking Sprocket':'DARK','Stormbolt Drake':'LIGHT','Ripple Nymph':'WATER','Spectrum Pike':'WATER','Stormhermit Elder':'LIGHT','Frenzied Gar':'WATER','Cogscale Saurian':'EARTH','Colossal Condor':'WIND','Spiketusk Brute':'EARTH','Obsidian Elfmage':'DARK'});
 Object.assign(FUS,{'Mazeforge Juggernaut':['Gigaforge Wolf','Mortar Trooper'],'Cogscale Saurian':['Powderkeg Juggler','Twin-Maw Tyrant']}); // อยู่ใน Extra Deck
 PK20B.forEach(([n,a,d,l,r])=>{CARDS[n]={t:'m',n,a,d,l};RAR[n]=r;if(r=='UR'||r=='SR')RARE.push(n)});
-// เอฟเฟกต์: Swordcourt Queen (ฟลิป: 500 ดาเมจต่อเวท/กับดักของคู่ต่อสู้) · Stormhermit Elder (ฟลิป: +1500 LP) · Stormbolt Drake (ทิ้งจากมือ: ค้นหาชื่อเดียวกันจากเด็คสูงสุด 2 ใบ) · Obsidian Elfmage (จ่าย 1000 LP ทุกครั้งที่โจมตี)
+// เอฟเฟกต์: Swordcourt Queen (ฟลิป: 500 ดาเมจต่อเวท/กับดักของคู่ต่อสู้) · Stormhermit Elder (ฟลิป: +3000 LP · ลงสุสานจากสนาม −5000 LP) · Stormbolt Drake (ทิ้งจากมือ: ค้นหาชื่อเดียวกันจากเด็คสูงสุด 2 ใบ) · Obsidian Elfmage (จ่าย 1000 LP ทุกครั้งที่โจมตี)
 const TDRG='Stormbolt Drake',DKE='Obsidian Elfmage';
 FLIPM.add('Swordcourt Queen');FLIPM.add('Stormhermit Elder');['Swordcourt Queen','Stormhermit Elder',TDRG,DKE].forEach(n=>EFFM.add(n));
 EFXT['Swordcourt Queen']='ฟลิป: ทำความเสียหายให้คู่ต่อสู้ 500 ต่อการ์ดเวทมนตร์/กับดักทุกใบที่อยู่บนสนามฝั่งคู่ต่อสู้ (นับรวมที่ตั้งคว่ำและเวทสนาม)';
-EFXT['Stormhermit Elder']='ฟลิป: ผู้เล่นฟื้น 1500 LP';
+EFXT['Stormhermit Elder']='ฟลิป: ผู้เล่นฟื้น 3000 LP · เมื่อการ์ดนี้ถูกส่งจากสนามลงสุสาน เจ้าของเสีย 5000 LP';
 EFXT[TDRG]='ทิ้งการ์ดนี้จากมือ (Main Phase): เลือกการ์ดชื่อ Stormbolt Drake จากเด็คขึ้นมือได้สูงสุด 2 ใบ แล้วสับเด็ค (กดปุ่มตอนแตะการ์ดในมือ · ฝั่ง AI ยังไม่ใช้เอฟเฟกต์นี้)';
 EFXT[DKE]='ทุกครั้งที่การ์ดนี้โจมตี ต้องจ่าย 1000 LP ก่อน (LP เหลือไม่เกิน 1000 จะโจมตีไม่ได้)';
 function tdrFx(p,i){ // Thunder Dragon: ทิ้งจากมือ ค้นหาชื่อเดียวกันจากเด็คสูงสุด 2 ใบ
@@ -1961,7 +1971,7 @@ Object.assign(ART,{
 // Royal Guard=Regal Bulwark · Barrel Dragon=Cylinder Drake · The Unhappy Maiden=Forlorn Damsel · Tremendous Fire=Inferno Cascade · Shield & Sword=Buckler and Blade · Sword of Deep-Seated=Ingrained Edge
 // Block Attack=Standstill Decree · Germ Infection=Microbe Blight · Robbin' Goblin=Pilfering Goblin · Mirror Force=Aegis Rebound · Paralyzing Potion=Numbing Elixir
 const PK20C=[
- ['Capcap Sporeling',1250,800,3,'C'],['Moltenrock Warden',1550,1800,4,'C'],['Thicket Wyrm Sovereign',2100,1800,6,'C'],
+ ['Capcap Sporeling',1250,800,3,'C'],['Moltenrock Warden',1550,1800,5,'C'],['Thicket Wyrm Sovereign',2100,1800,6,'C'],
  ['Gluttonous Ghoul',1600,1200,4,'C'],['Twin-Crown Stormwyrm',2800,2100,7,'UR'],['Regal Bulwark',1900,2200,6,'C'],
  ['Cylinder Drake',2600,2200,7,'UR'],['Forlorn Damsel',0,100,1,'SR']
 ];
@@ -2270,11 +2280,11 @@ function draw(p,k=1){
 EQT.ied=[...new Set(Object.values(TYPES))];(typeof EQV!='undefined'?EQV:(window.EQV={})).ied=[500,500];EQT.rom=EQT.ied;EQV.rom=[-500,-500];EQT.mbl=EQT.nme=EQT.ied;EQV.mbl=[0,0];EQV.nme=[0,0];EQT.stm=EQT.ied;EQV.stm=[700,0]; // Lodestone Band ATK/DEF -500 (ของเราเท่านั้น) · Microbe Blight/Numbing Elixir สวมได้ทั้งสองฝ่าย ยกเว้นเผ่า Machine // Ingrained Edge: อุปกรณ์ใช้ได้กับทุกชนิด
 CTK.add('pgb');
 EFFM.add('Capcap Sporeling');EFFM.add('Cylinder Drake');EFFM.add('Forlorn Damsel');
-EFXT['Marshland Warden']='ATK ของการ์ดนี้เพิ่มขึ้น 500 ขณะที่มี Moltenrock Warden (Lava Battleguard) หงายหน้าอยู่บนสนามฝั่งเดียวกัน';
-EFXT['Capcap Sporeling']='ใน Standby Phase ของผู้ควบคุม การควบคุมการ์ดนี้ย้ายไปให้คู่ต่อสู้ (ถ้าฝั่งนั้นมีช่องว่าง)';
+EFXT['Marshland Warden']='ATK ของการ์ดนี้เพิ่มขึ้น 500 ต่อ Moltenrock Warden แต่ละใบที่คุณควบคุม (หงายหน้า)';EFXT['Moltenrock Warden']='ATK ของการ์ดนี้เพิ่มขึ้น 500 ต่อ Marshland Warden แต่ละใบที่คุณควบคุม (หงายหน้า)';EFFM.add('Moltenrock Warden');
+EFXT['Capcap Sporeling']='ผู้ควบคุมการ์ดนี้เสีย 300 LP ทุก Standby Phase ของตนขณะที่หงายหน้าอยู่บนสนาม · ใน End Phase ของตน จ่าย 500 LP เพื่อย้ายการควบคุมการ์ดนี้ให้คู่ต่อสู้';
 EFXT['Cylinder Drake']='Main Phase (เทิร์นละครั้ง · กดปุ่มที่การ์ดบนสนาม): โยนเหรียญ 3 ครั้ง ถ้าออกหัว 2 ครั้งขึ้นไป ทำลายมอนสเตอร์ของคู่ต่อสู้ 1 ตัว (เจ้าของเลือกเป้าหมายเอง · ฝั่ง AI ยังไม่ใช้เอฟเฟกต์นี้)';
 EFXT['Forlorn Damsel']='ถ้าการ์ดนี้ถูกทำลายจากการต่อสู้แล้วส่งลงสุสาน: Battle Phase ของเทิร์นนี้จบลงทันที (ผู้เล่นฝั่งที่กำลังโจมตีโจมตีต่อไม่ได้)';
-function swampFx(){const P=SWAMP_PARTNER;[0,1].forEach(z=>{const has=G.f[z].some(x=>x&&!x.fd&&x.n==P);G.f[z].forEach(m=>{if(m&&m.n=='Marshland Warden'){const on=has&&!m.fd;if(on&&!m.sw){m.a+=500;m.sw=1}else if(!on&&m.sw){m.a-=500;m.sw=0}}})})}
+function swampFx(){} // ย้ายไปคำนวณใน refield() (Marshland Warden / Moltenrock Warden)
 function pgbFx(p){ // Pilfering Goblin: ผู้โจมตี p สร้างดาเมจการต่อสู้ -> คู่ต่อสู้ทิ้งมือแบบสุ่ม 1 ใบ
   if(RD()||!G.b[p].some(e=>e&&e.tr&&e.k=='pgb'))return;const q=1-p,h=G.hand[q];if(!h.length)return;
   const c=h.splice(Math.floor(Math.random()*h.length),1)[0];G.gy[q].push(c.n);log(`Pilfering Goblin: ${who(q)}ต้องทิ้ง ${c.n} จากมือแบบสุ่ม`)}
@@ -2303,12 +2313,23 @@ function stbNew(p){
   G.f[p].forEach(m=>{if(m&&m.gAct&&!m.fd&&m.gn<4){m.gn++;m.gb+=100;m.a+=100;m.d+=100;log(`${m.n}: Standby Phase ATK/DEF +100 (ครั้งที่ ${m.gn}/4)`)}});
   G.b[p].forEach(e=>{if(e&&e.k=='stm'&&e.on){const mm=G.f[0].concat(G.f[1]).find(m=>m&&m.id==e.on);if(mm){const d=Math.min(200,mm.a);mm.a-=d;e.dec=(e.dec||0)+d;log(`${e.n}: ${mm.n} ATK −${d} (Standby Phase ของ${who(p)})`)}}});
   G.b[p].forEach(e=>{if(e&&e.k=='mbl'&&e.on){const mm=G.f[0].concat(G.f[1]).find(m=>m&&m.id==e.on);if(mm&&TYPES[mm.n]!='Machine'){const d=Math.min(300,mm.a);mm.a-=d;e.dec=(e.dec||0)+d;log(`${e.n}: ${mm.n} ATK −${d} (Standby Phase ของ${who(p)})`)}}}); // Germ Infection
-  G.f[p].forEach((m,k)=>{if(m&&m.n=='Capcap Sporeling'){const j=G.f[q].findIndex(x=>!x);if(j>=0){G.f[q][j]=m;G.f[p][k]=null;m.can=false;log(`Capcap Sporeling: การควบคุมย้ายไปให้${who(q)}`)}}});
+  G.f[p].forEach(m=>{if(m&&!m.fd&&m.n=='Capcap Sporeling'){G.lp[p]-=300;log(`Capcap Sporeling: ${who(p)}เสีย 300 LP (Standby Phase)`)}});
+  chk();
 }
+async function capEnd(p){ // End Phase ของเจ้าของ: จ่าย 500 LP เพื่อย้ายการควบคุม Capcap Sporeling ให้คู่ต่อสู้ (เลือกได้)
+  const q=1-p;
+  for(const m of G.f[p].slice()){
+    if(!m||m.fd||m.n!='Capcap Sporeling'||G.over||G.lp[p]<=500||!G.f[q].some(x=>!x))continue;
+    const go=MODE!='pvp'&&p==1?G.lp[p]>1500:await askQ(p,'Capcap Sporeling: จ่าย 500 LP เพื่อย้ายการควบคุมการ์ดนี้ไปให้คู่ต่อสู้?\n(ถ้าไม่ย้าย จะเสีย 300 LP ทุก Standby Phase ของคุณ)');
+    const k=G.f[p].indexOf(m),j=G.f[q].findIndex(x=>!x);if(!go||k<0||j<0)continue;
+    G.lp[p]-=500;G.f[p][k]=null;G.f[q][j]=m;m.can=false;G.snap.f[p]=cnt(G.f[p]);G.snap.f[q]=cnt(G.f[q]);
+    log(`Capcap Sporeling: ${who(p)}จ่าย 500 LP ย้ายการควบคุมไปให้${who(q)}`);
+  }
+  chk();sync()}
 function startTurn(p){
   if(G.bsw&&G.bsw.length){G.bsw=[];[0,1].forEach(z=>G.f[z].forEach(m=>{if(m&&!m.fd){const t0=m.a;m.a=m.d;m.d=t0}}))} // Buckler and Blade: คืนค่า ATK/DEF
   G.turn=p;G.n++;G.sum=false;G.sel=null;G.mode=null;G.busy=false;G.intro=true;G.ph=0; // Standby Phase
-  G.f[p].forEach(m=>m&&(m.can=m.nx!==G.n&&!m.nm&&!m.np,m.nw=false,m.fl=false)); // m.nx = เคยโจมตี Sparkjaw Newt: โจมตีไม่ได้ในเทิร์นถัดไปของเจ้าของ
+  G.f[p].forEach(m=>m&&(m.can=m.nx!==G.n&&!m.nm&&!m.np,m.nw=false,m.fl=false,m.pc=false)); // m.nx = เคยโจมตี Sparkjaw Newt: โจมตีไม่ได้ในเทิร์นถัดไปของเจ้าของ
   standbyFx(p);stbNew(p);
   sync();
   const id=GID;
@@ -2325,6 +2346,7 @@ function startTurn(p){
   })();
 }
 function endFlow(p){ // End Phase แล้วค่อยเริ่มเทิร์นฝั่งตรงข้าม
+  if(!endFlow.d&&G.f[p].some(m=>m&&!m.fd&&m.n=='Capcap Sporeling')){const id=GID;G.intro=true;G.sel=null;G.mode=null;sync();capEnd(p).then(()=>{if(GID!=id||!G||G.over)return;endFlow.d=1;try{endFlow(p)}finally{endFlow.d=0}}).catch(()=>{});return}
   endPhaseFx(p);
   G.b[1-p].forEach((e,i)=>{if(e&&e.k=='sw'){e.tl--;if(e.tl<=0){log(`${e.n} หมดผล`);G.b[1-p][i]=null}}});chk(); // นับถอยหลัง Blades of Unveiling Radiance
   G.intro=true;G.ph=5;G.sel=null;G.mode=null;sync();
@@ -2399,7 +2421,7 @@ function flipFx(p,m,ap,asi,pt){ // pt = เป้าหมายที่ผู�
     else log(`${n} ฟลิป แต่ไม่ได้เลือก/ไม่มีมอนสเตอร์ให้ส่งกลับ`)}
   else if(n=='Winged Egg Sprite'){G.lp[p]+=500;log(`${who(p)}: ${n} ฟลิป ฟื้น 500 LP`)}
   else if(n=='Swordcourt Queen'){const k=G.b[q].filter(Boolean).length+(G.fz[q]?1:0);if(k){G.lp[q]-=500*k;log(`${n} ฟลิป ทำความเสียหาย ${500*k} (เวท/กับดักของ${who(q)} ${k} ใบ)`)}else log(`${n} ฟลิป แต่คู่ต่อสู้ไม่มีเวท/กับดักบนสนาม`)}
-  else if(n=='Stormhermit Elder'){G.lp[p]+=1500;log(`${who(p)}: ${n} ฟลิป ฟื้น 1500 LP`)}
+  else if(n=='Stormhermit Elder'){G.lp[p]+=3000;log(`${who(p)}: ${n} ฟลิป ฟื้น 3000 LP`)}
   else if(n=='Shapeshift Urn'){[p,q].forEach(z=>{const hh=G.hand[z].splice(0);hh.forEach(cc=>G.gy[z].push(cc.n));thorn(z,hh.length);draw(z,5)});log(`${n} ฟลิป: ทั้งสองฝ่ายทิ้งมือทั้งหมดแล้วจั่ว 5 ใบ`)}
   else if(n=='Citadel of Twilight Delusions'){let k=0;m.cAct=1;m.cn=0;[0,1].forEach(z=>G.f[z].forEach(t=>{if(t&&!t.fd&&t!==m&&TYPES[t.n]=='Zombie'){t.a+=200;t.d+=200;t.zm=t.zm||{};t.zm[m.id]=(t.zm[m.id]||0)+200;k++}}));log(`${n} ฟลิป: มอนสเตอร์ Zombie ${k} ตัว ATK/DEF +200`)}
   else if(n=='Spikeworm Burrower'){let k=0;while(k<5&&G.deck[q].length){G.gy[q].push(G.deck[q].shift().n);k++}log(`${n} ฟลิป: ส่งการ์ด ${k} ใบจากเด็ค${who(q)}ลงสุสาน`)}
@@ -2460,7 +2482,7 @@ function refield(){
     if(m.n=='Iron Sovereign Mech'){const w=m.fd?0:mc*100,ow=m.kb||0;if(w!=ow){m.a=Math.max(0,m.a+w-ow);m.kb=w}}
     if(m.n=='Gloomghast Specter'){const w=m.fd?0:G.gy[p].filter(x=>CARDS[x]&&CARDS[x].t=='m').length*100,ow=m.gb||0;if(w!=ow){m.a=Math.max(0,m.a+w-ow);m.gb=w}}
     if(m.n=='Irksome Rockling'){const w=m.fd?0:G.hand[p].length*300,ow=m.hb||0;if(w!=ow){m.a=Math.max(0,m.a+w-ow);m.d=Math.max(0,m.d+w-ow);m.hb=w}} // Muka Muka: ATK/DEF +300 ต่อการ์ดในมือ
-    if(m.n=='Marshland Warden'){const w=m.fd?0:(G.f[p].some(x=>x&&!x.fd&&x.n==SWAMP_PARTNER)?500:0),ow=m.sw||0;if(w!=ow){m.a=Math.max(0,m.a+w-ow);m.sw=w}} // Swamp Battleguard: ATK +500 เมื่อมี Lava Battleguard หงายหน้าฝั่งเดียวกัน
+    if(m.n=='Marshland Warden'||m.n=='Moltenrock Warden'){const pn=m.n=='Marshland Warden'?'Moltenrock Warden':'Marshland Warden',w=m.fd?0:G.f[p].filter(x=>x&&!x.fd&&x.n==pn).length*500,ow=m.sw||0;if(w!=ow){m.a=Math.max(0,m.a+w-ow);m.sw=w}} // Swamp Battleguard: ATK +500 เมื่อมี Lava Battleguard หงายหน้าฝั่งเดียวกัน
   }))}
 function pupGain(nid){[0,1].forEach(pp=>G.f[pp].forEach(m=>{if(m&&!m.fd&&m.n=='Enigmatic Stringmaster'&&m.id!==nid){G.lp[pp]+=500;log(`${who(pp)}: ${m.n} ฟื้นฟู +500 LP`)}}))} // Mysterious Puppeteer: อัญเชิญปกติ/ฟลิปอัญเชิญ (ไม่นับ Set / ตัวมันเอง)
 const fieldNet=(k,p)=>G.f[p].reduce((t,m)=>t+(m?bonusOf(k,m):0),0)-G.f[1-p].reduce((t,m)=>t+(m?bonusOf(k,m):0),0);
@@ -2735,7 +2757,7 @@ function clean(){[0,1].forEach(p=>{const ids=new Set(G.f[0].concat(G.f[1]).filte
 const cnt=a=>{const o={};a.forEach(x=>x&&(o[x.n]=(o[x.n]||0)+1));return o};
 function toGy(p,n,from){ // ส่งการ์ดลงสุสาน (Roach Squire กลับไปบนสุดของเด็คแทน)
   {const xb=G.xb&&G.xb[p],ix=xb?xb.indexOf(n):-1;if(ix>=0){xb.splice(ix,1);G.bn[p].push(n);return}} // ถูกกำจัดออกจากเกม (Voidstep Warrior)
-  if(n=='Roach Squire'&&CARDS[n]){G.deck[p].unshift({...CARDS[n]});log(`${n} ถูกส่งลงสุสาน → กลับไปอยู่บนสุดของเด็ค`)}else{G.gy[p].push(n);if(from=='f'&&n=='Tri-Eye Gobbler')sanganFx(p);if(from=='f'&&n=='Blackwood Enchantress')witchFx(p)}
+  if(n=='Roach Squire'&&CARDS[n]){G.deck[p].unshift({...CARDS[n]});log(`${n} ถูกส่งลงสุสาน → กลับไปอยู่บนสุดของเด็ค`)}else{G.gy[p].push(n);if(from=='f'&&n=='Stormhermit Elder'){G.lp[p]-=5000;log(`${who(p)}: ${n} ถูกส่งจากสนามลงสุสาน เสีย 5000 LP`)}if(from=='f'&&n=='Tri-Eye Gobbler')sanganFx(p);if(from=='f'&&n=='Blackwood Enchantress')witchFx(p)}
 }
 function track(){ // การ์ดที่หายไปจากสนามมอนสเตอร์/เวทกับดัก -> ไปสุสานของเจ้าของ
   if(!G.snap)return;
@@ -2955,6 +2977,7 @@ async function ai(){
   if(G.over)return render();
   G.ph=4;render();await nap(500); // Main Phase 2
   G.ph=5;render();await nap(500); // End Phase
+  await capEnd(1);if(G.over)return render();
   endPhaseFx(1);
   startTurn(0);
 }
@@ -3000,6 +3023,7 @@ function paint(){
   qaUI();
   if(G.snap)track();
   if(G.over&&!PAID){PAID=1;reward(G.win==0)}else if(!G.over)PAID=0;
+  setHB();
   const s=G.sel,mine=G.turn==0&&!G.busy&&!G.over&&!G.intro,mp=G.ph==2||G.ph==4,bp=G.ph==3,hc=s&&s.z=='h'&&G.hand[0][s.i],eqk=G.mode=='e'&&hc&&hc.k&&EQT[hc.k]?hc.k:null;
   const trb0=(p,i)=>p==0&&G.mode=='z'&&G.zp&&G.zp.row=='f'&&G.zp.msg.tr&&G.zp.msg.tr.includes(i);
   const slot=(p,i)=>{
@@ -3020,7 +3044,9 @@ function paint(){
     const zp=!e&&p==0&&G.mode=='z'&&G.zp&&G.zp.row=='b'&&G.zp.ok.includes(i)?' zpick':'';
     return `<div class="slot${zp}" data-bp="${p}" data-bi="${i}">${h}${e&&e.cl?`<i class="chb">${e.cl}</i>`:''}</div>`;
   };
-  const BK=`<div class="cb"><svg viewBox="0 0 60 88" preserveAspectRatio="none" aria-hidden="true"><rect width="60" height="88" fill="#140a04"/><rect x="2" y="2" width="56" height="84" rx="2" fill="#6b3d17" stroke="#d9b36a" stroke-width="1"/><rect x="5" y="5" width="50" height="78" fill="#2b1608" stroke="#a8742f" stroke-width=".6"/><g transform="translate(30 44)" fill="none" stroke-linecap="round"><circle r="23" stroke="#8a4a14" stroke-width="1.2" opacity=".8"/><circle r="18" stroke="#c8782a" stroke-width=".6" opacity=".6"/><ellipse rx="22" ry="8" stroke="#d98a34" stroke-width=".9" opacity=".55" transform="rotate(0)"/><ellipse rx="22" ry="8" stroke="#d98a34" stroke-width=".9" opacity=".55" transform="rotate(30)"/><ellipse rx="22" ry="8" stroke="#d98a34" stroke-width=".9" opacity=".55" transform="rotate(60)"/><ellipse rx="22" ry="8" stroke="#d98a34" stroke-width=".9" opacity=".55" transform="rotate(90)"/><ellipse rx="22" ry="8" stroke="#d98a34" stroke-width=".9" opacity=".55" transform="rotate(120)"/><ellipse rx="22" ry="8" stroke="#d98a34" stroke-width=".9" opacity=".55" transform="rotate(150)"/><path d="M0 -5 Q11 -12 21 -3" stroke="#e8a24a" stroke-width=".8" opacity=".7" transform="rotate(0)"/><path d="M0 -5 Q11 -12 21 -3" stroke="#e8a24a" stroke-width=".8" opacity=".7" transform="rotate(60)"/><path d="M0 -5 Q11 -12 21 -3" stroke="#e8a24a" stroke-width=".8" opacity=".7" transform="rotate(120)"/><path d="M0 -5 Q11 -12 21 -3" stroke="#e8a24a" stroke-width=".8" opacity=".7" transform="rotate(180)"/><path d="M0 -5 Q11 -12 21 -3" stroke="#e8a24a" stroke-width=".8" opacity=".7" transform="rotate(240)"/><path d="M0 -5 Q11 -12 21 -3" stroke="#e8a24a" stroke-width=".8" opacity=".7" transform="rotate(300)"/></g><path d="M9 8 l2.6 2.6 l-2.6 2.6 l-2.6 -2.6z" fill="#e0bb62"/><path d="M51 8 l2.6 2.6 l-2.6 2.6 l-2.6 -2.6z" fill="#e0bb62"/><path d="M9 80 l2.6 2.6 l-2.6 2.6 l-2.6 -2.6z" fill="#e0bb62"/><path d="M51 80 l2.6 2.6 l-2.6 2.6 l-2.6 -2.6z" fill="#e0bb62"/><ellipse cx="30" cy="44" rx="12" ry="17" fill="#140a04" stroke="#e0bb62" stroke-width="1.4"/><ellipse cx="30" cy="44" rx="9" ry="14" fill="#8a4a14" stroke="#a8742f" stroke-width=".6"/><path d="M30 33 L36 44 L30 55 L24 44Z" fill="#e0bb62"/><circle cx="30" cy="44" r="2.6" fill="#140a04"/></svg></div>`;
+  const BKSVG=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 88" preserveAspectRatio="none" aria-hidden="true"><rect width="60" height="88" fill="#140a04"/><rect x="2" y="2" width="56" height="84" rx="2" fill="#6b3d17" stroke="#d9b36a" stroke-width="1"/><rect x="5" y="5" width="50" height="78" fill="#2b1608" stroke="#a8742f" stroke-width=".6"/><g transform="translate(30 44)" fill="none" stroke-linecap="round"><circle r="23" stroke="#8a4a14" stroke-width="1.2" opacity=".8"/><circle r="18" stroke="#c8782a" stroke-width=".6" opacity=".6"/><ellipse rx="22" ry="8" stroke="#d98a34" stroke-width=".9" opacity=".55" transform="rotate(0)"/><ellipse rx="22" ry="8" stroke="#d98a34" stroke-width=".9" opacity=".55" transform="rotate(30)"/><ellipse rx="22" ry="8" stroke="#d98a34" stroke-width=".9" opacity=".55" transform="rotate(60)"/><ellipse rx="22" ry="8" stroke="#d98a34" stroke-width=".9" opacity=".55" transform="rotate(90)"/><ellipse rx="22" ry="8" stroke="#d98a34" stroke-width=".9" opacity=".55" transform="rotate(120)"/><ellipse rx="22" ry="8" stroke="#d98a34" stroke-width=".9" opacity=".55" transform="rotate(150)"/><path d="M0 -5 Q11 -12 21 -3" stroke="#e8a24a" stroke-width=".8" opacity=".7" transform="rotate(0)"/><path d="M0 -5 Q11 -12 21 -3" stroke="#e8a24a" stroke-width=".8" opacity=".7" transform="rotate(60)"/><path d="M0 -5 Q11 -12 21 -3" stroke="#e8a24a" stroke-width=".8" opacity=".7" transform="rotate(120)"/><path d="M0 -5 Q11 -12 21 -3" stroke="#e8a24a" stroke-width=".8" opacity=".7" transform="rotate(180)"/><path d="M0 -5 Q11 -12 21 -3" stroke="#e8a24a" stroke-width=".8" opacity=".7" transform="rotate(240)"/><path d="M0 -5 Q11 -12 21 -3" stroke="#e8a24a" stroke-width=".8" opacity=".7" transform="rotate(300)"/></g><path d="M9 8 l2.6 2.6 l-2.6 2.6 l-2.6 -2.6z" fill="#e0bb62"/><path d="M51 8 l2.6 2.6 l-2.6 2.6 l-2.6 -2.6z" fill="#e0bb62"/><path d="M9 80 l2.6 2.6 l-2.6 2.6 l-2.6 -2.6z" fill="#e0bb62"/><path d="M51 80 l2.6 2.6 l-2.6 2.6 l-2.6 -2.6z" fill="#e0bb62"/><ellipse cx="30" cy="44" rx="12" ry="17" fill="#140a04" stroke="#e0bb62" stroke-width="1.4"/><ellipse cx="30" cy="44" rx="9" ry="14" fill="#8a4a14" stroke="#a8742f" stroke-width=".6"/><path d="M30 33 L36 44 L30 55 L24 44Z" fill="#e0bb62"/><circle cx="30" cy="44" r="2.6" fill="#140a04"/></svg>`;
+  {const st=document.createElement('style');st.textContent='.cb.bk{background:url("data:image/svg+xml,'+encodeURIComponent(BKSVG)+'") 0 0/100% 100% no-repeat}';document.head.appendChild(st)}
+  const BK=`<div class="cb bk"></div>`;
   const zn=(cls,label,n,sub='',att='')=>`<div class="slot zn ${cls}" ${att}><span>${label}</span><b class="zc">${n}</b>${sub?`<small>${sub}</small>`:''}</div>`;
   const dz=p=>{const n=G.deck[p].length;return `<div class="slot zn dk ${n?'dkb':''}" data-dp="${p}"><span>เด็ค</span>${n?BK:''}<b class="zc">${n}</b></div>`},xz=p=>{const n=G.extra[p].length;return `<div class="slot zn ex ${n?'dkb':''}" data-xp="${p}"><span>Extra</span>${n?BK:'<small>ว่าง</small>'}<b class="zc">${n}</b></div>`};
   const gz=p=>{const g=G.gy[p],n=g.length?g[g.length-1]:'',c=n&&CARDS[n],cl=c?(c.t=='m'?(FUS[n]?'fu':EFFM.has(n)?'efm':''):c.t=='t'?'tr':'sp'):'';
@@ -3062,7 +3088,7 @@ function paint(){
       const m=G.f[0][s.i];
       if(m){
         info=`${m.n} · ATK ${m.a} / DEF ${m.d}${m.fd?' · คว่ำ':''}`+(m.can?(m.nw?(m.fl?' · เพิ่งเปิด (ตีได้ แต่เปลี่ยนท่าไม่ได้)':' · เพิ่งลง (ตีได้ แต่เปลี่ยนท่าไม่ได้)'):''):(m.nw?' · เพิ่งตั้งคว่ำ (เทิร์นนี้ยังเปิดไม่ได้)':' · ใช้แล้วในเทิร์นนี้'));
-        btns=m.fd?`<button data-a="flp" ${m.can&&mp?'':'disabled'}>เปิดการ์ด (ท่าโจมตี)</button>`:`<button data-a="atk" ${m.can&&m.pos=='a'&&G.n>1&&bp&&!swb(0)&&!(m.n==DKE&&G.lp[0]<=1000)?'':'disabled'}>โจมตี</button><button data-a="chg" ${m.can&&!m.lock&&!m.nw&&mp?'':'disabled'}>เปลี่ยนท่า</button>`+(m.n=='Patchwork Frank'?`<button data-a="cs" ${mp&&G.lp[0]>5000&&G.extra[0].length&&G.f[0].includes(null)?'':'disabled'}>จ่าย 5000 LP เรียก Fusion</button>`:'')+(m.n=='Striped Gale Crawler'?`<button data-a="gd" ${mp&&G.lp[0]>3000&&G.extra[0].length?'':'disabled'}>จ่าย 3000 LP ส่ง Extra Deck ลงสุสาน</button>`:'')+(m.n=='Mortar Trooper'?`<button data-a="mtr" ${mp&&G.f[0].some(Boolean)?'':'disabled'}>สังเวยมอนสเตอร์ 1 ตัว: ดาเมจ 500</button>`:'')+(m.n=='Aile Fledgling Blade'?`<button data-a="ail" ${mp&&G.f[0].some((t,k)=>t&&k!=s.i)?'':'disabled'}>สังเวยมอนสเตอร์อื่น 1 ตัว: ATK +700 จนจบเทิร์น</button>`:'')+(m.n=='Ballista Tortoise'?`<button data-a="btt" ${mp&&G.f[0].some(Boolean)?'':'disabled'}>สังเวยมอนสเตอร์ 1 ตัว: ดาเมจเท่าครึ่งหนึ่งของ ATK</button>`:'')+(m.n=='Cylinder Drake'?`<button data-a="cyl" ${mp&&m.cu!==G.n?'':'disabled'}>โยนเหรียญ 3 ครั้ง (เทิร์นละครั้ง): หัว 2 ครั้งขึ้นไป ทำลายมอนสเตอร์คู่ต่อสู้ 1 ตัว</button>`:'');
+        btns=m.fd?`<button data-a="flp" ${m.can&&mp?'':'disabled'}>เปิดการ์ด (ท่าโจมตี)</button>`:`<button data-a="atk" ${m.can&&m.pos=='a'&&G.n>1&&bp&&!swb(0)&&!(m.n==DKE&&G.lp[0]<=1000)?'':'disabled'}>โจมตี</button><button data-a="chg" ${m.can&&!m.lock&&!m.nw&&!m.pc&&mp?'':'disabled'}>เปลี่ยนท่า</button>`+(m.n=='Patchwork Frank'?`<button data-a="cs" ${mp&&G.lp[0]>5000&&G.extra[0].length&&G.f[0].includes(null)?'':'disabled'}>จ่าย 5000 LP เรียก Fusion</button>`:'')+(m.n=='Striped Gale Crawler'?`<button data-a="gd" ${mp&&G.lp[0]>3000&&G.extra[0].length?'':'disabled'}>จ่าย 3000 LP ส่ง Extra Deck ลงสุสาน</button>`:'')+(m.n=='Mortar Trooper'?`<button data-a="mtr" ${mp&&G.f[0].some(Boolean)?'':'disabled'}>สังเวยมอนสเตอร์ 1 ตัว: ดาเมจ 500</button>`:'')+(m.n=='Aile Fledgling Blade'?`<button data-a="ail" ${mp&&G.f[0].some((t,k)=>t&&k!=s.i)?'':'disabled'}>สังเวยมอนสเตอร์อื่น 1 ตัว: ATK +700 จนจบเทิร์น</button>`:'')+(m.n=='Ballista Tortoise'?`<button data-a="btt" ${mp&&G.f[0].some(Boolean)?'':'disabled'}>สังเวยมอนสเตอร์ 1 ตัว: ดาเมจเท่าครึ่งหนึ่งของ ATK</button>`:'')+(m.n=='Cylinder Drake'?`<button data-a="cyl" ${mp&&m.cu!==G.n?'':'disabled'}>โยนเหรียญ 3 ครั้ง (เทิร์นละครั้ง): หัว 2 ครั้งขึ้นไป ทำลายมอนสเตอร์คู่ต่อสู้ 1 ตัว</button>`:'');
       }
     }
   }
@@ -3446,9 +3472,14 @@ function profHtml(nt){
     <div class="panel"><b>เลือกรูปปกจากคลังการ์ด</b><div class="meta" style="margin:4px 0">แตะการ์ด 1 ใบเพื่อใช้เป็นปก · แตะซ้ำเพื่อเอาออก${pf.card?' · ตอนนี้: '+esc(pf.card):''}</div>
     ${own.length?`<div class="pfg">${own.map(n=>`<div data-m="pcs" data-n="${esc(n)}" tabindex="0" role="button">${tile(n,{sel:n==pf.card})}</div>`).join('')}</div>`:'<div class="meta">ยังไม่มีการ์ดในคลัง ไปซื้อซองที่ร้านค้าก่อนนะครับ</div>'}</div>`;
 }
+function setHB(){ // ในห้องต่อสู้: ปุ่มบนสุดเป็น "ยอมแพ้" / นอกห้องต่อสู้: "เมนู"
+  const b=$('hb');if(!b)return;const gm=SCREEN=='game'&&G;
+  b.dataset.m=gm?'sur':'home';b.textContent=gm?'ยอมแพ้':'เมนู';
+  if(gm)b.hidden=!!G.over; // จบเกมแล้วใช้ปุ่มในหน้าต่างผลแทน
+}
 function renderScr(){
   const g=SCREEN=='game';
-  $app.hidden=!g;$scr.hidden=g;document.querySelector('main').classList.toggle('wide',SCREEN=='deck');document.querySelector('main').classList.toggle('gm',g);$('lgb').hidden=!g;$('hb').hidden=SCREEN=='menu';
+  $app.hidden=!g;$scr.hidden=g;document.querySelector('main').classList.toggle('wide',SCREEN=='deck');document.querySelector('main').classList.toggle('gm',g);$('lgb').hidden=!g;$('hb').hidden=SCREEN=='menu';setHB();
   if(g)return;
   if(SCREEN=='menu')loginCheck();
   const y=scrollY,nt=NOTE?`<div class="note">${NOTE}</div>`:'',
@@ -3532,6 +3563,11 @@ function menu(a,el){
     if(a=='pcs'){const n=el.dataset.n;S.prof.card=(S.prof.card==n||!CARDS[n]||!(S.col[n]>0))?'':n}
     save();NOTE=a=='pns'?'บันทึกชื่อแล้ว':'';
     const g=$scr.querySelector('.pfg'),st=g?g.scrollTop:0;renderScr();const g2=$scr.querySelector('.pfg');if(g2)g2.scrollTop=st;return;
+  }
+  if(a=='sur'){
+    if(!G||G.over||!confirm('ยอมแพ้ใช่ไหม? จะนับว่าแพ้ในเกมนี้'))return;
+    if(ROLE=='guest')return conn&&conn.send({t:'act',a:{a:'sur'}});
+    return act(0,{a:'sur'});
   }
   if(TR&&(a=='home'||a=='go'))tLeave();
   if(a=='home'){leave();NOTE='';return go('menu')}
@@ -3716,7 +3752,7 @@ function view(p){
   const w=a=>p?[a[1],a[0]]:a,z=a=>a.map(()=>0);
   const f=G.f.map((r,i)=>i==p?r:r.map(m=>m&&m.fd?{id:m.id,fd:true,pos:'d',n:'?',l:0,a:0,d:0,can:false}:m));
   const b=G.b.map((r,i)=>i==p?r:r.map(e=>e&&(e.tr||e.sf)&&!e.ac&&!e.cl?{tr:e.tr?1:0,sf:e.sf?1:0,fd:true}:e));
-  return {evs:(G.evs||[]).map(e=>e.t=='peek'&&e.p!=p?{t:'peek',id:e.id,p:1-e.p}:{...e,p:1-e.p}),lp:w(G.lp),hand:w(G.hand.map((h,i)=>i==p?h:z(h))),deck:w(G.deck.map(z)),extra:w(G.extra.map((x,i)=>i==p?x:z(x))),f:w(f),b:w(b),fz:w(G.fz),gy:w(G.gy),bn:w(G.bn),fld:G.fld,pf:w(G.pf||[{name:'',card:''},{name:'',card:''}]),coin:G.coin?{w:1-G.coin.w,st:G.coin.st}:null,uid:G.uid,
+  return {evs:(G.evs||[]).map(e=>e.t=='peek'&&e.p!=p?{t:'peek',id:e.id,p:1-e.p}:{...e,p:1-e.p}),lp:w(G.lp),hand:w(G.hand.map((h,i)=>i==p?h:z(h))),deck:w(G.deck.map((d,i)=>i==p?d.filter(c=>isFG(c.n)).map(c=>({n:c.n})).concat(d.filter(c=>!isFG(c.n)).map(()=>0)):z(d))),extra:w(G.extra.map((x,i)=>i==p?x:z(x))),f:w(f),b:w(b),fz:w(G.fz),gy:w(G.gy),bn:w(G.bn),fld:G.fld,pf:w(G.pf||[{name:'',card:''},{name:'',card:''}]),coin:G.coin?{w:1-G.coin.w,st:G.coin.st}:null,uid:G.uid,
     turn:p?1-G.turn:G.turn,n:G.n,sum:G.sum,sel:null,mode:null,over:G.over,
     win:G.win==null?null:p?1-G.win:G.win,busy:false,log:G.log,ph:G.ph,intro:G.intro,qa:G.qa?{p:p?1-G.qa.p:G.qa.p,text:G.qa.text,opts:G.qa.p==p?G.qa.opts:undefined,mx:G.qa.mx,mn:G.qa.mn,lb:G.qa.lb,nb:G.qa.nb}:null,chain:(G.chain||[]).map(l=>({...l,p:p?1-l.p:l.p}))};
 }
@@ -3726,6 +3762,7 @@ function sync(){if(ROLE!='guest'&&G&&G.f)refield();render();if(MODE=='pvp'&&conn
 const A=pr=>Promise.resolve(pr).then(()=>sync()).catch(()=>{});
 function act(p,m){
   if(m.a=='qa'){if(G&&G.qa&&G.qa.p==p&&QA){const r=QA;QA=null;G.qa=null;r(Array.isArray(m.v)?m.v.map(x=>+x||0).filter(Boolean):(+m.v||0))}return}
+  if(m.a=='sur'){if(G&&!G.over){G.over=true;G.win=1-p;G.sel=null;G.mode=null;G.busy=false;G.qa=null;if(typeof QA!='undefined'&&QA){const r=QA;QA=null;try{r(0)}catch(e){}}log((p==0?'คุณ':'คู่ต่อสู้')+'ยอมแพ้')}return sync()}
   if(m.a=='new')return startGame();
   if(m.a=='pick')return pickOrder(p,!!m.first);
   if(G.over||G.turn!=p||G.busy||G.intro)return;
@@ -3751,7 +3788,7 @@ function act(p,m){
   else if(m.a=='tdr'){if(c&&c.t=='m'&&c.n==TDRG)A(tdrFx(p,m.i))}
   else if(m.a=='cyl'){if(x&&!x.fd&&x.n=='Cylinder Drake')cylUse(p,m.i)}
   else if(m.a=='btt'){const tt=G.f[p][m.t];if(x&&!x.fd&&x.n=='Ballista Tortoise'&&tt){const dm=Math.floor(Math.max(0,tt.a)/2);G.f[p][m.t]=null;emit({t:'act',p,n:x.n,x:EFXT[x.n],k:'flip'});G.lp[1-p]-=dm;log(`${who(p)}: ${x.n} สังเวย ${tt.fd?'มอนสเตอร์ที่คว่ำอยู่':tt.n} (ATK ${tt.a}) → ${who(1-p)}ได้รับความเสียหาย ${dm}`);chk()}}
-  else if(m.a=='chg'){if(x&&x.can&&!x.fd&&!x.lock&&!x.nw&&!x.nm){const pf=x.pos;x.pos=pf=='a'?'d':'a';x.can=false;if(POSM.has(x.n))A(posFx(p,x,pf,x.pos))}}
+  else if(m.a=='chg'){if(x&&x.can&&!x.fd&&!x.lock&&!x.nw&&!x.nm&&!x.pc){const pf=x.pos;x.pos=pf=='a'?'d':'a';x.pc=true;if(x.pos!='a')x.can=false; /* ป้องกัน→โจมตี: ยังโจมตีได้ในเทิร์นนี้ แต่เปลี่ยนท่าซ้ำไม่ได้ */if(POSM.has(x.n))A(posFx(p,x,pf,x.pos))}}
   else if(m.a=='atk'){if(G.ph==3&&!swb(p)&&x&&x.can&&!x.fd&&x.pos=='a'&&G.n>1&&!(x.n==DKE&&G.lp[p]<=1000)&&(m.t<0?(!G.f[1-p].some(Boolean)||DIRECT.has(x.n)):G.f[1-p][m.t])){attack(p,m.i,m.t).then(()=>sync()).catch(()=>{});return}}
   sync();
 }
@@ -3864,20 +3901,28 @@ function dragMove(e){
   const d=DRG;if(!d||e.pointerId!=d.id)return;const dx=e.clientX-d.x0,dy=e.clientY-d.y0;
   if(!d.on){
     if(Math.hypot(dx,dy)<8)return;
-    if(e.pointerType=='touch'&&Math.abs(dx)>Math.abs(dy)*1.2){dragEnd();return} // ปัดซ้ายขวา = เลื่อนมือการ์ดตามปกติ
+    if(!d.f&&e.pointerType=='touch'&&Math.abs(dx)>Math.abs(dy)*1.2){dragEnd();return} // ปัดซ้ายขวา = เลื่อนมือการ์ดตามปกติ
     d.on=true;const r=d.el.getBoundingClientRect(),g=d.el.cloneNode(true);g.className+=' dragghost';g.style.cssText=`position:fixed;left:0;top:0;width:${r.width}px;height:${r.height}px;margin:0;pointer-events:none;z-index:9999;opacity:.92;transform:translate(${r.left}px,${r.top}px) scale(1.08);transition:none`;
     document.body.appendChild(g);d.ghost=g;d.ox=d.x0-r.left;d.oy=d.y0-r.top;d.el.classList.add('dragsrc');document.body.classList.add('dragging');
-    document.querySelectorAll('[data-p="0"],[data-bp="0"]').forEach(x=>x.classList.add('dropok'));
+    document.querySelectorAll(d.f?'[data-p="1"]':'[data-p="0"],[data-bp="0"]').forEach(x=>x.classList.add('dropok'));
   }
   e.preventDefault();d.ghost.style.transform=`translate(${e.clientX-d.ox}px,${e.clientY-d.oy}px) scale(1.08)`;
   const sl=dragSlot(e.clientX,e.clientY);document.querySelectorAll('.drophov').forEach(x=>x.classList.remove('drophov'));
-  if(sl&&(sl.dataset.p=='0'||sl.dataset.bp=='0'))sl.classList.add('drophov');
+  if(sl&&(d.f?sl.dataset.p=='1':(sl.dataset.p=='0'||sl.dataset.bp=='0')))sl.classList.add('drophov');
 }
 function dragCancel(e){if(DRG&&e.pointerId==DRG.id)dragEnd()}
 function dragUp(e){
-  if(!DRG||e.pointerId!=DRG.id)return;const was=DRG.on,i=DRG.i,sl=was?dragSlot(e.clientX,e.clientY):null;
+  if(!DRG||e.pointerId!=DRG.id)return;const was=DRG.on,i=DRG.i,fl=DRG.f,sl=was?dragSlot(e.clientX,e.clientY):null,el2=was?document.elementFromPoint(e.clientX,e.clientY):null;
   dragEnd();if(!was)return;
   const sup=ev=>{if(!ev.isTrusted)return;ev.stopPropagation();ev.preventDefault()};window.addEventListener('click',sup,true);setTimeout(()=>window.removeEventListener('click',sup,true),60); // กันคลิกค้างหลังปล่อยนิ้ว
+  if(fl){ // ลากมอนสเตอร์บนสนามไปโจมตี: ปล่อยบนมอนสเตอร์ศัตรู = โจมตีเป้านั้น · ปล่อยฝั่งศัตรูตอนไม่มีมอนสเตอร์ (หรือโจมตีตรงได้) = โจมตี LP
+    if(!G||G.over||G.turn||G.busy||G.intro||G.ph!=3||G.mode)return;
+    const m=G.f[0][i];if(!m||!m.can||m.fd||m.pos!='a'||G.n<=1||swb(0)||(m.n==DKE&&G.lp[0]<=1000))return;
+    const opp=G.f[1].some(Boolean),ti=sl&&sl.dataset.p=='1'?+sl.dataset.i:-1,onOpp=!!(sl&&(sl.dataset.p=='1'||sl.dataset.bp=='1'))||!!(el2&&el2.closest&&el2.closest('.side.opp'));
+    if(ti>=0&&G.f[1][ti]){doAct({a:'atk',i,t:ti});G.sel=null;G.mode=null;return}
+    if(onOpp&&(!opp||DIRECT.has(m.n))){doAct({a:'atk',i,t:-1});G.sel=null;G.mode=null;return}
+    if(onOpp||sl)dragToast(opp?'ลากไปปล่อยบนมอนสเตอร์ของคู่ต่อสู้ที่จะโจมตี':'ปล่อยที่ฝั่งคู่ต่อสู้เพื่อโจมตีโดยตรง');
+    return}
   if(!sl||!(sl.dataset.p=='0'||sl.dataset.bp=='0')||!G||G.over||G.turn||G.busy||G.intro)return;
   const c=G.hand[0][i];if(!c)return;const onM=sl.dataset.p=='0',zi=onM?+sl.dataset.i:+sl.dataset.bi;
   const fin=b=>{ // กดปุ่มคำสั่งแล้ววางลงช่องที่ปล่อยการ์ด (ถ้ามีหลายช่องว่าง)
@@ -3910,8 +3955,12 @@ function dragAsk(name,opts,cb){ // กล่องถามท่าที่จ
   document.body.appendChild(ov)}
 document.addEventListener('pointerdown',e=>{
   if(DRG||SCREEN!='game'||!G||G.over||G.turn||G.busy||G.intro||DETAIL||e.button>0||(e.pointerType=='mouse'&&e.buttons!=1))return;
-  const el=e.target.closest&&e.target.closest('.hand [data-h]');if(!el)return;
-  DRG={id:e.pointerId,el,i:+el.dataset.h,x0:e.clientX,y0:e.clientY,on:false};
+  let el=e.target.closest&&e.target.closest('.hand [data-h]'),fi=false,idx=el?+el.dataset.h:-1;
+  if(!el&&G.ph==3&&!G.mode){const cd=e.target.closest&&e.target.closest('.slot[data-p="0"] .card');
+    if(cd){const sl0=cd.closest('.slot'),m=G.f[0][+sl0.dataset.i];
+      if(m&&m.can&&!m.fd&&m.pos=='a'&&G.n>1&&!swb(0)&&!(m.n==DKE&&G.lp[0]<=1000)){el=cd;fi=true;idx=+sl0.dataset.i}}}
+  if(!el)return;
+  DRG={id:e.pointerId,el,i:idx,f:fi,x0:e.clientX,y0:e.clientY,on:false};
   document.addEventListener('pointermove',dragMove,{capture:true,passive:false});document.addEventListener('pointerup',dragUp,true);document.addEventListener('pointercancel',dragCancel,true);
 },true);
 const CH={dsc:1,coh:1,sr:1,sd:1,fis:1,ds:1,rt:1,rev:1,gg:1}; // เอฟเฟกต์ที่ให้เจ้าของการ์ดเลือกเป้าหมายเอง
@@ -3992,6 +4041,7 @@ function pickFlip(hi){ // ฟลิปมอนสเตอร์ของเร
   const m=G.f[0][hi];if(!m||!m.fd||!m.can||!FLIPM.has(m.n))return false;
   const n=m.n,o=[],fl=(t,z)=>(t.fd?'มอนสเตอร์ที่คว่ำอยู่':`${t.n} (ATK ${t.a})`)+(z==1?' · ของคู่ต่อสู้':' · ของเรา');
   if(n=='Devourer Beetle'||n=='Featherpate Sprite')[1,0].forEach(z=>G.f[z].forEach((t,j)=>t&&t!==m&&o.push({l:fl(t,z),t:{z,j},s:z==1?'o':'s'})));
+  if(n=='Devourer Beetle')o.push({l:`${n} (ตัวนี้เอง · จะถูกทำลาย)`,t:{z:0,j:hi},s:'s'}); // ทำลายมอนสเตอร์ 1 ตัวบนสนาม — เลือกตัวมันเองได้
   else if(n=='Azure Shinobi'){G.b[1].forEach((e,j)=>e&&!e.tr&&o.push({l:e.sf?`การ์ดเวทที่ตั้งคว่ำ · ช่อง ${j+1}`:e.n,t:j}));if(G.fz[1])o.push({l:G.fz[1].n+' · เวทสนาม',t:-2})}
   else if(n=='Grim Trap Hunter')G.b[1].forEach((e,j)=>e&&e.tr&&o.push({l:`การ์ดกับดักที่วางไว้ · ช่อง ${j+1}`,t:j}));
   else if(n=='Snaremaster Rogue')[1,0].forEach(r=>G.b[r].forEach((e,j)=>e&&e.tr&&o.push({l:`การ์ดกับดักที่วางไว้ · ช่อง ${j+1}`+(r==1?' · ของคู่ต่อสู้':' · ของเรา'),t:{r,j},s:r==1?'o':'s'})));
