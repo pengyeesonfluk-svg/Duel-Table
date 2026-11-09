@@ -53,7 +53,7 @@ body.dragging{cursor:grabbing}
 .log{font-size:12px;color:var(--mute);min-height:68px}
 .log div:first-child{color:var(--ink)}
 .turn{text-align:center;font-size:12px;color:var(--mute);margin:4px 0}
-.ov{position:fixed;inset:0;background:#000b;display:flex;align-items:center;justify-content:center;text-align:center;font:700 28px Georgia,serif}
+.ov{position:fixed;inset:0;z-index:200;background:#000b;display:flex;align-items:center;justify-content:center;text-align:center;font:700 28px Georgia,serif}
 .ov div{background:var(--mat);border:2px solid var(--brass);padding:24px 34px;border-radius:12px}
 .ov button{margin-top:14px;font-size:16px}
 footer{text-align:center;color:var(--mute);font-size:11px;padding:10px}
@@ -564,6 +564,30 @@ main.hn.hc,main.hn.hc.wide{padding-bottom:40px!important}
 .pkc:active{background:#c9a45c22}
 .pkc .pkart.cv{flex:none;width:124px}.pkc .pkart.cv.box{width:144px}
 .pkc b{font:700 13px Georgia,'Noto Serif Thai',serif;color:var(--brass)}
+
+/* ---- ล็อกอินรายวัน (ปฏิทิน + สแตมป์ Duel Table สีแดง) ---- */
+.lgov{position:fixed;inset:0;z-index:10002;background:#000b;display:flex;align-items:center;justify-content:center;padding:12px;animation:lgfd .25s both}
+.lgbx{width:min(94vw,390px);max-height:94vh;overflow:auto;background:linear-gradient(180deg,#14423e,#0c2826);border:2px solid var(--brass);border-radius:14px;padding:14px 12px 12px;box-shadow:0 12px 40px #000a,0 0 24px #c9a45c33;color:var(--ink)}
+.lgbx h2{margin:0;text-align:center;font:700 20px Georgia,serif;color:var(--brass);letter-spacing:1px}
+.lgbx .lgsb{text-align:center;color:var(--mute);font-size:13px;margin:2px 0 10px}
+.lgg{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.lgw{text-align:center;font-size:11px;color:var(--mute);padding-bottom:2px}
+.lgc{position:relative;aspect-ratio:1/1.08;border-radius:8px;background:#0a1f1e;border:1px solid #2a5a54;overflow:hidden}
+.lgc.e{background:none;border:0}
+.lgc i{position:absolute;left:4px;top:2px;font:700 11px/1 sans-serif;font-style:normal;color:var(--ink)}
+.lgc b{position:absolute;left:0;right:0;bottom:3px;text-align:center;font:700 10px/1 sans-serif;color:var(--mute)}
+.lgc.bn{background:linear-gradient(180deg,#5a4414,#2e2208);border-color:var(--brass)}
+.lgc.bn b{color:#ffd978;font-size:11px}
+.lgc.fu{opacity:.6}
+.lgc.td{border:2px solid #ffd978;box-shadow:0 0 10px #ffd97866}
+.lgs{position:absolute;left:50%;top:48%;width:84%;aspect-ratio:1;margin:0;transform:translate(-50%,-50%) rotate(-14deg);border:2px solid #e0262a;border-radius:50%;box-shadow:inset 0 0 0 1px #e0262a;color:#e0262a;display:flex;flex-direction:column;align-items:center;justify-content:center;font:900 7.5px/1.15 Georgia,serif;letter-spacing:.4px;background:#e0262a14;opacity:.93;pointer-events:none}
+.lgs em{font-style:normal;display:block}
+.lgc.new .lgs{animation:lgst .5s .3s cubic-bezier(.2,1.4,.4,1) both}
+.lgmsg{text-align:center;margin:12px 0 4px;color:var(--leaf);font-weight:700}
+.lgbx .lgx{display:block;width:100%;margin-top:10px;padding:12px;font-size:15px}
+@keyframes lgfd{from{opacity:0}to{opacity:1}}
+@keyframes lgst{from{transform:translate(-50%,-50%) rotate(-14deg) scale(3);opacity:0}60%{opacity:1}to{transform:translate(-50%,-50%) rotate(-14deg) scale(1);opacity:.93}}
+@media (prefers-reduced-motion:reduce){.lgov,.lgc.new .lgs{animation:none}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
 </head>
@@ -1447,13 +1471,16 @@ function mkFx(e,q,ev){ // ผลของกับดักตอนประม
 }
 function chOpts(w,ev,L){ // การ์ด/สกิลที่ฝั่ง w ใช้ตอบโต้ได้ตอนนี้
   const o=[];const last=L&&L.length?L[L.length-1]:null,ctOnly=!!(last&&last.ct),actorCan=!!(last&&last.trap&&last.p!=w); // Counter Trap (Vol.6): ผู้เล่นฝั่งที่ใช้ก็ตอบสนองกับดักของอีกฝั่งด้วย Counter Trap ได้
-  const qo=qOpts(w).filter(x=>!nmLk(w,x.n));if(w==ev.p&&!actorCan)return qo;
+  const qo=qOpts(w).filter(x=>!nmLk(w,x.n));if(w==ev.p&&!actorCan){ // ผู้กระทำเอง: เปิดกับดักต่อเนื่องที่ตั้งไว้ (Wyrm Sealing Urn ฯลฯ) ได้ทุกครั้งที่เราลงมอนสเตอร์/โจมตี/ใช้การ์ด (บอทไม่ใช้เองอัตโนมัติ)
+    const mo=[];if((MODE=='pvp'||w==0)&&!RD()&&!(last&&last.ct)&&ev.t!='atk'&&ev.t!='bat')G.b[w].forEach((e,i)=>{if(e&&e.tr&&MAN(e.k)&&!e.ac&&!e.cl)mo.push({k:'t',i,n:e.n,x:e.x})});
+    return mo.filter(x=>!nmLk(w,x.n)).concat(qo)}
   G.b[w].forEach((e,i)=>{if(!e)return;if(CNTK[e.k]){if(ctOk(e,w,ev,L))o.push({k:'t',i,n:e.n,x:e.x})}else if(!ctOnly&&w!=ev.p&&trapOk(e,ev))o.push({k:'t',i,n:e.n,x:e.x})});
   if(!ctOnly&&w!=ev.p&&(ev.t=='bat'||ev.t=='atk')&&!ev.sk&&ev.tg&&SANGA.has(ev.tg.n)&&!ev.tg.fd)o.push({k:'m',n:ev.tg.n,x:EFXT[ev.tg.n]});
   if(!ctOnly&&w!=ev.p&&!ev.hu&&G.hand[w].some(c=>c.n=='Puffball Familiar')){const bot=MODE!='pvp'&&w==1,dm=ev.t=='bat'&&ev.tg&&ev.tg.pos=='a'?(!bot||ev.m.a>ev.tg.a):ev.t=='atk'&&!ev.tg?(!bot||ev.m.a>0):false;if(dm)o.push({k:'h',n:'Puffball Familiar',x:EFXT['Puffball Familiar']})} // Kuriboh: ทิ้งจากมือ ลดดาเมจการต่อสู้เป็น 0
   return o.filter(x=>!nmLk(w,x.n)).concat(qo);
 }
-const CHT=(ev,w)=>({sum:(ev.pos=='d'||(ev.m&&ev.m.fd))?'คู่ต่อสู้ตั้งมอนสเตอร์ลงคว่ำ':`คู่ต่อสู้ลง ${ev.m&&ev.m.n}`,atk:`คู่ต่อสู้ประกาศโจมตีด้วย ${ev.m&&ev.m.n}`,bat:`${ev.m&&ev.m.n} โจมตี ${ev.tg&&(ev.tg.fd&&w==ev.p?'มอนสเตอร์ที่คว่ำอยู่':ev.tg.n)} — กำลังเข้าสู่การคำนวณความเสียหาย`,spl:`คู่ต่อสู้ใช้เวทมนตร์ ${ev.c&&ev.c.n}`,flp:`คู่ต่อสู้พลิกเปิด ${ev.m&&ev.m.n}`,eff:`คู่ต่อสู้ใช้เอฟเฟกต์ของ ${ev.m&&ev.m.n}`}[ev.t]); // มอนสเตอร์ที่ลงคว่ำ ไม่บอกชื่อ
+const CHT0=(ev,w)=>({sum:(ev.pos=='d'||(ev.m&&ev.m.fd))?'คู่ต่อสู้ตั้งมอนสเตอร์ลงคว่ำ':`คู่ต่อสู้ลง ${ev.m&&ev.m.n}`,atk:`คู่ต่อสู้ประกาศโจมตีด้วย ${ev.m&&ev.m.n}`,bat:`${ev.m&&ev.m.n} โจมตี ${ev.tg&&(ev.tg.fd&&w==ev.p?'มอนสเตอร์ที่คว่ำอยู่':ev.tg.n)} — กำลังเข้าสู่การคำนวณความเสียหาย`,spl:`คู่ต่อสู้ใช้เวทมนตร์ ${ev.c&&ev.c.n}`,flp:`คู่ต่อสู้พลิกเปิด ${ev.m&&ev.m.n}`,spsum:`คู่ต่อสู้อัญเชิญพิเศษ ${ev.m&&ev.m.n}`,eff:`คู่ต่อสู้ใช้เอฟเฟกต์ของ ${ev.m&&ev.m.n}`}[ev.t]); // มอนสเตอร์ที่ลงคว่ำ ไม่บอกชื่อ
+const CHT=(ev,w)=>{const t=CHT0(ev,w);return w==ev.p&&t?t.replace('คู่ต่อสู้','คุณ'):t}; // ผู้กระทำเองก็ขึ้นหน้าต่าง Chain ได้ (กับดักต่อเนื่องของตัวเอง)
 async function chainWin(ev,L){ // L = ลิงก์ที่มีอยู่แล้ว (เช่น เวทที่เพิ่งใช้ = Chain 1) · คืนเมื่อ Chain ประมวลผลครบ
   L=L||[];const g=G,wb=G.busy;G.busy=true;let shown=false;
   const hud=()=>{g.chain=L.map(l=>({p:l.p,n:l.n,d:l.d?1:0,c:l.c?1:0}));sync()};
@@ -1488,6 +1515,8 @@ async function chainWin(ev,L){ // L = ลิงก์ที่มีอยู่
     }else if(L.length&&L[0].fx)await L[0].fx();
   }finally{L.forEach(l=>{if(l.ref)delete l.ref.cl});if(G===g){g.chain=null;g.busy=wb;sync()}}
 }
+function spq(p,si){const m=G.f[p][si];if(m)(G.spQ=G.spQ||[]).push({p,id:m.id})} // บันทึกการอัญเชิญพิเศษ เพื่อเปิดหน้าต่าง Chain หลังเวท/สกิลประมวลผลเสร็จ
+async function spFlush(){while(G&&G.spQ&&G.spQ.length&&!G.over){const q=G.spQ.shift(),m=G.f[q.p].find(x=>x&&x.id==q.id);if(m)await chainWin({t:'spsum',p:q.p,m},[])}}
 async function effChain(p,m){ // ใช้เอฟเฟกต์มอนสเตอร์ (กดใช้เอง/ฟลิป) → เปิดหน้าต่าง Chain ให้ฝั่งตรงข้ามตอบโต้ได้ (กับดักที่ไม่ระบุเงื่อนไข เช่น Karmic Reckoning)
   if(!G||G.over)return;await chainWin({t:'eff',p,m},[]);
 }
@@ -1853,7 +1882,7 @@ function mothSum(p,i,t){ // อัญเชิญพิเศษ Inchworm Mothle
   const B=CARDS[c.n];
   emit({t:'act',p,n:c.n,x:EFXT[c.n],k:'flip'});
   G.f[p][t]={id:++G.uid,n:B.n,a:B.a,d:B.d,l:B.l,pos:spPos(p),fd:false,can:true,nw:true};
-  log(`${who(p)}สังเวย ${MOTH} → อัญเชิญพิเศษ ${B.n} จากมือ`);chk();
+  spq(p,t);log(`${who(p)}สังเวย ${MOTH} → อัญเชิญพิเศษ ${B.n} จากมือ`);chk();
 }
 function cocClean(){ // Tiny Larva Moth ที่สวม Chrysalis ออกจากสนาม → Chrysalis ลงสุสาน
   if(!G||!G.cqs||!G.cqs.length)return;
@@ -3154,7 +3183,7 @@ async function useSpell(p,i,t,fn,z,src){
       log(`${who(p)}ใช้ ${f.src.map(q=>q.n+(q.z=='h'?' (จากมือ)':'')).join(' + ')} เป็นวัตถุดิบ`);
       f.src.filter(q=>q.z=='h').sort((u,v)=>v.i-u.i).forEach(q=>G.gy[p].push(G.hand[p].splice(q.i,1)[0].n)); // วัตถุดิบจากมือลงสุสาน
       f.src.filter(q=>q.z=='f').forEach(q=>G.f[p][q.i]=null);track();
-      const si=pickZ(G.f[p],z);G.f[p][si]={id:++G.uid,n:B.n,a:B.a,d:B.d,l:B.l,pos:spPos(p),fd:false,can:true,nw:true};log(`รวมร่างเป็น ${B.n}!`)}
+      const si=pickZ(G.f[p],z);G.f[p][si]={id:++G.uid,n:B.n,a:B.a,d:B.d,l:B.l,pos:spPos(p),fd:false,can:true,nw:true};spq(p,si);log(`รวมร่างเป็น ${B.n}!`)}
   }
   if(c.k=='dsc'){if(p==0||(typeof MODE!='undefined'&&MODE=='pvp'))pickDiscard(p,1,c.n);else autoDiscard(p,1);let w=-1;G.f[q].forEach((m,j)=>{if(m&&(w<0||m.a>G.f[q][w].a))w=j});if(t>=0&&G.f[q][t])w=t;if(w>=0){log(`${G.f[q][w].n} ถูกทำลาย`);G.f[q][w]=null}}
   if(c.k=='nfa'){ // Nightfall Approach: ทิ้งการ์ดบนมือ 2 ใบ แล้วเลือกมอนสเตอร์หงายหน้า 1 ตัวบนสนาม เปลี่ยนเป็นตั้งคว่ำ (t<100 = ของผู้ใช้ · t>=100 = ของคู่ต่อสู้)
@@ -3174,7 +3203,7 @@ async function useSpell(p,i,t,fn,z,src){
   if(c.k=='fis'){let w=-1;G.f[q].forEach((m,j)=>{if(m&&!m.fd&&(w<0||m.a<G.f[q][w].a))w=j});if(t>=0&&G.f[q][t]&&lowFU(G.f[q][t]))w=t;if(w>=0){log(`${G.f[q][w].n} ถูกทำลาย`);G.f[q][w]=null}}
   if(c.k=='rev'){track();const cand=[];[q,p].forEach(z=>G.gy[z].forEach((n,j)=>{const cc=CARDS[n];if(cc&&cc.t=='m')cand.push({z,j,n,a:cc.a})}));cand.sort((u,v)=>v.a-u.a);
     let w=cand[0];if(t&&t.r){const zz=t.r=='o'?q:p,ff=cand.find(x=>x.z==zz&&x.j==t.j);if(ff)w=ff}const si=pickZ(G.f[p],z);
-    if(w&&si>=0){const B=CARDS[w.n];G.gy[w.z].splice(w.j,1);G.f[p][si]={id:++G.uid,n:B.n,a:B.a,d:B.d,l:B.l,pos:spPos(p),fd:false,can:true,nw:true,rv:1};log(`${who(p)}ชุบชีวิต ${B.n} จากสุสาน${w.z==p?'ของตัวเอง':'ของคู่ต่อสู้'}`)}}
+    if(w&&si>=0){const B=CARDS[w.n];G.gy[w.z].splice(w.j,1);G.f[p][si]={id:++G.uid,n:B.n,a:B.a,d:B.d,l:B.l,pos:spPos(p),fd:false,can:true,nw:true,rv:1};spq(p,si);log(`${who(p)}ชุบชีวิต ${B.n} จากสุสาน${w.z==p?'ของตัวเอง':'ของคู่ต่อสู้'}`)}}
   if(c.k=='ds'){ // Hex Breaker: เลือกเวทหงายหน้า 1 ใบ หรือเวท/กับดักที่ตั้งคว่ำ 1 ใบ (ฝั่งใดก็ได้) · ทำลายถ้าเป็นเวทมนตร์ · ตั้งคว่ำ = เปิดดูก่อน ถ้าเป็นกับดักวางคืน
     const okT=(zz,jj)=>jj==-2?!!G.fz[zz]:!!(G.b[zz][jj]&&!G.b[zz][jj].rs&&stOk(zz,jj,'s'));
     let tz=-1,tj=-99;
@@ -3191,13 +3220,13 @@ async function useSpell(p,i,t,fn,z,src){
   if(c.k=='mir'){const hi2=G.hand[p].findIndex(h=>h.n=='Songstress Sisterhood'),di=G.deck[p].findIndex(h=>(h.n||h)=='Songstress Sisterhood'),si=pickZ(G.f[p],z),B=CARDS['Songstress Sisterhood'];
     if(si>=0){if(hi2>=0&&!(src=='d'&&di>=0))G.hand[p].splice(hi2,1);else if(di>=0)G.deck[p].splice(di,1)} // src: 'h' = จากมือ · 'd' = จากเด็ค (ไม่ระบุ = มือก่อน)
     if(si>=0){
-      G.f[p][si]={id:++G.uid,n:B.n,a:B.a,d:B.d,l:B.l,pos:spPos(p),fd:false,can:true,nw:true};log(`${who(p)}อัญเชิญพิเศษ ${B.n}`)}}
+      G.f[p][si]={id:++G.uid,n:B.n,a:B.a,d:B.d,l:B.l,pos:spPos(p),fd:false,can:true,nw:true};spq(p,si);log(`${who(p)}อัญเชิญพิเศษ ${B.n}`)}}
   await fx2(c.k,p,rsE);
   log(`${who(p)}ใช้ ${c.n}: ${c.x}`);
   chk();
   if(rsE){const gid=GID;setTimeout(()=>relSpell(p,rsE,gid),700)} // โชว์การ์ดในช่องสักครู่ แล้วส่งลงสุสาน
   };
-  await chainWin(ev,[{p,n:c.n,x:c.x,fx:REST,ref:rsE}]); // เวทที่ใช้ = Chain 1 · อีกฝั่งตอบโต้ด้วยกับดักได้
+  await chainWin(ev,[{p,n:c.n,x:c.x,fx:REST,ref:rsE}]);await spFlush(); // เวทที่ใช้ = Chain 1 · อีกฝั่งตอบโต้ด้วยกับดักได้
 }
 function bdFx(p,m){pgbFx(p); // เอฟเฟกต์เมื่อทำความเสียหายจากการต่อสู้ให้ LP คู่ต่อสู้
   const q=1-p;
@@ -3772,12 +3801,43 @@ function battHtml(cost){
   return `<div class="panel"><span class="meta">แบตเตอรี่เทรด</span><span class="bat">${[0,1,2].map(i=>`<i class="${i<b?'on':''}"></i>`).join('')}</span><b>${b}/${BATMAX}</b>
     ${cost?`<div class="meta">ดีลนี้ใช้ ${cost} ก้อน</div>`:''}<div class="meta">C/R ใช้ 1 · SR ใช้ 2 · UR ใช้ 3 ก้อนต่อการเทรด · รีเฟรชทุกเที่ยงคืน</div>${b<1?'<div class="bad">แบตเตอรี่หมด ต้องรอรีเฟรชพรุ่งนี้จึงจะเทรดได้</div>':''}</div>`;
 }
-const LOGIN_COINS=100;
-function loginCheck(){ // เข้าเกมในวันใหม่ = ล็อกอินรายวัน ได้ 100 เหรียญ
-  let last=null;try{last=localStorage.getItem('duel_login_v1')}catch(e){}
-  const k=dKey();if(last===k)return false;
-  try{localStorage.setItem('duel_login_v1',k)}catch(e){return false} // เก็บไม่ได้ = ไม่แจก กันได้ซ้ำทุกครั้งที่เปิด
-  S.coins+=LOGIN_COINS;save();NOTE='ล็อกอินรายวัน ได้รับ '+LOGIN_COINS+' เหรียญ';return true;
+// ---------- ล็อกอินรายวันแบบปฏิทิน ----------
+// เข้าเกมวันใหม่ = ปักสแตมป์วันที่นั้น +100 เหรียญ · วันที่ 7/14/21/28 ของเดือน +200 · ข้อมูลเก็บใน S.lg ({m:'ปี-เดือน', d:[วันที่ปักแล้ว]}) รีเซ็ตทุกต้นเดือน
+const LOGIN_COINS=100,LG_BONUS=200,LG_BDAYS=[7,14,21,28];
+const TH_MON=['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+const lgCoin=d=>LG_BDAYS.includes(d)?LG_BONUS:LOGIN_COINS;
+function lgGet(){
+  const dt=new Date(),mk=dt.getFullYear()+'-'+(dt.getMonth()+1),dim=new Date(dt.getFullYear(),dt.getMonth()+1,0).getDate();
+  let o=S.lg;if(!o||typeof o!='object'||o.m!==mk||!Array.isArray(o.d))o={m:mk,d:[]};
+  o.d=[...new Set(o.d.map(Number).filter(x=>Number.isInteger(x)&&x>=1&&x<=dim))].sort((a,b)=>a-b);
+  return S.lg=o}
+function loginCheck(){
+  if(!S)return false;
+  const dt=new Date(),day=dt.getDate(),lg=lgGet();
+  if(lg.d.includes(day))return false;
+  let legacy=null;try{legacy=localStorage.getItem('duel_login_v1')}catch(e){}
+  try{localStorage.setItem('duel_login_v1',dKey(dt))}catch(e){return false} // เก็บไม่ได้ = ไม่แจก กันได้ซ้ำทุกครั้งที่เปิด
+  const c=legacy===dKey(dt)?0:lgCoin(day); // ระบบเก่าแจก 100 ของวันนี้ไปแล้ว → ปักสแตมป์ให้แต่ไม่แจกซ้ำ
+  lg.d.push(day);lg.d.sort((a,b)=>a-b);S.coins+=c;save();
+  NOTE=c?'ล็อกอินรายวัน วันที่ '+day+' ได้รับ '+c+' เหรียญ':'ปักสแตมป์ล็อกอินวันที่ '+day+' แล้ว';
+  lgShow(day,c);return true;
+}
+function lgShow(nd,got){ // หน้าปฏิทินล็อกอิน: nd = วันที่เพิ่งปักวันนี้ (แสดงอนิเมชันสแตมป์) · เปิดดูเฉยๆ ส่ง 0
+  const old=document.getElementById('lgov');if(old)old.remove();
+  const dt=new Date(),y=dt.getFullYear(),m=dt.getMonth(),today=dt.getDate(),dim=new Date(y,m+1,0).getDate(),off=new Date(y,m,1).getDay(),lg=lgGet();
+  const cells=[];for(let i=0;i<off;i++)cells.push('<div class="lgc e"></div>');
+  for(let d=1;d<=dim;d++){const st=lg.d.includes(d),bn=LG_BDAYS.includes(d);
+    cells.push(`<div class="lgc${st?' st':''}${bn?' bn':''}${d==today?' td':''}${d>today?' fu':''}${st&&d==nd?' new':''}" title="วันที่ ${d}: ${lgCoin(d)} เหรียญ${st?' (ปักสแตมป์แล้ว)':''}"><i>${d}</i><b>${lgCoin(d)}</b>${st?'<span class="lgs" aria-label="สแตมป์ Duel Table"><em>DUEL</em><em>TABLE</em></span>':''}</div>`)}
+  const nb=LG_BDAYS.find(x=>x>today),
+    msg=nd?`ได้รับ +${got} เหรียญ${LG_BDAYS.includes(nd)?' (โบนัสวันที่ '+nd+')':''}`:(lg.d.includes(today)?'วันนี้รับแล้ว พรุ่งนี้มาปักสแตมป์ต่อ':'');
+  const ov=document.createElement('div');ov.id='lgov';ov.className='lgov';ov.setAttribute('role','dialog');ov.setAttribute('aria-modal','true');ov.setAttribute('aria-label','ล็อกอินรายวัน');
+  ov.innerHTML=`<div class="lgbx"><h2>ล็อกอินรายวัน</h2><div class="lgsb">${TH_MON[m]} ${y+543} · ปักแล้ว ${lg.d.length}/${dim} วัน</div>
+    <div class="lgg">${['อา','จ','อ','พ','พฤ','ศ','ส'].map(w=>`<div class="lgw">${w}</div>`).join('')}${cells.join('')}</div>
+    ${msg?`<div class="lgmsg">${msg}</div>`:''}<div class="meta" style="text-align:center">ปักสแตมป์ทุกวัน +${LOGIN_COINS} เหรียญ · วันที่ ${LG_BDAYS.join(' / ')} +${LG_BONUS} เหรียญ${nb?' · โบนัสถัดไปวันที่ '+nb:' · โบนัสเดือนนี้ครบแล้ว'}</div>
+    <button type="button" class="lgx" id="lgx">ปิด</button></div>`;
+  const close=()=>{ov.remove();document.removeEventListener('keydown',esc)},esc=e=>{if(e.key=='Escape')close()};
+  ov.addEventListener('click',e=>{if(e.target===ov||e.target.id=='lgx')close()});document.addEventListener('keydown',esc);
+  document.body.appendChild(ov);const b=ov.querySelector('#lgx');if(b)b.focus();
 }
 function reward(w){const c=w?30:10;S.coins+=c;QP('play');if(w)QP('win');save();RW='ได้รับ '+c+' เหรียญ'}
 const EXC=n=>RARE.includes(n)?15:3; // เหรียญที่ได้เมื่อการ์ดเกิน 3 ใบ (ธรรมดา 3 / หายาก 15)
@@ -4068,16 +4128,31 @@ function dkPanel(){ // แผงบันทึก/โหลดเด็ค (ช
   return ''}
 function dkOwned(list,mx){const u={},o=[];let miss=0;for(const n of list){u[n]=(u[n]||0)+1;if(o.length<mx&&u[n]<=Math.min(LIM(n),S.col[n]||0))o.push(n);else miss++}return [o,miss]}
 function go(s){SCREEN=s;renderScr()}
-const DKMON=['m','fu','rit'];
+const DKMON=['m','mn','me','fu','rit'];
+// ตัวกรองประเภทการ์ดในหน้าจัดเด็ค: mn=มอนสเตอร์ธรรมดา · me=มอนสเตอร์เอฟเฟกต์ · fu=หลอมรวม · rit=พิธีกรรม (แยกกันไม่ซ้อน)
+function dkTy(n){const c=CARDS[n],f=DK.f,fu=!!FUS[n],ri=RIT.has(n);
+  if(f=='all')return true;
+  if(f=='mn')return c.t=='m'&&!fu&&!ri&&!EFFM.has(n);
+  if(f=='me')return c.t=='m'&&!fu&&!ri&&EFFM.has(n);
+  if(f=='fu')return fu;
+  if(f=='rit')return ri;
+  if(f=='q')return isEq(n);
+  if(f=='s')return c.t=='s'&&!isEq(n)&&!isCs(n)&&!isQk(n);
+  if(f=='cs')return isCs(n);
+  if(f=='qk')return isQk(n);
+  if(f=='t')return c.t=='t'&&!isCt(n)&&!isCn(n);
+  if(f=='ct')return isCt(n);
+  if(f=='cn')return isCn(n);
+  return c.t==f}
 function dkFilt(){
   const on=DKMON.includes(DK.f),ms=Object.keys(CARDS).filter(n=>CARDS[n].t=='m'),
     lvs=[...new Set(ms.map(n=>CARDS[n].l))].filter(x=>x>0).sort((a,b)=>a-b),
     ats=['LIGHT','DARK','WATER','FIRE','EARTH','WIND'].filter(a=>Object.values(ATTR).includes(a)),
     tys=[...new Set(Object.values(TYPES))].sort(),
     sel=(k,lb,arr,fmt)=>`<select class="dkfs" data-k="${k}" ${on?'':'disabled'} aria-label="${lb}"><option value="">${lb}: ทั้งหมด</option>${arr.map(v=>`<option value="${v}"${String(DK[k])===String(v)?' selected':''}>${fmt?fmt(v):v}</option>`).join('')}</select>`;
-  const TL=[['all','ประเภท: ทั้งหมด'],['m','มอนสเตอร์'],['fu','หลอมรวม'],['rit','มอนสเตอร์พิธีกรรม'],['s','เวทมนตร์'],['q','เวทอุปกรณ์'],['cs','เวทมนตร์ต่อเนื่อง'],['qk','ฉับพลัน'],['t','กับดัก'],['ct','กับดักต่อเนื่อง'],['cn','กับดักสวนกลับ']],
+  const TL=[['all','ประเภท: ทั้งหมด'],['mn','มอนสเตอร์ธรรมดา'],['me','มอนสเตอร์เอฟเฟกต์'],['fu','มอนสเตอร์หลอมรวม'],['rit','มอนสเตอร์พิธีกรรม'],['s','เวทมนตร์'],['q','เวทอุปกรณ์'],['cs','เวทมนตร์ต่อเนื่อง'],['qk','ฉับพลัน'],['t','กับดัก'],['ct','กับดักต่อเนื่อง'],['cn','กับดักสวนกลับ']],
     tsel=`<select class="dkfs" data-k="f" aria-label="ประเภทการ์ด">${TL.map(([v,t])=>`<option value="${v}"${DK.f==v?' selected':''}>${t}</option>`).join('')}</select>`;
-  return `<div class="dkfl${on?'':' off'}">${tsel}${sel('lv','เลเวล',lvs,v=>'Lv '+v)}${sel('at','ธาตุ',ats)}${sel('ty','เผ่า',tys)}${on?'':'<div class="meta">เลือกประเภท "มอนสเตอร์ / หลอมรวม / พิธีกรรม" ก่อน จึงจะกรองเลเวล ธาตุ เผ่าได้</div>'}</div>`}
+  return `<div class="dkfl${on?'':' off'}">${tsel}${sel('lv','เลเวล',lvs,v=>'Lv '+v)}${sel('at','ธาตุ',ats)}${sel('ty','เผ่า',tys)}${on?'':'<div class="meta">เลือกประเภทมอนสเตอร์ (ธรรมดา / เอฟเฟกต์ / หลอมรวม / พิธีกรรม) ก่อน จึงจะกรองเลเวล ธาตุ เผ่าได้</div>'}</div>`}
 function dkMatch(n){const c=CARDS[n];
   if(DKMON.includes(DK.f)){if(DK.lv!==''&&c.l!=+DK.lv)return false;if(DK.at&&ATTR[n]!=DK.at)return false;if(DK.ty&&TYPES[n]!=DK.ty)return false}
   const q=(DK.q||'').trim().toLowerCase();if(!q)return true;return (n+' '+(c.x||'')+' '+(TYPES[n]||'')+' '+(ATTR[n]||'')).toLowerCase().includes(q)}
@@ -4097,7 +4172,7 @@ document.addEventListener('keydown',e=>{if(e.key=='Enter'&&e.target.id=='dkn'){e
 document.addEventListener('input',e=>{ // ค้นหาแบบสดๆ โดยไม่วาดทั้งหน้าใหม่ (ช่องค้นหาไม่หลุดโฟกัส)
   if(e.target.id=='dkn'){DK.nm=e.target.value;return}
   if(e.target.id!='dkq')return;DK.q=e.target.value;
-  const pl=Object.keys(S.col).filter(n=>DK.f=='all'||(DK.f=='fu'?!!FUS[n]:DK.f=='q'?isEq(n):DK.f=='s'?CARDS[n].t=='s'&&!isEq(n)&&!isCs(n)&&!isQk(n):DK.f=='cs'?isCs(n):DK.f=='qk'?isQk(n):DK.f=='rit'?RIT.has(n):DK.f=='t'?CARDS[n].t=='t'&&!isCt(n)&&!isCn(n):DK.f=='ct'?isCt(n):DK.f=='cn'?isCn(n):CARDS[n].t==DK.f)).filter(dkMatch)
+  const pl=Object.keys(S.col).filter(n=>dkTy(n)).filter(dkMatch)
    .sort((a,b)=>((CARDS[b].t=='m')-(CARDS[a].t=='m'))||(CARDS[b].l||0)-(CARDS[a].l||0)||(CARDS[b].a||0)-(CARDS[a].a||0)||a.localeCompare(b));
   $('dkl').innerHTML=dkRows(pl,DK.sel);$('dkc').textContent=pl.length+' ใบ'});
 function profHtml(nt){
@@ -4143,7 +4218,7 @@ function renderScr(){
   let h='';
   if(SCREEN=='menu'){const pf=myProf();h=`<div class="big">DUEL TABLE</div><div class="mn">
     <button data-m="go" data-s="pvp">เล่นกับคน</button><button data-m="bot">เล่นกับบอท</button>
-    <button data-m="go" data-s="trade">เทรดการ์ด</button><button data-m="go" data-s="quest">เควส${qReady()?` <span class="bad">● ${qReady()}</span>`:''}</button></div>${nt}`}
+    <button data-m="go" data-s="trade">เทรดการ์ด</button><button data-m="go" data-s="quest">เควส${qReady()?` <span class="bad">● ${qReady()}</span>`:''}</button><button data-m="lg">ปฏิทินล็อกอิน · ${lgGet().d.length} วัน</button></div>${nt}`}
   else if(SCREEN=='prof')h=profHtml(nt);
   else if(SCREEN=='shop'&&!SPV){ // หน้ารายการซอง: เลือก Series แล้วเลื่อนดูซอง แตะซองเพื่อเข้าไปดูการ์ด/ซื้อ
     const cur=serOf(PACKS[SP]);
@@ -4178,7 +4253,7 @@ function renderScr(){
       sel=DK.sel&&CARDS[DK.sel]?DK.sel:null,c=sel&&CARDS[sel],
       byLv=(a,b)=>(M(b)-M(a))||(CARDS[b].l||0)-(CARDS[a].l||0)||(CARDS[b].a||0)-(CARDS[a].a||0)||a.localeCompare(b),
       cur=[...S.deck].sort(byLv),ex=[...S.extra].sort(byLv),
-      pl=Object.keys(S.col).filter(n=>DK.f=='all'||(DK.f=='fu'?!!FUS[n]:DK.f=='q'?isEq(n):DK.f=='s'?CARDS[n].t=='s'&&!isEq(n)&&!isCs(n)&&!isQk(n):DK.f=='cs'?isCs(n):DK.f=='qk'?isQk(n):DK.f=='rit'?RIT.has(n):DK.f=='t'?CARDS[n].t=='t'&&!isCt(n)&&!isCn(n):DK.f=='ct'?isCt(n):DK.f=='cn'?isCn(n):CARDS[n].t==DK.f)).filter(n=>dkMatch(n)).sort(byLv);
+      pl=Object.keys(S.col).filter(n=>dkTy(n)).filter(n=>dkMatch(n)).sort(byLv);
     const dt=c?`<div class="dt">${tile(sel)}<div><b>${sel}</b>
       <div class="meta">${c.t=='m'?`มอนสเตอร์${ATTR[sel]?' · '+ATTR[sel]:''}${TYPES[sel]?' · '+TYPES[sel]:''}${FUS[sel]?' · หลอมรวม':''} · Lv${c.l} · ATK ${c.a} / DEF ${c.d}`+(c.l>4&&!FUS[sel]?` · สังเวย ${need(c)} ตัว`:''):c.t=='t'?(isCt(sel)?'กับดักต่อเนื่อง (Continuous Trap)':'กับดัก'):EQT[c.k]?'เวทมนตร์อุปกรณ์ (Equip Spell)':FLD[c.k]?'เวทมนตร์สนาม (Field Spell)':QK[c.k]?'ฉับพลัน (Quick-Play Spell)':CSX.has(c.k)?'เวทมนตร์ต่อเนื่อง (Continuous Spell)':'เวทมนตร์'}</div>
       ${c.t!='m'?`<div>${c.x}</div>`:FUS[sel]?`<div>วัตถุดิบ: ${FUS[sel].join(' + ')}</div>`:''}<div class="meta">ในเด็ค ${dcount(sel)} · มี ${S.col[sel]||0}</div>
@@ -4229,6 +4304,7 @@ function menu(a,el){
     if(ROLE=='guest')return conn&&conn.send({t:'act',a:{a:'sur'}});
     return act(0,{a:'sur'});
   }
+  if(a=='lg')return lgShow(0);
   if(TR&&(a=='home'||a=='go'))tLeave();
   if(a=='home'){leave();NOTE='';return go('menu')}
   if(a=='go'){NOTE='';RES=null;SHSEL=null;SHD=null;return go(el.dataset.s)}
@@ -4445,7 +4521,7 @@ function act(p,m){
   else if(m.a=='cs'){if(x&&!x.fd&&x.n=='Patchwork Frank'&&G.lp[p]>5000&&G.extra[p].includes(m.fn)&&FUS[m.fn]&&CARDS[m.fn]&&G.f[p].includes(null)){
     G.lp[p]-=5000;track();G.extra[p].splice(G.extra[p].indexOf(m.fn),1);const B=CARDS[m.fn],si=pickZ(G.f[p],m.z);
     emit({t:'act',p,n:x.n,x:EFXT[x.n],k:'flip'});G.f[p][si]={id:++G.uid,n:B.n,a:B.a,d:B.d,l:B.l,pos:spPos(p),fd:false,can:true,nw:true};
-    log(`${who(p)}จ่าย 5000 LP: ${x.n} เรียก ${B.n} จาก Extra Deck`);chk()}}
+    spq(p,si);log(`${who(p)}จ่าย 5000 LP: ${x.n} เรียก ${B.n} จาก Extra Deck`);chk();A(spFlush())}}
   else if(m.a=='gd'){if(x&&!x.fd&&x.n=='Striped Gale Crawler'&&G.lp[p]>3000&&G.extra[p].includes(m.fn)&&CARDS[m.fn]){
     G.lp[p]-=3000;G.extra[p].splice(G.extra[p].indexOf(m.fn),1);G.gy[p].push(m.fn);emit({t:'act',p,n:x.n,x:EFXT[x.n],k:'flip'});
     log(`${who(p)}จ่าย 3000 LP: ${x.n} ส่ง ${m.fn} จาก Extra Deck ลงสุสาน`);chk()}}
@@ -4453,7 +4529,7 @@ function act(p,m){
   else if(m.a=='ail'){const tt=G.f[p][m.t];if(x&&!x.fd&&x.n=='Aile Fledgling Blade'&&mp&&tt&&tt!==x){G.f[p][m.t]=null;x.a+=700;x.ab=(x.ab||0)+700;emit({t:'act',p,n:x.n,x:EFXT[x.n],k:'flip'});log(`${who(p)}: ${x.n} สังเวย ${tt.fd?'มอนสเตอร์ที่คว่ำอยู่':tt.n} → ATK +700 จนจบเทิร์น (ATK ${x.a})`);chk()}}
   else if(m.a=='tdr'){if(c&&c.t=='m'&&c.n==TDRG)A(tdrFx(p,m.i))}
   else if(m.a=='coc'){if(c&&c.t=='m'&&c.n==COCN)A(cocFx(p,m.i,m.t))}
-  else if(m.a=='msm'){if(c&&c.t=='m'&&MOTHS[c.n])A(mothSum(p,m.i,m.t))}
+  else if(m.a=='msm'){if(c&&c.t=='m'&&MOTHS[c.n])A((async()=>{mothSum(p,m.i,m.t);await spFlush()})())}
   else if(m.a=='cyl'){if(x&&!x.fd&&x.n=='Cylinder Drake')cylUse(p,m.i)}
   else if(m.a=='eyb'){if(x&&!x.fd&&x.n=='Eyeball Cluster')eyeUse(p,m.i)}
   else if(m.a=='btt'){const tt=G.f[p][m.t];if(x&&!x.fd&&x.n=='Ballista Tortoise'&&tt){const dm=Math.floor(Math.max(0,tt.a)/2);G.f[p][m.t]=null;emit({t:'act',p,n:x.n,x:EFXT[x.n],k:'flip'});G.lp[1-p]-=dm;log(`${who(p)}: ${x.n} สังเวย ${tt.fd?'มอนสเตอร์ที่คว่ำอยู่':tt.n} (ATK ${tt.a}) → ${who(1-p)}ได้รับความเสียหาย ${dm}`);chk()}}
