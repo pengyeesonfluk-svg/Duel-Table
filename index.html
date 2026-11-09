@@ -1453,7 +1453,7 @@ function chOpts(w,ev,L){ // การ์ด/สกิลที่ฝั่ง w 
   if(!ctOnly&&w!=ev.p&&!ev.hu&&G.hand[w].some(c=>c.n=='Puffball Familiar')){const bot=MODE!='pvp'&&w==1,dm=ev.t=='bat'&&ev.tg&&ev.tg.pos=='a'?(!bot||ev.m.a>ev.tg.a):ev.t=='atk'&&!ev.tg?(!bot||ev.m.a>0):false;if(dm)o.push({k:'h',n:'Puffball Familiar',x:EFXT['Puffball Familiar']})} // Kuriboh: ทิ้งจากมือ ลดดาเมจการต่อสู้เป็น 0
   return o.filter(x=>!nmLk(w,x.n)).concat(qo);
 }
-const CHT=ev=>({sum:`คู่ต่อสู้ลง ${ev.m&&ev.m.n}`,atk:`คู่ต่อสู้ประกาศโจมตีด้วย ${ev.m&&ev.m.n}`,bat:`${ev.m&&ev.m.n} โจมตี ${ev.tg&&ev.tg.n} — กำลังเข้าสู่การคำนวณความเสียหาย`,spl:`คู่ต่อสู้ใช้เวทมนตร์ ${ev.c&&ev.c.n}`,flp:`คู่ต่อสู้พลิกเปิด ${ev.m&&ev.m.n}`}[ev.t]);
+const CHT=(ev,w)=>({sum:(ev.pos=='d'||(ev.m&&ev.m.fd))?'คู่ต่อสู้ตั้งมอนสเตอร์ลงคว่ำ':`คู่ต่อสู้ลง ${ev.m&&ev.m.n}`,atk:`คู่ต่อสู้ประกาศโจมตีด้วย ${ev.m&&ev.m.n}`,bat:`${ev.m&&ev.m.n} โจมตี ${ev.tg&&(ev.tg.fd&&w==ev.p?'มอนสเตอร์ที่คว่ำอยู่':ev.tg.n)} — กำลังเข้าสู่การคำนวณความเสียหาย`,spl:`คู่ต่อสู้ใช้เวทมนตร์ ${ev.c&&ev.c.n}`,flp:`คู่ต่อสู้พลิกเปิด ${ev.m&&ev.m.n}`,eff:`คู่ต่อสู้ใช้เอฟเฟกต์ของ ${ev.m&&ev.m.n}`}[ev.t]); // มอนสเตอร์ที่ลงคว่ำ ไม่บอกชื่อ
 async function chainWin(ev,L){ // L = ลิงก์ที่มีอยู่แล้ว (เช่น เวทที่เพิ่งใช้ = Chain 1) · คืนเมื่อ Chain ประมวลผลครบ
   L=L||[];const g=G,wb=G.busy;G.busy=true;let shown=false;
   const hud=()=>{g.chain=L.map(l=>({p:l.p,n:l.n,d:l.d?1:0,c:l.c?1:0}));sync()};
@@ -1465,7 +1465,7 @@ async function chainWin(ev,L){ // L = ลิงก์ที่มีอยู่
       if(o.length){
         shown=true;hud();
         if(MODE!='pvp'&&cur==1){pk=0;await nap(600)} // บอทใช้เองทันที
-        else pk=(await askQ(cur,`${CHT(ev)}\nต้องการใช้การ์ด/สกิลตอบโต้หรือไม่? (ตอนนี้ Chain ${L.length} ลิงก์)`,o))-1;
+        else pk=(await askQ(cur,`${CHT(ev,cur)}\nต้องการใช้การ์ด/สกิลตอบโต้หรือไม่? (ตอนนี้ Chain ${L.length} ลิงก์)`,o))-1;
       }
       if(pk>=0&&o[pk]){
         const op=o[pk];let link;
@@ -1487,6 +1487,9 @@ async function chainWin(ev,L){ // L = ลิงก์ที่มีอยู่
       }
     }else if(L.length&&L[0].fx)await L[0].fx();
   }finally{L.forEach(l=>{if(l.ref)delete l.ref.cl});if(G===g){g.chain=null;g.busy=wb;sync()}}
+}
+async function effChain(p,m){ // ใช้เอฟเฟกต์มอนสเตอร์ (กดใช้เอง/ฟลิป) → เปิดหน้าต่าง Chain ให้ฝั่งตรงข้ามตอบโต้ได้ (กับดักที่ไม่ระบุเงื่อนไข เช่น Karmic Reckoning)
+  if(!G||G.over)return;await chainWin({t:'eff',p,m},[]);
 }
 async function codFx(p,x){ // Abyssal Summons: เปิดเป็น Flip Summon แล้วคู่ต่อสู้เลือกใช้กับดักเองผ่าน Chain
   await chainWin({t:'flp',p,m:x},[]);return !G.f[p].includes(x);
@@ -3314,7 +3317,7 @@ async function attack(p,si,ti){
     if(m.n=='Voidstep Warrior'&&G.f[p][si]===m&&G.f[q][ti]===t){ // D.D. Warrior: หลังคำนวณความเสียหาย กำจัดทั้งคู่ออกจากเกมได้
       const bot=MODE!='pvp'&&p==1,ok=bot?((t.pos=='a'?t.a:t.d)>=m.a):await askQ(p,`${m.n}: ต้องการกำจัด (Banish) ${m.n} และ ${t.n} ที่ต่อสู้ด้วยออกจากเกมหรือไม่?`);
       if(ok&&G.f[p][si]===m&&G.f[q][ti]===t){banish(p,si);banish(q,ti)}}
-    if(flipPend&&!G.over){chk();const atk=G.f[p][si]===m;flipFx(q,t,atk?p:null,atk?si:null)} // ถูกทำลายในการต่อสู้ก่อน (ลงสุสานแล้ว) แล้วฟลิปค่อยทำงาน
+    if(flipPend&&!G.over){chk();await effChain(q,t);const atk=G.f[p][si]===m;flipFx(q,t,atk?p:null,atk?si:null)} // ถูกทำลายในการต่อสู้ก่อน (ลงสุสานแล้ว) แล้วฟลิปค่อยทำงาน
   }
   if((m.n=='Forlorn Damsel'&&G.f[p][si]!==m)||(tgt&&tgt.n=='Forlorn Damsel'&&G.f[q][ti]!==tgt)){G.f[p].forEach(x=>x&&(x.can=false));log('Forlorn Damsel: ถูกทำลายจากการต่อสู้ Battle Phase จบลง')}
   if(tmp&&tmpM&&G.f[q].includes(tmpM))tmpM[tmp]-=500; // จบการต่อสู้: ค่าชั่วคราวหมดผล
@@ -3541,7 +3544,7 @@ async function ai(){
   }
   for(let i=0;i<5;i++){ // เปิดมอนสเตอร์คว่ำเป็นท่าโจมตีถ้าไม่มีตัวไหนของผู้เล่นที่เห็นแรงกว่า
     const m=G.f[1][i];
-    if(m&&m.fd&&m.can&&G.f[0].every(t=>!t||t.fd||(t.pos=='a'?t.a:t.d)<m.a)){m.fd=false;m.pos='a';m.can=true;m.nw=true;m.fl=true;log(`${who(1)}เปิด ${m.n} เป็นท่าโจมตี`);if(!(await codFx(1,m))){if(m.n=='Sandglass of Valor')hourglass(1,m);pupGain(m.id);if(m.n=='Wyrmbane Slayer')await slayerFx(1,m);if(FLIPM.has(m.n))flipFx(1,m)}render();await nap(700)}
+    if(m&&m.fd&&m.can&&G.f[0].every(t=>!t||t.fd||(t.pos=='a'?t.a:t.d)<m.a)){m.fd=false;m.pos='a';m.can=true;m.nw=true;m.fl=true;log(`${who(1)}เปิด ${m.n} เป็นท่าโจมตี`);if(!(await codFx(1,m))){if(m.n=='Sandglass of Valor')hourglass(1,m);pupGain(m.id);if(m.n=='Wyrmbane Slayer')await slayerFx(1,m);if(FLIPM.has(m.n)){await effChain(1,m);flipFx(1,m)}}render();await nap(700)}
   }
   G.ph=3;render();await nap(500); // Battle Phase
   for(let bpn=0;bpn<2;bpn++){ // Parasol Forecaster: ทำ Battle Phase ได้ 2 ครั้ง
@@ -3724,11 +3727,12 @@ function load(txt){
   {const u={};S.extra=S.extra.filter(n=>{u[n]=(u[n]||0)+1;return u[n]<=Math.min(LIM(n),S.col[n]||0)}).slice(0,15)} // Extra Deck สูงสุด 15 ใบ
   if(!S.prof||typeof S.prof!='object')S.prof={name:'',card:''};S.prof.name=cleanName(S.prof.name);if(!(S.prof.card&&CARDS[S.prof.card]&&S.col[S.prof.card]>0))S.prof.card=''; // โปรไฟล์: การ์ดปกต้องยังอยู่ในคลัง
   if(!S.start1500){S.start1500=1;S.coins=Math.max(S.coins||0,1500)} // ทุกคนเริ่มที่ 1500 เหรียญ
+  S.coins=Math.ceil(Math.max(0,+S.coins||0)/10)*10; // เหรียญมีเศษ → ปัดขึ้นเป็นหลัก 10 (เช่น 71 → 80)
   if(!Array.isArray(S.decks))S.decks=[];
   S.decks=S.decks.filter(d=>d&&typeof d=='object'&&typeof d.name=='string').slice(0,30).map(d=>({name:d.name.slice(0,24),deck:(Array.isArray(d.deck)?d.deck:[]).filter(n=>CARDS[n]&&!FUS[n]).slice(0,60),extra:(Array.isArray(d.extra)?d.extra:[]).filter(n=>CARDS[n]&&FUS[n]).slice(0,15)})); // เด็คที่บันทึกไว้ (ช่องเด็ค)
   qSync();save();return true;
 }
-function save(){try{localStorage.setItem('duel_save_v1',JSON.stringify(S))}catch(e){}}
+function save(){S.coins=Math.ceil(Math.max(0,+S.coins||0)/10)*10;try{localStorage.setItem('duel_save_v1',JSON.stringify(S))}catch(e){}} // ปัดเหรียญขึ้นเป็นหลัก 10 ทุกครั้งที่บันทึก
 // ---------- เควสรายวัน/รายสัปดาห์ + แบตเตอรี่ห้องเทรด ----------
 // ความคืบหน้าเก็บใน S.q (บันทึกพร้อมเซฟ) · รีเซ็ตตามวันที่ในเครื่อง (เที่ยงคืน) · สัปดาห์เริ่มวันจันทร์
 const DQ=[{id:'d1',t:'play',g:2,r:20,n:'เล่นดวล 2 ครั้ง'},{id:'d2',t:'win',g:1,r:30,n:'ชนะดวล 1 ครั้ง'},{id:'d3',t:'pack',g:1,r:20,n:'ซื้อซองการ์ด 1 ซอง'},{id:'d4',t:'trade',g:1,r:30,n:'เทรดการ์ดสำเร็จ 1 ครั้ง'}];
@@ -3793,7 +3797,7 @@ function buy(){
   const P=PACKS[SP];
   if(OP)return;
   if(S.coins<P.c1)return say('เหรียญไม่พอ');
-  S.coins-=P.c1;QP('pack');const had={...S.col},seen={};
+  const c0=S.coins;S.coins-=P.c1;QP('pack');const had={...S.col},seen={};
   if(P.sd){ // Starter Deck: ได้การ์ดทุกใบอย่างละ 1 (ถ้ามีครบ 3 ใบแล้วแปลงเป็นเหรียญ) ไม่มีแอนิเมชันเปิดซอง
     const r=P.all().map(n=>{const ex=fgCt(n)>=3;if(ex)S.coins+=EXC(n);else S.col[n]=(S.col[n]||0)+1;return{n,nw:!ex&&!had[n],ex}});
     save();RES=r;const gain=r.filter(x=>x.ex).reduce((t,x)=>t+EXC(x.n),0);
@@ -3802,7 +3806,7 @@ function buy(){
   const r=pull(P.n,P);save();
   RES=r.map(({n,ex})=>{const nw=!ex&&!had[n]&&!seen[n];seen[n]=1;return{n,nw,ex}});
   const gain=r.filter(x=>x.ex).reduce((t,x)=>t+EXC(x.n),0);
-  say(gain?`การ์ดซ้ำเกิน 3 ใบ แปลงเป็น ${gain} เหรียญ`:'');openPack(RES,P);
+  say(gain?`หักค่าซอง ${P.c1} เหรียญ · การ์ดซ้ำเกิน 3 ใบ แปลงเป็น +${gain} เหรียญ (ปัดเศษเป็นหลัก 10 · สุทธิ −${c0-S.coins})`:`หักค่าซอง ${P.c1} เหรียญ`);openPack(RES,P);
 }
 // ---------- เปิดซอง: สไลด์หัวซอง แล้วสไลด์การ์ดทีละใบ ----------
 let OP=null;
@@ -4431,12 +4435,13 @@ function act(p,m){
   else if(m.a=='ph'){const t=+m.ph;if(G.ph>=2&&(t==3||t==4)&&t>G.ph){G.ph=t;if(p==0){G.sel=null;G.mode=null}}}
   else if(!mp&&m.a!='atk'&&!(m.a=='bact'&&G.b[p][m.i]&&MAN(G.b[p][m.i].k))){return sync()}
   else if(nlGate(p,m,c,x)){return sync()}
+  else if(['cs','gd','mtr','ail','btt','cyl','eyb'].includes(m.a)&&!m.ec&&x&&!x.fd){A(effChain(p,x).then(()=>{if(G.f[p][m.i]===x&&!x.fd)act(p,{...m,ec:1})}));return}
   else if(m.a=='sum'){if(c&&c.t=='m'&&canSummon(p,c))A(summon(p,m.i,m.pos=='d'?'d':'a',m.tr,m.z))}
   else if(m.a=='use'){if(c&&c.t=='s')A(useSpell(p,m.i,m.t,m.fn,m.z,m.src))}
   else if(m.a=='set'){const bi=pickZ(G.b[p],m.z);const ns=c&&c.t=='s'&&!FLD[c.k]&&!EQT[c.k];if(c&&(c.t=='t'||ns)&&bi>=0&&chtPay(p)){G.hand[p].splice(m.i,1);G.b[p][bi]=ns?{n:c.n,k:c.k,x:c.x,sf:1}:{n:c.n,k:c.k,x:c.x,tr:1};emit({t:'set',p});log(`${who(p)}ตั้งการ์ดคว่ำ 1 ใบ`)}}
   else if(m.a=='bact'){const e=G.b[p][m.i];if(e&&e.sf&&usable(p,e,1))A(actSet(p,m.i));else if(e&&e.tr&&MAN(e.k)&&!e.ac&&!RD()){e.ac=1;emit({t:'act',p,n:e.n,x:e.x,k:'trap'});log(`${who(p)}เปิดใช้กับดักต่อเนื่อง ${e.n}`);jarFx()}}
   else if(m.a=='fld'){if(c&&c.t=='s'&&FLD[c.k]&&chtPay(p))setField(p,m.i)}
-  else if(m.a=='flp'){if(x&&x.fd&&x.can){x.fd=false;x.pos='a';x.can=true;x.nw=true;x.fl=true;x.ia=!x.nm&&!x.np&&!x.hx;log(`${who(p)}เปิด ${x.n} เป็นท่าโจมตี`);A(codFx(p,x).then(async g=>{if(!g){if(x.n=='Sandglass of Valor')hourglass(p,x);pupGain(x.id);if(x.n=='Wyrmbane Slayer')await slayerFx(p,x);if(FLIPM.has(x.n))flipFx(p,x,null,null,m.t)}}))}}
+  else if(m.a=='flp'){if(x&&x.fd&&x.can){x.fd=false;x.pos='a';x.can=true;x.nw=true;x.fl=true;x.ia=!x.nm&&!x.np&&!x.hx;log(`${who(p)}เปิด ${x.n} เป็นท่าโจมตี`);A(codFx(p,x).then(async g=>{if(!g){if(x.n=='Sandglass of Valor')hourglass(p,x);pupGain(x.id);if(x.n=='Wyrmbane Slayer')await slayerFx(p,x);if(FLIPM.has(x.n)){await effChain(p,x);flipFx(p,x,null,null,m.t)}}}))}}
   else if(m.a=='cs'){if(x&&!x.fd&&x.n=='Patchwork Frank'&&G.lp[p]>5000&&G.extra[p].includes(m.fn)&&FUS[m.fn]&&CARDS[m.fn]&&G.f[p].includes(null)){
     G.lp[p]-=5000;track();G.extra[p].splice(G.extra[p].indexOf(m.fn),1);const B=CARDS[m.fn],si=pickZ(G.f[p],m.z);
     emit({t:'act',p,n:x.n,x:EFXT[x.n],k:'flip'});G.f[p][si]={id:++G.uid,n:B.n,a:B.a,d:B.d,l:B.l,pos:spPos(p),fd:false,can:true,nw:true};
