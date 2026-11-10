@@ -3084,7 +3084,7 @@ function jarFx(){ // Wyrm Sealing Urn (กับดักต่อเนื่�
   if(!G||!G.b||!G.f)return;
   const on=!RD()&&[0,1].some(z=>G.b[z].some(e=>e&&e.tr&&e.k=='jar'&&e.ac));
   [0,1].forEach(z=>G.f[z].forEach(m=>{if(!m)return;
-    if(on&&!m.fd&&TYPES[m.n]=='Dragon'){if(m.pos!='d'){m.pos='d';log(`Wyrm Sealing Urn: ${m.n} เปลี่ยนเป็นท่าป้องกัน`)}m.jr=1;m.lock=true}
+    if(on&&!m.fd&&TYPES[m.n]=='Dragon'){if(m.pos!='d'){m.pos='d';m.can=false;log(`Wyrm Sealing Urn: ${m.n} เปลี่ยนเป็นท่าป้องกัน`)}m.jr=1;m.lock=true}
     else if(m.jr){delete m.jr;if(!m.hx)delete m.lock}}))}
 function hxcFx(){ // Hexstar Fetters (กับดักต่อเนื่อง): ผูกมอนสเตอร์ของคู่ต่อสู้ ห้ามโจมตี/เปลี่ยนท่า · ทำลายตัวเองเมื่อเป้าหมายออกจากสนาม
   if(!G||!G.b||RD())return;
@@ -3977,7 +3977,7 @@ async function summon(p,i,pos,tr,z){
   if(pos=='a')pupGain(G.f[p][si]?G.f[p][si].id:null);
   const nm=G.f[p][si];if(nm&&pos=='a'&&nm.n=='Sandglass of Valor')hourglass(p,nm); // Normal Summon
   if(nm&&pos=='a'&&nm.n=='Wyrmbane Slayer')await slayerFx(p,nm);
-  refield();
+  refield();jarFx();
 }
 // ---- เวทสนาม / หลอมรวม ----
 const bonusOf=(k,m)=>{const f=k&&FLD[k];if(!f)return 0;const t=TYPES[m.n];return f.up.includes(t)?200:f.dn.includes(t)?-200:0};
@@ -5857,7 +5857,7 @@ function view(p){
     turn:p?1-G.turn:G.turn,n:G.n,nl:w(G.nl||[null,null]),sum:G.sum,sel:null,mode:null,over:G.over,
     win:G.win==null?null:p?1-G.win:G.win,busy:false,log:G.log,ph:G.ph,intro:G.intro,xbT:G.xbT||[0,0],qa:G.qa?{p:p?1-G.qa.p:G.qa.p,text:G.qa.text,opts:G.qa.p==p?G.qa.opts:undefined,mx:G.qa.mx,mn:G.qa.mn,lb:G.qa.lb,nb:G.qa.nb}:null,chain:(G.chain||[]).map(l=>({...l,p:p?1-l.p:l.p}))};
 }
-function sync(){if(ROLE!='guest'&&G&&G.f)refield();render();if(MODE=='pvp'&&conn&&conn.open)conn.send({t:'state',s:view(1)})}
+function sync(){if(ROLE!='guest'&&G&&G.f){jarFx();refield()}render();if(MODE=='pvp'&&conn&&conn.open)conn.send({t:'state',s:view(1)})}
 
 // ---------- ดำเนินการ (ฝั่งเจ้าของเกม) ----------
 const A=pr=>Promise.resolve(pr).then(()=>sync()).catch(()=>{});
@@ -6179,7 +6179,7 @@ document.addEventListener('change',e=>{
   if(e.target.id!='sfile'||!e.target.files[0])return;
   const r=new FileReader();r.onload=()=>applySave(String(r.result));r.readAsText(e.target.files[0]);
 });
-/*ART-REDO-3*/(()=>{ // อาร์ตใหม่ (ต้นฉบับของเกม โทนสีอิงการ์ดอ้างอิง): Sword Saint Masaru · Dusk Flame Wyrm · Pincer Strike · Wyrm Sealing Urn · Bone Servant · Pyre Weaver
+/*ART-REDO-3*/(()=>{ // อาร์ตใหม่ (ต้นฉบับของเกม โทนสีอิงการ์ดอ้างอิง): Sword Saint Masaru · Dusk Flame Wyrm · Pincer Strike · Wyrm Sealing Urn · Bone Servant · Pyre Weaver · Heaven's Verdict
 const P=(d,f,s,w=1.5)=>`<path d='${d}' fill='${f}'${s?` stroke='${s}' stroke-width='${w}' stroke-linejoin='round'`:''}/>`,
 C=(x,y,r,f)=>`<circle cx='${x}' cy='${y}' r='${r}' fill='${f}'/>`,
 E2=(x,y,rx,ry,f)=>`<ellipse cx='${x}' cy='${y}' rx='${rx}' ry='${ry}' fill='${f}'/>`,
@@ -6222,6 +6222,7 @@ const N={
  +L('M45 41 H55 M47 39.5 v4 M50 39.5 v4 M53 39.5 v4','#14091f',.9)
  +P('M18 68 L14 50 L18 52 L20 45 L24 52 L27 48 L27 68Z','#ece6d4','#8a846c',1)+P('M82 68 L86 50 L82 52 L80 45 L76 52 L73 48 L73 68Z','#ece6d4','#8a846c',1)
  +L('M30 64 Q50 54 70 64','#2a1a48',2),
+"Heaven's Verdict":BG('zq7','#6a4a6a','#2e1e3a','#120a1a')+`<g stroke='#ffe9a0' stroke-width='1' opacity='.3'><path d='M80 26 L50 0 M80 26 L100 0 M80 26 L100 30 M80 26 L96 56 M80 26 L58 8'/></g>`+`<circle cx='50' cy='26' r='19' fill='#f0d890' opacity='.3'/>`+P('M6 80 Q6 62 13 61 Q20 62 20 80Z','#4a3a5a')+C(13,56,5,'#c8a888')+P('M80 80 Q80 68 88 67 Q96 68 96 80Z','#4a3a5a')+C(88,62,4.5,'#c8a888')+P('M18 80 Q22 44 50 38 Q78 44 82 80Z','#2a1a3a','#c9a45c',1.2)+P('M44 80 L47 46 L53 46 L56 80Z','#5a3a7a')+P('M63 54 L79 30 L85 34 L72 60Z','#2a1a3a','#c9a45c',1)+`<circle cx='84' cy='26' r='11' fill='#fff0b0' opacity='.55'/>`+C(84,27,5,'#d8b898')+P('M38 25 Q50 6 62 25 Q50 18 38 25Z','#3a2a5a','#c9a45c',1)+C(50,29,10,'#d8b898')+P('M40 29 Q50 58 60 29 Q50 38 40 29Z','#dcd8d0')+P('M40 24 Q50 15 60 24 Q56 21 50 21 Q44 21 40 24Z','#dcd8d0')+L('M45 27 h3 M52 27 h3','#3a2a1a',1.3)+L('M14 14 H34 M24 14 V26 M16 26 H32','#c9a45c',1.3),
 'Pyre Weaver':BG('zq6','#ffcc30','#e8501a','#7a1a10')
  +P('M0 80 Q4 42 14 28 Q16 50 24 44 Q20 66 34 80Z','#ff7a1a')+P('M100 80 Q96 42 86 28 Q84 50 76 44 Q80 66 66 80Z','#ff7a1a')
  +P('M30 80 Q30 54 50 47 Q70 54 70 80Z','#3a3a9a','#1a1a4a',1.8)
