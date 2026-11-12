@@ -6619,10 +6619,11 @@ function act(p,m){
   else if(m.a=='atk'){if(G.ph==2&&x&&x.ia&&x.can&&!x.fd&&x.pos=='a'&&G.n>1&&!swb(p)&&(m.t<0?(!G.f[1-p].some(Boolean)||DIRECT.has(x.n)):G.f[1-p][m.t])){G.ph=3} /* มอนสเตอร์ที่เพิ่งเปลี่ยน/พลิกเป็นท่าโจมตี: กดโจมตีจาก Main Phase เข้า Battle Phase แล้วตีได้ทันที */if(G.ph==3&&!swb(p)&&x&&x.can&&!x.fd&&x.pos=='a'&&G.n>1&&!(x.n==DKE&&G.lp[p]<=1000)&&(m.t<0?(!G.f[1-p].some(Boolean)||DIRECT.has(x.n)):G.f[1-p][m.t])){attack(p,m.i,m.t).then(()=>sync()).catch(()=>{});return}}
   sync();
 }
+const mirZ=t=>Array.isArray(t)?t.map(mirZ):(t&&typeof t=='object'&&(t.z===0||t.z===1))?{...t,z:1-t.z}:t; // guest เห็นสนามกลับด้าน (view(1)) → แปลงเป้าหมายฟลิป z ให้ตรงกับฝั่งโฮสต์ก่อนส่ง
 const doAct=m=>{
   if(ROLE=='guest'){
     if(!(conn&&conn.open))return;
-    conn.send({t:'act',a:m});G.busy=true; // แสดงสถานะกำลังส่ง กันแตะซ้ำ
+    conn.send({t:'act',a:(m.a=='flp'&&m.t!=null)?{...m,t:mirZ(m.t)}:m});G.busy=true; // แสดงสถานะกำลังส่ง กันแตะซ้ำ
     setTimeout(()=>{if(ROLE=='guest'&&G&&G.busy){G.busy=false;render()}},2500);
   }else act(0,m);
 };
