@@ -751,6 +751,10 @@ main.hn.hc,main.hn.hc.wide{padding-bottom:40px!important}
 .csg{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
 .csg .csi button{padding:6px 2px;font-size:11px}.csg .csi .cpr{font-size:11px}.csg .csi .cst{font-size:10px}.csg .csi .pt{font-size:9px;padding:1px 2px}
 .csi{display:flex;flex-direction:column;gap:4px}
+.sdw{position:relative;overflow:hidden;border-radius:8px}
+.sdw.so .mc{filter:grayscale(.85) brightness(.55)}
+.sdt{position:absolute;left:50%;top:50%;width:150%;transform:translate(-50%,-50%) rotate(-24deg);text-align:center;background:linear-gradient(180deg,#e0382c,#a01c14);color:#fff;font:900 12px/1 Georgia,sans-serif;letter-spacing:1px;padding:5px 0;border-top:1.5px solid #ffd2cc;border-bottom:1.5px solid #5a0a06;box-shadow:0 2px 8px #000c;text-shadow:0 1px 2px #000;pointer-events:none;white-space:nowrap}
+@media(max-width:480px){.sdt{font-size:10px;letter-spacing:.5px;padding:4px 0}}
 .csi .mc{aspect-ratio:auto;min-height:118px;font-size:10px;gap:2px;cursor:default}.csi .mc .art{flex:1 1 44px;min-height:44px}
 .csi.pm .mc{box-shadow:0 0 0 2px #ffd978,0 0 14px #ffd97888}
 .csi .cpr{text-align:center;font:700 13px sans-serif;color:#ffd978}
@@ -6138,12 +6142,12 @@ function spGet(){
   if(!Array.isArray(o.f))o.f=[];if(typeof o.mv!='string')o.mv='';o.pt=Math.max(0,Math.floor(+o.pt||0));if(!o.rk||typeof o.rk!='object')o.rk={};
   if(!o.b||typeof o.b!='object')o.b={};o.pr=o.pr?1:0;
   return S.sp=o}
-function spLeft(n){const b=spGet().b[n]||0;return Math.max(0,3-b)}
+function spLeft(n){const b=spGet().b[n]||0;return Math.max(0,1-b)}
 function spBuy(n){
   const sp=spGet(),it=sp.a?spStock(sp.a).find(x=>x.n==n):null;
   if(!it)return say('ไม่มีการ์ดนี้ในร้านวันนี้');
   const pr=spPrice(n);
-  if(it.pm?(sp.pr||sp.b[n]):spLeft(n)<1)return say(it.pm?'โควตา SR/UR ของวันนี้ใช้ไปแล้ว':'ซื้อการ์ดใบนี้ครบโควตาของรอบนี้แล้ว');
+  if(it.pm?(sp.pr||sp.b[n]):spLeft(n)<1)return say(it.pm?'โควตา SR/UR ของวันนี้ใช้ไปแล้ว':'วันนี้ซื้อการ์ดใบนี้ไปแล้ว (ซื้อได้ใบละ 1 ใบต่อวัน)');
   if(fgCt(n)+shPend(n)>=3)return say('คุณมี '+n+' ครบ 3 ใบแล้ว (รวมที่กำลังขนส่ง/อยู่ในจดหมาย)');
   if(sp.pt<pr)return say('แต้มร้านไม่พอ (ต้องใช้ '+pr+' แต้ม · ได้แต้มจากดวลกับคนในร้าน)');
   sp.pt-=pr;S.col[n]=(S.col[n]||0)+1;sp.b[n]=(sp.b[n]||0)+1;if(it.pm)sp.pr=1;
@@ -6350,10 +6354,11 @@ function cshopHtml(nt){
   if(CSW=='daily'){
     const st=spStock(sp.a),pm=st.find(x=>x.pm);
     const cell=it=>{const n=it.n,pr=spPrice(n),own=fgCt(n)+shPend(n),
-      lock=it.pm?(sp.b[n]?'ซื้อแล้ว':sp.pr?'โควตา SR/UR หมด':''):(spLeft(n)<1?'ซื้อครบรอบนี้':''),
+      lock=it.pm?(sp.b[n]?'ซื้อแล้ว':sp.pr?'โควตา SR/UR หมด':''):(spLeft(n)<1?'ซื้อแล้ววันนี้':''),
       why=lock||(own>=3?'มีครบ 3 ใบ':sp.pt<pr?'แต้มไม่พอ':'');
-      return `<div class="csi${it.pm?' pm':''}">${tile(n,{sh:1,sel:n==SHSEL})}${it.pm?`<div class="pt">${RAR[n]} · 1 ใบ/รอบ</div>`:''}<div class="cpr">⭐ ${pr} แต้ม</div><div class="cst">มีอยู่ ${fgCt(n)} ใบ</div><button type="button" data-m="cbuy" data-n="${mlEsc(n)}" ${why?'disabled':''}>${why||'ซื้อ'}</button></div>`};
-    return `${back}${head}<div class="csn"><div>แตะการ์ด 2 ครั้งเพื่อดูความสามารถ</div><div>สต็อกรีเซ็ตในอีก ~${hr} ชม. · ${pm?'วันนี้มี '+RAR[pm.n]+' มาวางขาย!':'วันนี้ไม่มี SR/UR'}</div><div>ทุกร้านมี SR/UR จำนวนเท่ากันในแต่ละวัน · ซื้อได้ 1 ใบต่อวัน (รวมทุกร้าน)</div><div>แต้มร้านได้จากการสู้กับคนในร้านเท่านั้น</div><div>การ์ดทั่วไปซื้อซ้ำได้สูงสุด 3 ใบต่อรอบ และถือได้ไม่เกิน 3 ใบต่อชื่อ</div></div>
+      const sold=it.pm?!!sp.b[n]:spLeft(n)<1;
+      return `<div class="csi${it.pm?' pm':''}"><div class="sdw${sold?' so':''}">${tile(n,{sh:1,sel:n==SHSEL})}${sold?'<div class="sdt">SOLD OUT</div>':''}</div>${it.pm?`<div class="pt">${RAR[n]} · 1 ใบ/วัน</div>`:''}<div class="cpr">⭐ ${pr} แต้ม</div><div class="cst">มีอยู่ ${fgCt(n)} ใบ</div><button type="button" data-m="cbuy" data-n="${mlEsc(n)}" ${why?'disabled':''}>${why||'ซื้อ'}</button></div>`};
+    return `${back}${head}<div class="csn"><div>แตะการ์ด 2 ครั้งเพื่อดูความสามารถ</div><div>สต็อกรีเซ็ตในอีก ~${hr} ชม. · ${pm?'วันนี้มี '+RAR[pm.n]+' มาวางขาย!':'วันนี้ไม่มี SR/UR'}</div><div>ทุกร้านมี SR/UR จำนวนเท่ากันในแต่ละวัน · ซื้อได้ 1 ใบต่อวัน (รวมทุกร้าน)</div><div>แต้มร้านได้จากการสู้กับคนในร้านเท่านั้น</div><div>การ์ดแต่ละใบซื้อได้ 1 ใบต่อวัน และถือได้ไม่เกิน 3 ใบต่อชื่อ</div></div>
     ${nt}<div class="panel"><b>การ์ดประจำวัน</b> <span class="meta">${st.length} ใบ · C ${SP_PRICE.C} · R ${SP_PRICE.R} · SR ${SP_PRICE.SR} · UR ${SP_PRICE.UR} แต้ม</span><div style="margin-top:6px"><b>⭐ แต้มร้านของคุณ: ${sp.pt}</b> <span class="meta">(ชนะดวล +${SP_WIN} · แพ้ +${SP_LOSE})</span></div><div class="csg" style="margin-top:8px">${st.map(cell).join('')}</div></div>${SHD&&CARDS[SHD]?detail({...CARDS[SHD],n:SHD}):''}`}
   if(CSW=='fight'){
     const rk=sp.rk[sp.a]||0;
