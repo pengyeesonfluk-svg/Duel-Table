@@ -1746,7 +1746,7 @@ EFXT['Spikeworm Burrower']='ฟลิป: ส่งการ์ด 5 ใบบ�
 function RD(){return [0,1].some(z=>G.b[z].some(e=>e&&e.tr&&e.k=='rd'&&e.st!==G.n))} // Edict of the Palace: กับดักอื่นไม่ทำงาน
 function CDK(){return !RD()&&[0,1].some(z=>G.b[z].some(e=>e&&e.tr&&e.k=='cdk'&&e.st!==G.n))} // Whispers from Darkness: ห้ามใช้ Soul Recall + มอนสเตอร์ที่ชุบด้วย Soul Recall ลงสุสาน
 // ===== ระบบ Chain แบบ EDOPro / Master Duel: กับดักและสกิลต้องกด "ใช้" เอง · ประมวลผลจาก Chain ล่าสุดไป Chain แรก =====
-const TRG={pit:'sum',tp:'atk',jd:'atk',rf:'bat',cw:'bat',rvt:'spl',nd:'spl',nr:'spl',ar:'spl',mfh:'spl',cod:'flp',snf:'sum'}; // กับดัก -> เหตุการณ์ที่ใช้ได้
+const TRG={pit:'sum',tp:'atk',jd:'atk',rf:'bat',cw:'bat',rvt:'spl',nd:'spl',nr:'spl',ar:'spl',mfh:'spl',cod:'flp',snf:'sum',mf:'atk',gw:'spl'}; // กับดัก -> เหตุการณ์ที่ใช้ได้
 function trapOk(e,ev){if(e.k=='hmr')return false; // e = กับดักของฝั่งที่ตอบโต้ · ev = เหตุการณ์ {t,p(ผู้กระทำ),m,c,tg,pos}
   if(!e||!e.tr||e.cl||RD()||(MAN(e.k)?e.ac:e.k=='jd'?false:(e.k=='pit'?(ev.t!='sum'&&ev.t!='flp'):TRG[e.k]!=ev.t)))return false; // Crimson Tribute (กับดักต่อเนื่อง) เปิดได้ทุกช่วงที่คู่ต่อสู้ทำอะไรก็ได้
   const q=1-ev.p,c=ev.c,m=ev.m;
@@ -1762,6 +1762,7 @@ function trapOk(e,ev){if(e.k=='hmr')return false; // e = กับดักข�
     case'nd':return c.k=='dh';
     case'nr':return c.k=='rev';
     case'gw':return c.k=='hfd';
+    case'mf':return G.f[ev.p].some(x=>x&&x.pos=='a'); // Aegis Rebound: ขึ้นเชนตอนประกาศโจมตี ถ้าฝั่งผู้โจมตีมีมอนสเตอร์ท่าโจมตี
     case'ar':return c.k=='dh'||c.k=='fis'||!!XT[c.k];
     case'mfh':return !!c&&isTgSp(c.k)&&mfhAlt(c.k,ev.p,ev.st).length>0; // เวทที่เลือกเป้าหมาย และมีเป้าหมายอื่นให้เปลี่ยน
     default:return true; // jd, cod
@@ -6186,7 +6187,7 @@ function cshopList(sp,nt){
 const SP_BOT=[{n:'เด็กในร้าน',i:'🧒',c:40,lp:8000,d:'ลูกหลานเจ้าของร้านที่เพิ่งหัดเล่น'},{n:'ผู้เล่นฝีมือดี',i:'🎴',c:80,lp:8000,d:'ลูกค้าประจำที่ไม่ยอมใคร'},{n:'พนักงานขาย',i:'🧑‍💼',c:120,lp:8000,d:'รู้จักการ์ดทุกใบในร้านเป็นอย่างดี'},{n:'รองผู้จัดการ',i:'👔',c:160,lp:8000,d:'มือดีอันดับสองของร้าน'},{n:'เจ้าของร้าน',i:'👑',c:200,lp:8000,d:'ผู้ที่ไม่เคยแพ้ใครในร้านนี้'}];
 
 /* ===== แข่งขันประจำสัปดาห์ (16 ทีม แพ้คัดออก) ===== */
-const WK_RN=['รอบ 16 ทีม','รอบ 8 ทีม','รอบรองชนะเลิศ','รอบชิงชนะเลิศ'],WK_RW=[100,200,300,500],WK_FEE=250,WK_LP=[8000,8000,8000,8000],WK_LOSE=20,
+const WK_RN=['รอบ 16 ทีม','รอบ 8 ทีม','รอบรองชนะเลิศ','รอบชิงชนะเลิศ'],WK_RW=[100,200,300,400],WK_CH=500,WK_FEE=250,WK_LP=[8000,8000,8000,8000],WK_LOSE=20,
   WK_NM=['ราชันย์เงา','มังกรทมิฬ','แชมป์เก่า','นักล่าแสง','จอมขมังเวท','อัศวินเหล็ก','เทพเจ้าไพ่','ผู้คุมสุสาน','ราชินีอัคคี','นักสะสมลึกลับ','จอมยุทธ์พายุ','ปีศาจพิธีกรรม','เซียนหลอมรวม','เจ้าสำนักไพ่','ผู้พิชิตไร้พ่าย','จอมมารกับดัก','ราชาแห่งหิน','ผู้เล่นนิรนาม'],
   WK_IC=['🐉','👹','🏆','🦅','🧙','🛡','🎴','💀','🔥','🕵','🌪','😈','⚗','🏯','⚔','🪤','⛰','🎭'];
 function wkKey(){const d=new Date();return dKey(new Date(d.getFullYear(),d.getMonth(),d.getDate()-(d.getDay()+6)%7))} // สัปดาห์เริ่มวันจันทร์
@@ -6214,16 +6215,16 @@ function wkPrize(){ // การ์ด UR มอนสเตอร์ธาต�
   return p.length?p[Math.random()*p.length|0]:null}
 function wkReward(win){
   const W=wkGet();if(!W||W.st!='run'){RW='';return}
-  const r=W.r,c=win?WK_RW[r]:WK_LOSE;W.dv=0;
+  const r=W.r,c=win?(r>=3?WK_CH:0):WK_RW[r];W.dv=0;
   if(win){wkSim(W,r,true);if(r>=3)W.st='champ';else W.r=r+1}else wkOut(W);
   S.coins+=c;let pz='';
   if(win&&r>=3){const pn=wkPrize();if(pn){S.col[pn]=(S.col[pn]||0)+1;if(!S.champ||typeof S.champ!='object')S.champ={};S.champ[pn]=1;pz=' + การ์ด UR '+pn+' (ป้ายแชมป์ประจำสัปดาห์)'}}
   QP('play');if(win)QP('win');const sn=shPlay();save();
-  RW=(win?(r>=3?'🏆 แชมป์ประจำสัปดาห์! +'+c+' เหรียญ'+pz:WK_RN[r]+' · ชนะ +'+c+' เหรียญ · เข้า'+WK_RN[r+1]):'ตกรอบที่'+WK_RN[r]+' · +'+c+' เหรียญ')+(sn?' · พัสดุการ์ดมาถึงแล้ว ดูที่จดหมาย ✉':'')}
+  RW=(win?(r>=3?'🏆 แชมป์ประจำสัปดาห์! +'+c+' เหรียญ'+pz:WK_RN[r]+' · ชนะ · เข้า'+WK_RN[r+1]):'ตกรอบที่'+WK_RN[r]+' · +'+c+' เหรียญ')+(sn?' · พัสดุการ์ดมาถึงแล้ว ดูที่จดหมาย ✉':'')}
 function wkHtml(back,head,nt){
   const W=wkGet();wkChk(W);
-  const open=wkOpenNow(),rw=WK_RN.map((n,i)=>`<span>${n} +${WK_RW[i]} 🪙</span>`).join(' · ');
-  const info=`<div class="csn"><div>เปิดทุกวันศุกร์ · เสาร์ · อาทิตย์ เวลา 18:00–23:59 น.</div><div>แข่งได้ 1 ครั้งต่ออาทิตย์ · เริ่มแล้วนับสิทธิ์ทันที (ชนะหรือแพ้ก็นับ · ออกกลางคันเท่ากับยอมแพ้)</div><div>แข่งแบบแพ้คัดออก 16 ทีม · สุ่มเจอบอทที่เก่งมาก · LP บอท 8000 ทุกรอบ</div><div>รางวัลเมื่อชนะ: ${rw}</div><div>ค่าสมัคร ${WK_FEE} 🪙 ต่อครั้ง · แชมป์รับ ${WK_RW[3]} 🪙 + การ์ดมอนสเตอร์ UR ธาตุ${(SPA.find(x=>x[0]==spGet().a)||[])[1]||''}ของร้าน 1 ใบ พร้อมป้าย 🏆 แชมป์ประจำสัปดาห์</div></div>`;
+  const open=wkOpenNow(),rw=WK_RN.map((n,i)=>`<span>แพ้${n} +${WK_RW[i]} 🪙</span>`).join(' · ');
+  const info=`<div class="csn"><div>เปิดทุกวันศุกร์ · เสาร์ · อาทิตย์ เวลา 18:00–23:59 น.</div><div>แข่งได้ 1 ครั้งต่ออาทิตย์ · เริ่มแล้วนับสิทธิ์ทันที (ชนะหรือแพ้ก็นับ · ออกกลางคันเท่ากับยอมแพ้)</div><div>แข่งแบบแพ้คัดออก 16 ทีม · สุ่มเจอบอทที่เก่งมาก · LP บอท 8000 ทุกรอบ</div><div>รางวัลเมื่อแพ้: ${rw} · <span>ชนะรอบชิงชนะเลิศ +${WK_CH} 🪙</span></div><div>ค่าสมัคร ${WK_FEE} 🪙 ต่อครั้ง · แชมป์รับ ${WK_CH} 🪙 + การ์ดมอนสเตอร์ UR ธาตุ${(SPA.find(x=>x[0]==spGet().a)||[])[1]||''}ของร้าน 1 ใบ พร้อมป้าย 🏆 แชมป์ประจำสัปดาห์</div></div>`;
   let st,btn;
   if(!W){st=open?'<b>เปิดแล้ว · พร้อมแข่งขัน</b>':'🔒 <b>ล็อกอยู่</b> · เปิดรอบถัดไป '+wkNextTxt();btn=`<button type="button" data-m="wks" ${open?'':'disabled'}>${open?'สมัครแข่งขัน · '+WK_FEE+' 🪙':'🔒 ยังไม่เปิด'}</button>`}
   else if(W.st=='run'){st='กำลังแข่งอยู่ · '+WK_RN[W.r];btn=`<button type="button" data-m="wks">ต่อการแข่งขัน · ${WK_RN[W.r]}</button>`}
@@ -6237,7 +6238,7 @@ function wkStart(){
   if(!okDeck(S.deck,S.extra))return badDeck();
   if(!W){
     if(S.coins<WK_FEE)return say('เหรียญไม่พอ · ค่าสมัครแข่งขัน '+WK_FEE+' เหรียญ');
-    return spAsk('🏆 สมัครแข่งขันประจำสัปดาห์','ค่าสมัคร <b>'+WK_FEE+' เหรียญ</b> ต่อครั้ง<br>แชมป์รับ '+WK_RW[3]+' เหรียญ + การ์ด UR ธาตุร้าน 1 ใบ<br>ออกกลางคันเท่ากับยอมแพ้ (ไม่คืนค่าสมัคร)','จ่าย '+WK_FEE+' 🪙 และเริ่มแข่ง',()=>{
+    return spAsk('🏆 สมัครแข่งขันประจำสัปดาห์','ค่าสมัคร <b>'+WK_FEE+' เหรียญ</b> ต่อครั้ง<br>แชมป์รับ '+WK_CH+' เหรียญ + การ์ด UR ธาตุร้าน 1 ใบ<br>ออกกลางคันเท่ากับยอมแพ้ (ไม่คืนค่าสมัคร)','จ่าย '+WK_FEE+' 🪙 และเริ่มแข่ง',()=>{
       if(wkGet()||S.coins<WK_FEE)return;S.coins-=WK_FEE;const N=wkNew();renderScr();wkShowBr(N,{zoom:true,cb:wkDuel})})}
   wkShowBr(W,{zoom:true,cb:wkDuel})}
 function wkDuel(){
