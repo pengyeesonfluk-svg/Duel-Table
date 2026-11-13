@@ -5601,7 +5601,7 @@ function mlBanner(r){ // แบนเนอร์สรุปของที่�
   ov.addEventListener('click',e=>{if(e.target.id=='mlbk')close()});
   document.body.appendChild(ov);const b=ov.querySelector('#mlbk');if(b)b.focus()}
 document.addEventListener('click',e=>{if(e.target.closest&&e.target.closest('#mlb'))mlShow()});
-function reward(w){if(WKR>=0)return wkReward(w);let c=w?30:10,txt;
+function reward(w){if(WKR>=0)return wkReward(w);let c=w?50:20,txt;
   if(SPG>=0){const sp=spGet(),p=w?SP_WIN:SP_LOSE,nm=SP_BOT[SPG].n;sp.pt+=p;c=w?SP_BOT[SPG].c:0; // ดวลในร้าน: ได้แต้มร้าน + ถ้าชนะได้เหรียญตามระดับคู่ต่อสู้ (40/80/120/160/200)
     txt='ได้รับ '+p+' แต้มร้าน (รวม '+sp.pt+' แต้ม)'+(w?' + '+c+' เหรียญ · ชนะ'+nm:' · แพ้'+nm);
     if(w&&sp.a&&SPG==(sp.rk[sp.a]||0)){sp.rk[sp.a]=SPG+1;txt+=SPG+1<SP_BOT.length?' · ปลดล็อก '+SP_BOT[SPG+1].n:' · คุณขึ้นเป็นเจ้าของร้านแล้ว!'}
@@ -6394,7 +6394,7 @@ function renderScr(){
     ${P.le?`<div class=\"panel\"><b>เลือกซอง</b><div class=\"meta\" style=\"margin:4px 0\">เลื่อนซ้าย-ขวา แล้วแตะซองที่ต้องการ</div><div class=\"lesr\">${P.sub.map((s,i)=>`<button type=\"button\" data-m=\"lesel\" data-i=\"${i}\" class=\"lesc${i==LESEL?' on':''}\"><div class=\"pkart cv\">${packCover(s)}</div><b>${s.t2}</b><span class=\"meta\">${s.rare().join(' · ')}</span></button>`).join('')}</div></div>`:''}
     ${RES?`<div class="panel"><b>การ์ดที่ได้</b><div class="pool" style="margin-top:8px">${RES.map(r=>tile(r.n,{sh:1,sel:r.n==SHSEL,badge:r.ex?'+'+EXC(r.n):r.nw?'NEW':''})).join('')}</div></div>`:''}
     <div class="panel"><b>${P.sd?'การ์ดในชุดนี้':'การ์ดในซองนี้'}</b><div class="stat" style="margin:6px 0"><span class="${own.length==all.length?'ok':''}">สะสมแล้ว ${own.length}/${all.length} แบบ</span><span>รวม ${tot} ใบ</span></div><div class="tabs">${[['all','ทั้งหมด'],['own','ที่มีแล้ว'],['miss','ที่ยังขาด']].map(([f,t])=>`<button data-m="pf" data-f="${f}" class="${PF==f?'on':''}">${t}</button>`).join('')}</div><div class="meta" style="margin:6px 0">◆ ขอบเรืองแสง = หายาก · ตัวเลข ×n = จำนวนที่มี · การ์ดจางๆ = ยังไม่มี · แตะการ์ด 2 ครั้งเพื่อดูความสามารถ</div><div class="pool">${shown.map(n=>tile(n,{sh:1,sel:n==SHSEL,badge:S.col[n]?'×'+S.col[n]:'',mx:!S.col[n]})).join('')||'<div class="meta">ไม่มีการ์ดในหมวดนี้</div>'}</div></div>
-    <div class="meta">ชนะดวลได้ 30 เหรียญ แพ้ได้ 10 เหรียญ</div>${nt}${SHD&&CARDS[SHD]?detail({...CARDS[SHD],n:SHD}):''}`;
+    <div class="meta">ชนะดวลได้ 50 เหรียญ แพ้ได้ 20 เหรียญ</div>${nt}${SHD&&CARDS[SHD]?detail({...CARDS[SHD],n:SHD}):''}`;
   }
   else if(SCREEN=='save')h=`${coin}<div class="panel"><b>ตั้งค่า</b><div class="btns" style="margin-top:8px"><button id="sdb" type="button">${sdTxt()}</button></div></div><div class="panel"><b>เซฟ / โหลดข้อมูล</b>
     <div class="meta" style="margin:4px 0 8px">เกมบันทึกอัตโนมัติในเบราว์เซอร์นี้ · การ์ด ${Object.values(S.col).reduce((a,b)=>a+b,0)} ใบ · เด็ค ${S.deck.length} ใบ<br>การโหลดจะทับข้อมูลปัจจุบันทั้งหมด</div>
